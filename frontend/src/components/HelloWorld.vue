@@ -89,7 +89,7 @@
       href: 'https://discord.vuetifyjs.com',
       icon: 'mdi-account-group-outline',
       subtitle: 'Connect with Vuetify developers.',
-      title: 'Discord',
+      title: 'Discord oder so',
     },
   ]
 </script>
