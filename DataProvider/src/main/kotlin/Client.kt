@@ -1,14 +1,13 @@
 package de.enebnelung
 
-import com.microsoft.azure.sdk.iot.device.ConnectionStatusChangeContext
-import com.microsoft.azure.sdk.iot.device.DeviceClient
-import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeReason
-import com.microsoft.azure.sdk.iot.device.Message
+import com.microsoft.azure.sdk.iot.device.*
 import com.microsoft.azure.sdk.iot.device.exceptions.IotHubClientException
 import com.microsoft.azure.sdk.iot.device.transport.IotHubConnectionStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -17,44 +16,39 @@ fun main() = Client.run()
 
 object Client {
     var connectionState: IotHubConnectionStatus = IotHubConnectionStatus.DISCONNECTED
-    val onConnectionStatusChanged: (ConnectionStatusChangeContext) -> Unit = { ctx ->
-        val status: IotHubConnectionStatus = ctx.newStatus
-        val statusChangeReason: IotHubConnectionStatusChangeReason = ctx.newStatusReason
-        val throwable: Throwable? = ctx.cause
-
-        println()
-        println("CONNECTION STATUS UPDATE: $status")
-        println("CONNECTION STATUS REASON: $statusChangeReason")
-        println("CONNECTION STATUS THROWABLE: " + (if (throwable == null) "null" else throwable.message))
-        println()
-
-        throwable?.printStackTrace()
-        val msg = when (status) {
-            IotHubConnectionStatus.DISCONNECTED ->
-                "The connection was lost, and is not being re-established." +
-                        " Look at provided exception for how to resolve this issue." +
-                        " Cannot send messages until this issue is resolved, and you manually re-open the device client"
-
-            IotHubConnectionStatus.DISCONNECTED_RETRYING ->
-                """The connection was lost, but is being re-established.
-                   Can still send messages, but they won't be sent until the connection is re-established""".trimIndent().replace('\n', ' ')
-
-            IotHubConnectionStatus.CONNECTED -> "The connection was successfully established. Can send messages."
-        }
-    }
 
     @OptIn(ExperimentalUuidApi::class)
     fun run() = runBlocking {
         val connectionString = Env.connectionString
         val protocol = Env.getProtocol()
 
+        // create client and open connection
         val client = DeviceClient(connectionString, protocol).apply {
-            setConnectionStatusChangeCallback(onConnectionStatusChanged, null)
+            setConnectionStatusChangeCallback(::onConnectionStatusChanged, null)
+            setMessageCallback(::onCloudToDeviceMessageReceived, null)
             open(true)
         }
-        println("Client opened")
 
-        for (i in 0 until Env.numOfMessages) {
+        // wait until connection is established or null
+        val connected = withTimeoutOrNull<Boolean>(5.seconds) {
+            while (connectionState != IotHubConnectionStatus.CONNECTED) {
+                delay(100.milliseconds)
+            }
+            return@withTimeoutOrNull true
+        } == true
+
+        // check for connection
+        if (!connected) {
+            println("Connection could not be opened. Exiting...")
+            return@runBlocking
+        } else {
+            println("Connected to IoTHub!")
+        }
+
+        // --> connection is open
+
+        // send random messages to IoTHub
+        repeat(Env.numOfMessages) {
             val temperature = 20 + Math.random() * 10
             val humidity = 30 + Math.random() * 20
 
@@ -76,6 +70,32 @@ object Client {
             }
         }
 
+        readln()
         client.close()
+    }
+
+    private fun onCloudToDeviceMessageReceived(msg: Message, context: Any?): IotHubMessageResult {
+        val msgStr = msg.bytes.toString(Message.DEFAULT_IOTHUB_MESSAGE_CHARSET)
+        println("Received message with content: $msgStr")
+        // Notify IoT Hub that the message
+        return IotHubMessageResult.COMPLETE
+    }
+
+    private fun onConnectionStatusChanged(ctx: ConnectionStatusChangeContext) {
+        val status: IotHubConnectionStatus = ctx.newStatus
+        val statusChangeReason: IotHubConnectionStatusChangeReason = ctx.newStatusReason
+        val throwable: Throwable? = ctx.cause
+
+        println(
+            """
+            CONNECTION STATUS:
+                UPDATE: $status
+                REASON: $statusChangeReason
+                THROWABLE: ${if (throwable == null) "null" else throwable.message}
+        """.trimIndent()
+        )
+        throwable?.printStackTrace()
+
+        connectionState = status
     }
 }
