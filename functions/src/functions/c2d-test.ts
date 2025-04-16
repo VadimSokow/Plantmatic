@@ -17,20 +17,13 @@ export async function c2dTest(request: HttpRequest, context: InvocationContext):
     try {
         const body: RequestBody = await request.json() as RequestBody;
         context.log(body);
-
-        return {
-            body: JSON.stringify({
-                deviceId: body.deviceId,
-                value: body.message.value
-            })
-        };
-        // const registry = Client.fromConnectionString(iotHubConnectionString);
-        // await registry.send(body.deviceId, body.message);
+        const client = Client.fromConnectionString(iotHubConnectionString);
+        await client.send(body.deviceId, JSON.stringify(body.message));
     } catch (e) {
         context.error("Error:", e);
     }
 
-    return {body: 'Error'};
+    return { status: 200 };
 }
 
 app.http('c2dTest', {
