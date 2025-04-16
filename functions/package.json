@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@azure/cosmos": "^4.3.0",
-    "@azure/functions": "^4.0.0"
+    "@azure/functions": "^4.0.0",
+    "azure-iothub": "^1.16.5"
   },
   "devDependencies": {
     "@types/node": "^20.x",
