@@ -9,8 +9,8 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-const route = useRoute();
-const id = ref<string>(route.params['id']);
+const route = useRoute('/plants/[id]');
+const id = ref<string>(route.params.id);
 const plant = ref<{ name: string; details: string }>({ name: '', details: '' });
 
 onMounted(() => {
