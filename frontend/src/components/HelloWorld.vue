@@ -13,11 +13,6 @@
       </div>
 
       <v-row>
-        <v-card title="Test Card" text="Manfred muss das mögen!">
-          <v-card-actions>
-            <v-btn>Clicky!</v-btn>
-          </v-card-actions>
-        </v-card>
         <v-col cols="12">
           <v-card
             class="py-4"
@@ -89,7 +84,7 @@
       href: 'https://discord.vuetifyjs.com',
       icon: 'mdi-account-group-outline',
       subtitle: 'Connect with Vuetify developers.',
-      title: 'Discord oder so',
+      title: 'Community',
     },
   ]
 </script>
