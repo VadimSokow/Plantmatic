@@ -3,7 +3,6 @@ import time
 from typing import Optional, Tuple
 from ...interfaces.sensor_interface import TempHumiditySensorInterface
 
-
 class DHT11Sensor(TempHumiditySensorInterface):
     def __init__(self, pin):
         self.pin = pin
