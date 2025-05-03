@@ -29,11 +29,18 @@ msalInstance.addEventCallback((event) => {
   }
 });
 
-await msalInstance.initialize();
-const app = createApp(App)
 
-registerPlugins(app)
+async function init() {
+  await msalInstance.initialize();
+  const app = createApp(App)
 
-router.isReady().then(() => {
-  app.mount('#app');
+  registerPlugins(app)
+
+  router.isReady().then(() => {
+    app.mount('#app');
+  });
+}
+
+init().catch((error) => {
+  console.error("Error during initialization:", error);
 });
