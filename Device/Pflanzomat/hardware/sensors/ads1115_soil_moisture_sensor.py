@@ -31,7 +31,7 @@ class ADS1115SoilSensor(SoilMoistureSensorInterface):
             self.ads = ADS.ADS1115(i2c, address=self.i2c_address)
             self.ads.gain = 1
             self.chan = AnalogIn(self.ads, self.adc_channel)
-            print(f"ADS1115 an Adresse {hex(self.i2c_address)} initialisiert für Kanal {self.adc_channel}.")
+            #print(f"ADS1115 an Adresse {hex(self.i2c_address)} initialisiert für Kanal {self.adc_channel}.")
         except ValueError:
             print(f"Fehler: ADS1115 an Adresse {hex(self.i2c_address)} nicht gefunden. Verbindung prüfen & I2C aktiviert?")
             self.ads = None
@@ -53,7 +53,7 @@ class ADS1115SoilSensor(SoilMoistureSensorInterface):
         try:
             # Spannung auslesen
             current_voltage = self.chan.voltage
-            print(f"DEBUG: Gemessene Spannung: {current_voltage:.3f} V") # Zum Debuggen/Kalibrieren
+            #print(f"DEBUG: Gemessene Spannung: {current_voltage:.3f} V") # Zum Debuggen/Kalibrieren
 
             range_voltage = self.voltage_dry - self.voltage_wet
             if range_voltage <= 0:

@@ -1,6 +1,6 @@
 import board
 import adafruit_ads1x15.ads1115 as ADS
-
+# todo requirements.txt erstellen 
 # todo beim Start config aus cloud laden / bei config änderung sendet cloud config Daten
 # --- Pin Konfiguration (BCM Nummerierung) ---
 DHT11_PIN = board.D4
