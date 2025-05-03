@@ -17,7 +17,7 @@ class DHT11Sensor(TempHumiditySensorInterface):
         """Interne Setup-Methode."""
         try:
             self.dht_device = adafruit_dht.DHT11(self.pin, use_pulseio=False)
-            print(f"DHT11 Sensor an GPIO {self.pin.id} initialisiert.")
+            #print(f"DHT11 Sensor an GPIO {self.pin.id} initialisiert.")
         except RuntimeError as error:
             print(f"Fehler bei der Initialisierung des DHT11: {error.args[0]}")
             self.dht_device = None
