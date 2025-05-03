@@ -1,0 +1,38 @@
+import axios from "axios";
+import {loginRequest} from "../authConfig";
+import {msalInstance} from "../authConfig";
+import {InteractionRequiredAuthError, InteractionStatus} from "@azure/msal-browser";
+
+export const apiClient = axios.create({
+  baseURL: 'https://plantmaticfun.azurewebsites.net/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+apiClient.interceptors.request.use(
+  async (config) => {
+    const response = await msalInstance.acquireTokenSilent({
+      ...loginRequest
+    }).catch(async (e) => {
+      if (e instanceof InteractionRequiredAuthError) {
+        await msalInstance.acquireTokenRedirect(loginRequest);
+      }
+      throw e;
+    });
+    if (response.accessToken) {
+      config.headers.Authorization = `Bearer ${response.accessToken}`;
+    } else {
+      console.error("No access token found");
+      return Promise.reject(new Error("No access token found"));
+    }
+    return config;
+  }, (error) => {
+    return Promise.reject(error);
+  }
+)
+
+export const getDeviceId = async (input_id: string) => {
+  const response = await apiClient.get(`/device/${input_id}`);
+  return response.data;
+}

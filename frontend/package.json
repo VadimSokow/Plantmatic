@@ -12,6 +12,7 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@azure/msal-browser": "^4.11.1",
     "@mdi/font": "7.4.47",
     "axios": "^1.8.4",
     "roboto-fontface": "*",

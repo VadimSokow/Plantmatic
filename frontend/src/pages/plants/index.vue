@@ -8,11 +8,14 @@
         <v-list-item-subtitle>Letzte Messung: {{ plant.lastMeasurement }}</v-list-item-subtitle>
       </v-list-item>
     </v-list>
+    <v-divider></v-divider>
+    <h2>Gerät ID: {{ deviceId }}</h2>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import {getDeviceId} from "@/api/client.ts";
 // Importiere deinen Pinia Store, falls du ihn für die Pflanzenliste nutzt
 // import { usePlantStore } from '@/stores/plant';
 
@@ -23,6 +26,7 @@ interface Plant {
 }
 
 const plants = ref<Plant[]>([]);
+const deviceId = ref<string>('');
 // const plantStore = usePlantStore();
 
 onMounted(() => {
@@ -33,5 +37,10 @@ onMounted(() => {
     { id: 1, name: 'Tomate #1', lastMeasurement: 'Gestern' },
     { id: 2, name: 'Basilikum', lastMeasurement: 'Heute Morgen' },
   ];
+  getDeviceId('12312-manfred').then((data) => {
+    deviceId.value = data;
+  }).catch((err) => {
+    console.error('Error fetching device ID:', err);
+  });
 });
 </script>
