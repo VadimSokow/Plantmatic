@@ -1,0 +1,408 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Plantmatic API",
+    "description": "The API for the Plantmatic Web App.",
+    "version": "0.1.0"
+  },
+  "host": "plantfun.azurewebsites.net/api",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "implicit",
+      "authorizationUrl": "TODO/AUTH/URL/FROM/ENTRA/EXTERNAL/ID",
+      "scopes": {}
+    }
+  },
+  "security": [
+    {
+      "oauth2": []
+    }
+  ],
+  "paths": {
+    "/devices": {
+      "get": {
+        "description": "Gibt eine Liste von Geräte, auf die der Nutzer zugriff hat, zurück.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "devices": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Die ID des Gerätes."
+                      },
+                      "owner": {
+                        "type": "string",
+                        "description": "Der Besitzer des Gerätes."
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Der Typ des Gerätes."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/devices/{id}": {
+      "get": {
+        "description": "Gibt die Details eines Gerätes zurück.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Die ID des Gerätes."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "device": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Die ID des Gerätes."
+                    },
+                    "owner": {
+                      "type": "string",
+                      "description": "Der Besitzer des Gerätes."
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Der Typ des Gerätes."
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Der Name des Gerätes."
+                        },
+                        "location": {
+                          "type": "string",
+                          "description": "Der Standort des Gerätes."
+                        }
+                      }
+                    },
+                    "state": {
+                      "type": "object",
+                      "$ref": "#/definitions/state",
+                      "description": "Der aktuelle Zustand des Gerätes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/devices/{id}/states": {
+      "get": {
+        "description": "Gibt den historischen Zustand eines Gerätes zurück.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Die ID des Gerätes."
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64",
+            "description": "Der Startzeitpunkt (Unix-Zeitstempel) für die historischen Daten."
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64",
+            "description": "Der Endzeitpunkt (Unix-Zeitstempel) für die historischen Daten."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/state"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/devices/{id}/states/request": {
+      "get": {
+        "description": "Fordert den aktuellen Zustand eines Gerätes an.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Die ID des Gerätes."
+          },
+          {
+            "name": "timeout",
+            "in": "query",
+            "required": false,
+            "default": 3,
+            "type": "integer",
+            "description": "Die maximale Wartezeit (in Sekunden) für die Antwort.",
+            "maximum": 5,
+            "minimum": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/state"
+            }
+          },
+          "201": {
+            "description": "Anfrage erfolgreich gesendet, aber noch keine Antwort erhalten."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/devices/{id}/config": {
+      "get": {
+        "description": "Gibt die Konfiguration eines Gerätes zurück.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Die ID des Gerätes."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/deviceConfig"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "description": "Aktualisiert die Konfiguration eines Gerätes.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Die ID des Gerätes."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/deviceConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/devices/{id}/action/pump": {
+      "post": {
+        "description": "Steuert die Pumpe eines Gerätes.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Die ID des Gerätes."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "on"
+                      ]
+                    },
+                    "duration": {
+                      "type": "integer",
+                      "description": "Die Dauer des Einschaltens der Pumpe in Sekunden."
+                    }
+                  },
+                  "required": [
+                    "action",
+                    "duration"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "off"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "action"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/state"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "state": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "temperature_celsius": {
+          "type": "integer"
+        },
+        "humidity_percent": {
+          "type": "integer"
+        },
+        "soil_moisture_percent": {
+          "type": "integer"
+        },
+        "light_level_percent": {
+          "type": "integer"
+        },
+        "pump_on": {
+          "type": "boolean"
+        },
+        "led_color": {
+          "type": "string"
+        }
+      }
+    },
+    "deviceConfig": {
+      "type": "object",
+      "properties": {
+        "send_frequency": {
+          "type": "integer",
+          "description": "Die Frequenz, in der die Daten gesendet werden (in Sekunden)."
+        },
+        "min_humidity_percent": {
+          "type": "integer",
+          "description": "Die minimale Luftfeuchtigkeit, bei der die Pumpe eingeschaltet wird."
+        },
+        "max_humidity_percent": {
+          "type": "integer",
+          "description": "Die maximale Luftfeuchtigkeit, bei der die Pumpe ausgeschaltet wird."
+        }
+      }
+    }
+  }
+}
