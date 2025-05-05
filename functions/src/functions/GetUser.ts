@@ -5,7 +5,7 @@ export async function getUser(request: HttpRequest, context: InvocationContext):
   const principalHeader = request.headers.get("x-ms-client-principal");
 
   if (!principalHeader) {
-    return { status: 401, body: "Nicht authentifiziert" };
+    return { status: 401, body: "Nicht authentifiziert bitte zurück zur Anmeldung" };
   }
 
   const decoded = Buffer.from(principalHeader, "base64").toString("utf8");
