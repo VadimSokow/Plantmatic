@@ -14,8 +14,8 @@ export async function getUser(request: HttpRequest, context: InvocationContext):
   return {
     status: 200,
     jsonBody: {
-      id: principal.userId,
-      email: principal.userDetails,
+      username: principal.preferred_username,
+      email: principal.email,
       roles: principal.userRoles,
     },
   };
