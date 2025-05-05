@@ -45,7 +45,7 @@ export async function GetClaims(request: HttpRequest, context: InvocationContext
 }
 
 // Funktion registrieren (neue Syntax)
-app.http("GetClaims", {
+app.http("getUser", {
   methods: ["GET", "POST"],
   authLevel: "anonymous",
   handler: GetClaims,
