@@ -4,7 +4,7 @@ import {LogLevel, PublicClientApplication} from '@azure/msal-browser';
 export const msalConfig = {
   auth: {
     clientId: 'b3763c91-c7c2-460e-b201-c20b7a2f1f4a',
-    authority: 'https://PlantmaticExternalID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880',
+    authority: 'https://login.microsoftonline.com/ecb007b7-2fe6-4285-85da-a28ec3437880',
     redirectUri: '/', // Must be registered as a SPA redirectURI on your app registration
     postLogoutRedirectUri: '/' // Must be registered as a SPA redirectURI on your app registration
   },
