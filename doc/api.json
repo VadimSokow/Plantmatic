@@ -250,7 +250,7 @@
           }
         }
       },
-      "post": {
+      "put": {
         "description": "Aktualisiert die Konfiguration eines Gerätes.",
         "parameters": [
           {
