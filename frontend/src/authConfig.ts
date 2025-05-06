@@ -4,7 +4,7 @@ import {LogLevel, PublicClientApplication} from '@azure/msal-browser';
 export const msalConfig = {
   auth: {
     clientId: 'b3763c91-c7c2-460e-b201-c20b7a2f1f4a',
-    authority: 'https://PlantmaticID.ciamlogin.com/PlantmaticID.onmicrosoft.com/oauth2/v2.0/authorize?client_id=05048acd-bf0d-46d1-9c77-1fa3c8c218a4&nonce=KVjspJba6L&redirect_uri=https://plantfun.azurewebsites.net/.auth/login/aad/callback&scope=openid&response_type=id_token&prompt=login',
+    authority: 'https://PlantmaticID.ciamlogin.com/PlantmaticID.onmicrosoft.com',
     redirectUri: '/', // Must be registered as a SPA redirectURI on your app registration
     postLogoutRedirectUri: '/' // Must be registered as a SPA redirectURI on your app registration
   },
