@@ -1,5 +1,5 @@
 <template>
-  <v-btn type="primary" @click="logoutRedirect">Sign In</v-btn>
+  <v-btn type="primary" @click="logoutRedirect">Sign Out</v-btn>
 </template>
 
 <script setup lang="ts">

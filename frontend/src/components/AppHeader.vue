@@ -20,6 +20,7 @@ const logout = () => {
     <v-btn to="/plants">Pflanzen</v-btn>
     <v-btn to="/settings">Einstellungen</v-btn>
 <!--    <v-btn @click="logout()">Logout</v-btn>-->
+    <SignInButton/>
     <SignOutButton/>
   </v-app-bar>
 </template>
