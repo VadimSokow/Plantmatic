@@ -43,7 +43,7 @@ export const msalInstance = new PublicClientApplication(msalConfig);
 
 // Add here scopes for id token to be used at MS Identity Platform endpoints.
 export const loginRequest = {
-  scopes: ['User.Read', 'api://b3763c91-c7c2-460e-b201-c20b7a2f1f4a/PlantAPI'],
+  scopes: ['User.Read', 'user_impersonation'],
 };
 
 export const tokenRequest = {
