@@ -4,7 +4,7 @@ import {msalInstance} from "../authConfig";
 import {InteractionRequiredAuthError, InteractionStatus} from "@azure/msal-browser";
 
 export const apiClient = axios.create({
-  baseURL: 'https://plantmaticfun.azurewebsites.net/api',
+  baseURL: 'https://plantfun.azurewebsites.net/api',
   headers: {
     'Content-Type': 'application/json',
   },
