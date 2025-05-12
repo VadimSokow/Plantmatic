@@ -1,5 +1,5 @@
 import axios from "axios";
-import {loginRequest} from "../authConfig";
+import {loginRequest, tokenRequest} from "../authConfig";
 import {msalInstance} from "../authConfig";
 import {InteractionRequiredAuthError, InteractionStatus} from "@azure/msal-browser";
 
@@ -13,10 +13,10 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(
   async (config) => {
     const response = await msalInstance.acquireTokenSilent({
-      ...loginRequest
+      ...tokenRequest
     }).catch(async (e) => {
       if (e instanceof InteractionRequiredAuthError) {
-        await msalInstance.acquireTokenRedirect(loginRequest);
+        await msalInstance.acquireTokenRedirect(tokenRequest);
       }
       throw e;
     });
