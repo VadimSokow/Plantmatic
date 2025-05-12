@@ -1,21 +1,26 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
 import { CosmosClient } from "@azure/cosmos"
 
+const cosmosEndpoint = process.env.CosmosDBEndpoint;
+const cosmosKey = process.env.CosmosDBKey;
+
 export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const cosmosConnection = process.env.CosmosDBConnection
 
-    if (!cosmosConnection) {
+    if (!cosmosEndpoint || !cosmosKey) {
+        context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
         return {
             status: 500,
-            body: "Missing CosmosDBConnection string in environment variables."
+            body: "Something was not ok."
         }
     }
 
 
-    
-
     try {
-        const client = new CosmosClient(cosmosConnection)
+        const client = new CosmosClient({
+            endpoint: cosmosEndpoint,
+            key: cosmosKey,
+        })
         const dbName = "Plantmatic12"
         const conName = "Plants"
         const database = client.database(dbName)      
