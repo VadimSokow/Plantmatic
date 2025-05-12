@@ -2,11 +2,19 @@ import {LogLevel, PublicClientApplication} from '@azure/msal-browser';
 
 // Config object to be passed to Msal on creation
 export const msalConfig = {
-  auth: {
+  /*auth: {
     clientId: 'b3763c91-c7c2-460e-b201-c20b7a2f1f4a',
-    authority: 'https://PlantmaticID.ciamlogin.com/PlantmaticID.onmicrosoft.com',
+    //authority: 'https://PlantmaticID.ciamlogin.com/PlantmaticID.onmicrosoft.com',
+    authority: 'https://plantmaticid.ciamlogin.com/plantmaticid.onmicrosoft.com/plantmaticupandin/v2.0',
+    //authority: 'https://plantmaticid.ciamlogin.com/plantmaticid.onmicrosoft.com/plantmaticupandin/v2.0/.well-known/openid-configuration',
     redirectUri: '/', // Must be registered as a SPA redirectURI on your app registration
     postLogoutRedirectUri: '/' // Must be registered as a SPA redirectURI on your app registration
+  },*/
+  auth: {
+    clientId: 'b3763c91-c7c2-460e-b201-c20b7a2f1f4a',
+    authority: 'https://plantmaticid.ciamlogin.com/organizations/v2.0',
+    redirectUri: 'https://blue-pebble-05abc6003.6.azurestaticapps.net/',
+    postLogoutRedirectUri: 'https://blue-pebble-05abc6003.6.azurestaticapps.net/'
   },
   cache: {
     cacheLocation: 'localStorage'
