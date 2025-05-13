@@ -8,6 +8,7 @@ export const msalConfig = {
     redirectUri: 'https://blue-pebble-05abc6003.6.azurestaticapps.net/',
     postLogoutRedirectUri: '/',
     navigateToLoginRequestUrl: false,
+    knownAuthorities: ["PlantmaticID.ciamlogin.com"]
   },
   cache: {
     cacheLocation: 'localStorage'
