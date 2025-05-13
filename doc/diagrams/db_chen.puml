@@ -1,0 +1,54 @@
+@startchen
+
+entity Device{
+ID <<key>>
+Name
+Standort
+Owner
+Config
+}
+
+relationship Zustand {
+
+}
+
+relationship hat_Modell {
+
+}
+
+relationship hat_Template{
+
+}
+
+
+
+entity Modell{
+Sensoren
+}
+
+entity Messung <<weak>> {
+ID <<key>>
+Temp
+Bodenfeuchte
+Licht
+LED_Status
+Pumpstatus
+}
+
+entity PflanzenTemplate {
+Name <<key>>
+Temp
+Bodenfeuchte
+Licht
+}
+
+Device -1- Zustand
+Messung -N- Zustand
+Device -N- hat_Modell
+hat_Modell -1- Modell
+Device -1- hat_Template
+hat_Template -1- PflanzenTemplate
+
+
+
+@endchen
