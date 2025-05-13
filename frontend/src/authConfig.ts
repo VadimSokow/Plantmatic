@@ -5,7 +5,7 @@ export const msalConfig = {
   auth: {
     clientId: 'eedbd612-f827-4bfc-bb2b-668615b9a8f6',
     authority: 'https://PlantmaticID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880/v2.0',
-    redirectUri: '/',
+    redirectUri: 'https://blue-pebble-05abc6003.6.azurestaticapps.net/',
     postLogoutRedirectUri: '/',
     navigateToLoginRequestUrl: false,
   },
