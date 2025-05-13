@@ -42,12 +42,12 @@ Bodenfeuchte
 Licht
 }
 
-Device -1- Zustand
-Messung -N- Zustand
-Device -N- hat_Modell
-hat_Modell -1- Modell
-Device -1- hat_Template
-hat_Template -1- PflanzenTemplate
+Device -(1,N)- Zustand
+Messung -(N,1)- Zustand
+Device -(N,1)- hat_Modell 
+hat_Modell -(1,N)- Modell 
+Device -(0,1)- hat_Template
+hat_Template -(1,N)- PflanzenTemplate
 
 
 
