@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <h1>Pflanzenvorlagen</h1>
-    <div v-if="loading">Lade Daten...</div>
-    <div v-else-if="error">Fehler beim Laden: {{ error }}</div>
+    <div v-if="isLoading">Lade Daten...</div>
+    <div v-else-if="hasError">Fehler beim Laden: {{ hasError }}</div>
     <v-list v-else>
       <v-list-item v-for="plant in plantTemplates" :key="plant.id">
         <v-list-item-title>{{ plant.comname }} ({{ plant.latname }})</v-list-item-title>
