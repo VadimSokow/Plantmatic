@@ -2,10 +2,11 @@
 
 entity Device{
 ID <<key>>
-Name
+Name 
 Standort
 Owner
-Config
+DevConfig
+Pflanzen
 }
 
 relationship Zustand {
@@ -16,18 +17,26 @@ relationship hat_Modell {
 
 }
 
-relationship hat_Template{
+relationship referenziert{
 
 }
+
+relationship ist_zugewiesen {
+
+}
+
 
 
 
 entity Modell{
-Sensoren
+ID <<key>> 
+Sensoren 
 }
 
+entity Pflanze {
+PflaConfig
+}
 entity Messung <<weak>> {
-ID <<key>>
 Temp
 Bodenfeuchte
 Licht
@@ -36,18 +45,20 @@ Pumpstatus
 }
 
 entity PflanzenTemplate {
-Name <<key>>
+Name <<key>> 
 Temp
 Bodenfeuchte
 Licht
 }
 
 Device -(1,N)- Zustand
-Messung -(N,1)- Zustand
+Messung -1- Zustand
 Device -(N,1)- hat_Modell 
 hat_Modell -(1,N)- Modell 
-Device -(0,1)- hat_Template
-hat_Template -(1,N)- PflanzenTemplate
+referenziert -(1,1)- PflanzenTemplate
+referenziert -(1,1)- Pflanze
+Device -(1,N)- ist_zugewiesen
+ist_zugewiesen -1- Pflanze
 
 
 
