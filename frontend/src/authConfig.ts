@@ -2,26 +2,12 @@ import {LogLevel, PublicClientApplication} from '@azure/msal-browser';
 
 // Config object to be passed to Msal on creation
 export const msalConfig = {
-  /*auth: {
-    clientId: 'b3763c91-c7c2-460e-b201-c20b7a2f1f4a',
-    //authority: 'https://PlantmaticID.ciamlogin.com/PlantmaticID.onmicrosoft.com',
-    authority: 'https://plantmaticid.ciamlogin.com/plantmaticid.onmicrosoft.com/plantmaticupandin/v2.0',
-    //authority: 'https://plantmaticid.ciamlogin.com/plantmaticid.onmicrosoft.com/plantmaticupandin/v2.0/.well-known/openid-configuration',
-    redirectUri: '/', // Must be registered as a SPA redirectURI on your app registration
-    postLogoutRedirectUri: '/' // Must be registered as a SPA redirectURI on your app registration
-  },*/
-  /*auth: {
-    clientId: 'b3763c91-c7c2-460e-b201-c20b7a2f1f4a',
-    authority: 'https://plantmaticid.ciamlogin.com/organizations/v2.0',
-    redirectUri: 'https://blue-pebble-05abc6003.6.azurestaticapps.net/',
-    postLogoutRedirectUri: 'https://blue-pebble-05abc6003.6.azurestaticapps.net/'
-  },*/
   auth: {
-    clientId: 'eedbd612-f827-4bfc-bb2b-668615b9a8f6', // This is the ONLY mandatory field that you need to supply.
-    authority: 'https://PlantmaticID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880/v2.0', // Replace the placeholder with your tenant subdomain
-    redirectUri: 'http://localhost:3000/redirect', // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
-    postLogoutRedirectUri: '/', // Indicates the page to navigate after logout.
-    navigateToLoginRequestUrl: false, // If "true", will navigate back to the original request location before processing the auth code response.
+    clientId: 'eedbd612-f827-4bfc-bb2b-668615b9a8f6',
+    authority: 'https://PlantmaticID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880/v2.0',
+    redirectUri: 'http://localhost:3000/redirect',
+    postLogoutRedirectUri: '/',
+    navigateToLoginRequestUrl: false,
   },
   cache: {
     cacheLocation: 'localStorage'
