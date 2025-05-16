@@ -357,6 +357,19 @@
           }
         }
       }
+    },
+    "/user": {
+      "get": {
+        "description": "Entschlüsselt den JWT und holt den Nutzernamen dort raus",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
     }
   },
   "definitions": {
