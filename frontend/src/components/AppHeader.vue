@@ -22,7 +22,8 @@ const logout = () => {
     <v-btn to="/plants">Pflanzen</v-btn>
     <v-btn to="/settings">Einstellungen</v-btn>
 
-    <AuthButton/>
+<!--    <AuthButton/>-->
+    <Account/>
   </v-app-bar>
 </template>
 

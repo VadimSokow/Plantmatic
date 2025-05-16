@@ -38,15 +38,18 @@ router.isReady().then(() => {
 })
 
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
-  if (to.meta.requiresAuth) {
-    const request = {
-      ...loginRequest,
-      redirectStartPage: to.fullPath
-    }
-    const shouldProceed = await isAuthenticated(msalInstance, InteractionType.Redirect, request);
-    return shouldProceed || '/failed';
+  if (to.name === '/login') {
+    return true;
   }
 
+  const request = {
+    ...loginRequest,
+    redirectStartPage: to.fullPath
+  }
+  const shouldProceed = await isAuthenticated(msalInstance, InteractionType.None, request);
+  if (!shouldProceed) {
+    return '/login';
+  }
   return true;
 });
 
