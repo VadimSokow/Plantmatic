@@ -358,9 +358,9 @@
         }
       }
     },
-    "/user": {
+    "/plants": {
       "get": {
-        "description": "Entschlüsselt den JWT und holt den Nutzernamen dort raus",
+        "description": "Gibt alle möglichen Pflanzenvorlagen zurück",
         "responses": {
           "200": {
             "description": "OK"
