@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "security/detect-unsafe-regex": ["error", {
+      "ignore": ["/auth/callback"]
+    }]
+  }
+}

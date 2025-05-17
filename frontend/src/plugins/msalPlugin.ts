@@ -1,4 +1,4 @@
-import {type App, reactive} from 'vue';
+import { type App, reactive } from 'vue';
 import {
   type AccountInfo,
   type EventMessage,
@@ -16,7 +16,7 @@ type AccountIdentifiers = Partial<Pick<AccountInfo, 'homeAccountId' | 'localAcco
  * @param arrayA
  * @param arrayB
  */
-function accountArraysAreEqual(arrayA: Array<AccountIdentifiers>, arrayB: Array<AccountIdentifiers>): boolean {
+function accountArraysAreEqual (arrayA: Array<AccountIdentifiers>, arrayB: Array<AccountIdentifiers>): boolean {
   if (arrayA.length !== arrayB.length) {
     return false;
   }

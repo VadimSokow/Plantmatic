@@ -1,7 +1,7 @@
 <template>
   <v-container>
-    <v-row justify="center" align="center">
-      <v-col cols="12" sm="8" md="6">
+    <v-row align="center" justify="center">
+      <v-col cols="12" md="6" sm="8">
         <v-card class="mx-auto mt-5">
           <v-card-title class="text-h4">
             Seite nicht gefunden
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter} from 'vue-router'
+  import { useRouter } from 'vue-router'
 
-const router = useRouter()
+  const router = useRouter()
 </script>

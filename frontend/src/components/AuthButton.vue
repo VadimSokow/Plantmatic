@@ -4,14 +4,14 @@
 </template>
 
 <script setup lang="ts">
-import {useMsal} from '../composition-api/useMsal';
-import {loginRequest} from "../authConfig";
-import {useIsAuthenticated} from "@/composition-api/useIsAuthenticated.ts";
+  import { useMsal } from '../composition-api/useMsal';
+  import { loginRequest } from '../authConfig';
+  import { useIsAuthenticated } from '@/composition-api/useIsAuthenticated.ts';
 
-const {instance} = useMsal();
+  const { instance } = useMsal();
 
-const isAuth = useIsAuthenticated();
+  const isAuth = useIsAuthenticated();
 
-const login = () => instance.loginRedirect(loginRequest);
-const logout = () => instance.logoutRedirect();
+  const login = () => instance.loginRedirect(loginRequest);
+  const logout = () => instance.logoutRedirect();
 </script>

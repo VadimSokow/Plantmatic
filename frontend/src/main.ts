@@ -6,24 +6,24 @@
 
 // Plugins
 import { registerPlugins } from '@/plugins';
-import { msalInstance } from "./authConfig";
-import { type AuthenticationResult, EventType } from "@azure/msal-browser";
+import { msalInstance } from './authConfig';
+import { type AuthenticationResult, EventType } from '@azure/msal-browser';
 
 // Components
 import App from './App.vue'
 
 // Composables
 import { createApp } from 'vue'
-import router from "@/router";
+import router from '@/router';
 
-async function msalInit() {
+async function msalInit () {
   await msalInstance.initialize();
   // Account selection logic is app dependent. Adjust as needed for different use cases.
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
     msalInstance.setActiveAccount(accounts[0]);
   }
-  msalInstance.addEventCallback((event) => {
+  msalInstance.addEventCallback(event => {
     if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
       const payload = event.payload as AuthenticationResult;
       const account = payload.account;
@@ -32,7 +32,7 @@ async function msalInit() {
   });
 }
 
-async function init() {
+async function init () {
   await msalInit();
   const app = createApp(App)
 
@@ -43,6 +43,6 @@ async function init() {
   });
 }
 
-init().catch((error) => {
-  console.error("Error during initialization:", error);
+init().catch(error => {
+  console.error('Error during initialization:', error);
 });

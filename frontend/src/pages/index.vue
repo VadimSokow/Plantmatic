@@ -14,14 +14,14 @@
 </template>
 
 <script lang="ts" setup>
-import {storeToRefs} from 'pinia';
-import {onMounted} from 'vue';
-import {usePlantTemplateStore} from "@/stores/plant_templates.ts";
+  import { storeToRefs } from 'pinia';
+  import { onMounted } from 'vue';
+  import { usePlantTemplateStore } from '@/stores/plant_templates.ts';
 
-const plantStore = usePlantTemplateStore();
-const {plantTemplates, isLoading, hasError} = storeToRefs(plantStore);
+  const plantStore = usePlantTemplateStore();
+  const { plantTemplates, isLoading, hasError } = storeToRefs(plantStore);
 
-onMounted(() => {
-  plantStore.fetchPlantTemplates();
-});
+  onMounted(() => {
+    plantStore.fetchPlantTemplates();
+  });
 </script>

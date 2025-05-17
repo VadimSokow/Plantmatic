@@ -19,7 +19,7 @@ interface PlantMeasurement {
   timestamp: number;
 }
 
-export const usePlantStore = defineStore("plant", {
+export const usePlantStore = defineStore('plant', {
   state: (): PlantState => ({
     plants: [],
     selectedPlant: null,
@@ -27,7 +27,5 @@ export const usePlantStore = defineStore("plant", {
     error: null,
   }),
 
-  actions: {
-
-  }
+  actions: {},
 });

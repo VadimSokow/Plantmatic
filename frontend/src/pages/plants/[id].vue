@@ -6,17 +6,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+  import { onMounted, ref } from 'vue';
+  import { useRoute } from 'vue-router';
 
-const route = useRoute('/plants/[id]');
-const id = ref<string>(route.params.id);
-const plant = ref<{ name: string; details: string }>({ name: '', details: '' });
+  const route = useRoute('/plants/[id]');
+  const id = ref<string>(route.params.id);
+  const plant = ref<{ name: string; details: string }>({ name: '', details: '' });
 
-onMounted(() => {
-  // Hier würdest du die Details für die Pflanze mit der ID vom Backend abrufen
-  console.log('Abrufen der Details für Pflanze:', id.value);
-  // Beispiel-Daten:
-  plant.value = { name: `Pflanze ${id.value}`, details: 'Weitere Informationen...' };
-});
+  onMounted(() => {
+    // Hier würdest du die Details für die Pflanze mit der ID vom Backend abrufen
+    console.log('Abrufen der Details für Pflanze:', id.value);
+    // Beispiel-Daten:
+    plant.value = { name: `Pflanze ${id.value}`, details: 'Weitere Informationen...' };
+  });
 </script>

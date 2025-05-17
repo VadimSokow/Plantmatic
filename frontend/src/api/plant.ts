@@ -2,8 +2,8 @@ export const fetchPlants = async () => {
   return {
     plants: [
       {
-        id: "1",
-        name: "Plant 1",
+        id: '1',
+        name: 'Plant 1',
         lastMeasurement: {
           temperature: 22,
           humidity: 50,
@@ -13,8 +13,8 @@ export const fetchPlants = async () => {
         },
       },
       {
-        id: "2",
-        name: "Plant 2",
+        id: '2',
+        name: 'Plant 2',
         lastMeasurement: {
           temperature: 24,
           humidity: 55,

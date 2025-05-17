@@ -1,6 +1,6 @@
-import {defineStore} from 'pinia';
-import type {PlantTemplate} from "@/types/plant_templates.ts";
-import {fetchPlantTemplates} from "@/api/plant_templates.ts";
+import { defineStore } from 'pinia';
+import type { PlantTemplate } from '@/types/plant_templates.ts';
+import { fetchPlantTemplates } from '@/api/plant_templates.ts';
 
 export const usePlantTemplateStore = defineStore('plant_templates', {
   state: () => ({
@@ -9,13 +9,19 @@ export const usePlantTemplateStore = defineStore('plant_templates', {
     error: null as string | null,
   }),
   actions: {
-    async fetchPlantTemplates() {
+    async fetchPlantTemplates () {
       this.loading = true;
       this.error = null;
       try {
         this.plantTemplates = await fetchPlantTemplates();
-      } catch (error: any) {
-        this.error = error.message || 'Fehler beim Laden der Pflanzenvorlagen.';
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          this.error = error.message;
+        } else if (typeof error === 'string') {
+          this.error = error;
+        } else {
+          this.error = 'Unbekannter Fehler beim Laden der Pflanzenvorlagen.';
+        }
       } finally {
         this.loading = false;
       }
@@ -23,10 +29,8 @@ export const usePlantTemplateStore = defineStore('plant_templates', {
     // ... weitere Aktionen
   },
   getters: {
-    allPlantTemplates: (state) => state.plantTemplates,
-    isLoading: (state) => state.loading,
-    hasError: (state) => state.error,
+    allPlantTemplates: state => state.plantTemplates,
+    isLoading: state => state.loading,
+    hasError: state => state.error,
   },
 });
-
-

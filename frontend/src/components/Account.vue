@@ -1,6 +1,6 @@
 <template>
   <v-menu offset-y>
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn class="text-none" v-bind="props">
         <span class="mr-2">{{ username }}</span>
         <v-icon>mdi-account-circle</v-icon>
@@ -15,22 +15,11 @@
 </template>
 
 <script setup lang="ts">
-import {useMsal} from '../composition-api/useMsal';
+  import { useMsal } from '../composition-api/useMsal';
 
-const {instance} = useMsal();
+  const { instance } = useMsal();
 
-const username = instance.getAllAccounts()[0]?.username || null;
+  const username = instance.getAllAccounts()[0]?.username || null;
 
-const logout = () => instance.logoutRedirect();
-
-onMounted(() => {
-
-});
+  const logout = () => instance.logoutRedirect();
 </script>
-
-<style scoped>
-/* Optional: Entfernt den Standard-Fokus-Rahmen */
-.v-btn:focus {
-  outline: none;
-}
-</style>

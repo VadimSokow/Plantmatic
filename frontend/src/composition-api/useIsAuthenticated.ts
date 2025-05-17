@@ -1,7 +1,7 @@
-import { type Ref, ref, watch } from "vue";
-import { useMsal } from "./useMsal";
+import { type Ref, ref, watch } from 'vue';
+import { useMsal } from './useMsal';
 
-export function useIsAuthenticated(): Ref<boolean> {
+export function useIsAuthenticated (): Ref<boolean> {
   const { accounts } = useMsal();
   const isAuthenticated = ref(accounts.value.length > 0);
 

@@ -4,28 +4,28 @@ Sie wird typischerweise zur Übersicht über alle Geräte verwendet.
 -->
 
 <script setup lang="ts">
-defineProps({
-  deviceId: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  modell: {
-    type: String,
-    required: true,
-  },
-  connection: {
-    type: String,
-    required: true,
-  },
-  state: {
-    type: String,
-    required: true,
-  },
-});
+  defineProps({
+    deviceId: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    modell: {
+      type: String,
+      required: true,
+    },
+    connection: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+  });
 </script>
 
 <template>

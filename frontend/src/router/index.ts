@@ -1,17 +1,9 @@
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
-// Composables
-import {createRouter, createWebHistory} from 'vue-router/auto'
-import {setupLayouts} from 'virtual:generated-layouts'
-import {routes} from 'vue-router/auto-routes'
-import {useAuthStore} from "@/stores/auth.ts";
-import {msalInstance, loginRequest} from "../authConfig";
-import {InteractionType, type PopupRequest, PublicClientApplication, type RedirectRequest} from "@azure/msal-browser";
-import type {RouteLocationNormalized} from "vue-router";
+import { createRouter, createWebHistory } from 'vue-router/auto'
+import { setupLayouts } from 'virtual:generated-layouts'
+import { routes } from 'vue-router/auto-routes'
+import { loginRequest, msalInstance } from '../authConfig';
+import { InteractionType, type PopupRequest, PublicClientApplication, type RedirectRequest } from '@azure/msal-browser';
+import type { RouteLocationNormalized } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,14 +29,19 @@ router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
   if (to.name === '/login') {
     return true;
   }
 
+  if (to.path.endsWith('/auth/callback')) {
+    return '/';
+  }
+
   const request = {
     ...loginRequest,
-    redirectStartPage: to.fullPath
+    redirectStartPage: to.fullPath,
   }
   const shouldProceed = await isAuthenticated(msalInstance, InteractionType.None, request);
   if (!shouldProceed) {
@@ -56,7 +53,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
 export default router
 
 
-export async function isAuthenticated(instance: PublicClientApplication, interactionType: InteractionType, loginRequest: PopupRequest | RedirectRequest): Promise<boolean> {
+export async function isAuthenticated (instance: PublicClientApplication, interactionType: InteractionType, loginRequest: PopupRequest | RedirectRequest): Promise<boolean> {
   // If your application uses redirects for interaction, handleRedirectPromise must be called and awaited on each page load before determining if a user is signed in or not
   return instance.handleRedirectPromise().then(() => {
     const accounts = instance.getAllAccounts();
