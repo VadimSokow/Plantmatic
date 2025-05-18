@@ -1,16 +1,17 @@
-import {LogLevel, PublicClientApplication} from '@azure/msal-browser';
+import { LogLevel, PublicClientApplication } from '@azure/msal-browser';
 
 // Config object to be passed to Msal on creation
 export const msalConfig = {
   auth: {
     clientId: 'eedbd612-f827-4bfc-bb2b-668615b9a8f6',
     authority: 'https://PlantmaticID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880/v2.0',
-    redirectUri: '/',
+    redirectUri: 'http://localhost:3001/auth/callback',
     postLogoutRedirectUri: '/',
     navigateToLoginRequestUrl: false,
+    knownAuthorities: ['PlantmaticID.ciamlogin.com'],
   },
   cache: {
-    cacheLocation: 'localStorage'
+    cacheLocation: 'localStorage',
   },
   system: {
     loggerOptions: {
@@ -35,9 +36,9 @@ export const msalConfig = {
             return;
         }
       },
-      logLevel: LogLevel.Verbose
-    }
-  }
+      logLevel: LogLevel.Verbose,
+    },
+  },
 };
 
 export const msalInstance = new PublicClientApplication(msalConfig);

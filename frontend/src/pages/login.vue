@@ -1,37 +1,35 @@
 <template>
-  <v-container>
-    <v-row justify="center">
-      <v-col cols="12" sm="8" md="6">
-        <v-card>
-          <v-card-title>Login</v-card-title>
-          <v-card-text>
-            <v-text-field label="Benutzername"></v-text-field>
-            <v-text-field label="Passwort" type="password"></v-text-field>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn color="primary" @click="login">Einloggen</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-app>
+    <v-main class="d-flex align-center justify-center">
+      <v-card class="pa-4" max-width="400">
+        <v-img
+          alt="Logo"
+          class="mx-auto mb-4"
+          contain
+          height="150"
+          src="@/assets/logo.svg"
+          width="150"
+        />
+        <h2 class="text-center mb-2">Plantmatic</h2>
+        <p class="text-center mb-4">Anmelden um das Dashboard zu öffnen.</p>
+        <v-btn class="mx-auto d-block" color="primary" @click="login()">Login</v-btn>
+      </v-card>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup lang="ts">
-import {useRouter} from 'vue-router';
-import {useAuthStore} from "@/stores/auth.ts";
+  import { useMsal } from '../composition-api/useMsal';
+  import { loginRequest } from '../authConfig';
 
-definePage({
-  meta: {
-    layout: 'login',
-  },
-})
+  const { instance } = useMsal();
 
-const router = useRouter();
-const authStore = useAuthStore();
+  // eslint-disable-next-line no-undef
+  definePage({
+    meta: {
+      layout: 'empty',
+    },
+  })
 
-const login = () => {
-  authStore.loginDummy();
-  router.push('/plants');
-};
+  const login = () => instance.loginRedirect(loginRequest);
 </script>

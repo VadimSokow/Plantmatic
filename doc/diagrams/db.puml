@@ -1,0 +1,87 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+' Was ist ein Gerät?
+' -> Controller (Raspi), nicht die Pflanze
+
+hide empty members
+
+entity Device {
+    id
+    --
+    name
+    owner: User
+    standort: string
+    config: DeviceConfig(JSON)
+}
+
+entity Modell {
+    id
+    --
+    name
+}
+
+entity ModellConfigField {
+    name: string
+    unit: string
+    min: string
+    max: string
+    default: string
+}
+
+entity ModelSensor {
+    sensorId
+    plant-slot
+    field-name
+}
+
+entity Sensor {
+    id
+    --
+    name
+    type
+    genauigkeit
+    unit
+    min-value
+    max-value
+}
+
+' Pflanze an einem Gerät für einem Nutzer
+entity Pflanze {
+    id
+    --
+    name
+    slot
+    config: PflanzenConfig
+}
+
+entity PflanzeModell {
+    lat-name
+    --
+    name
+    default: PflanzenConfig
+}
+
+entity PflanzenConfig {
+    min-humidity
+    max-humidity
+    min-soil-moisture
+    max-soil-moisture
+    min-temperature
+    max-temperature
+    min-light
+    max-light
+    min-light-time
+    max-light-time
+}
+
+Pflanze }|--|| Device
+Modell ||--|| Device
+ModellConfigField ||--|| Modell
+ModelSensor |o--|| Modell
+ModelSensor ||--|| Sensor
+Pflanze ||--|| PflanzeModell
+Pflanze ||--|| PflanzenConfig
+PflanzeModell ||--|| PflanzenConfig
+
+@enduml

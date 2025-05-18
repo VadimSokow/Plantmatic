@@ -11,9 +11,9 @@ import router from '../router'
 
 // Types
 import type { App } from 'vue'
-import {msalPlugin} from "@/plugins/msalPlugin.ts";
-import {msalInstance} from "@/authConfig.ts";
-import VueApexCharts from "vue3-apexcharts";
+import { msalPlugin } from '@/plugins/msalPlugin.ts';
+import { msalInstance } from '@/authConfig.ts';
+import VueApexCharts from 'vue3-apexcharts';
 
 export function registerPlugins (app: App) {
   app

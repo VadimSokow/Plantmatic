@@ -357,6 +357,65 @@
           }
         }
       }
+    },
+    "/devices/new": {
+      "put": {
+        "description": "Ermöglicht das Hinzufügen eines neuen Gerätes",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/plants": {
+      "get": {
+        "description": "Gibt alle möglichen Pflanzenvorlagen zurück",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/plants/{user}": {
+      "get": {
+        "description": "Gibt alle vom Nutzer verwendten Pflanzenvorlagen zurück",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/plants/new": {
+      "put": {
+        "description": "Ermöglicht das Hinzufügen einer neuen Vorlage",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
     }
   },
   "definitions": {
