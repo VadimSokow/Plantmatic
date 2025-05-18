@@ -1,7 +1,7 @@
 import tomli
 import toml
 
-default_toml_path = "" #TODO der Pfad zur Datei config.toml
+default_toml_path = "/home/pi/PlantMQTT/Device/useToml.py" #TODO der Pfad zur Datei config.toml
 
 def update_toml ( section:str, key:str, new_value, toml_path:default_toml_path):
     '''

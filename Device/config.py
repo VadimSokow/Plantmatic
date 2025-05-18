@@ -5,8 +5,7 @@ import adafruit_ads1x15.ads1115 as ADS
 # --- Pin Konfiguration (BCM Nummerierung) ---
 DHT11_PIN = board.D4
 SOIL_MOISTURE_ADC_CHANNEL = ADS.P0  # A0
-#todo weitere Sensoren Konfigurieren
-# LIGHT_SENSOR_ADC_CHANNEL = 1  # A1
+LIGHT_SENSOR_ADC_CHANNEL = ADS.P1  # A1
 
 # Pins für Aktoren
 RELAY_PIN_PUMP = board.D17
@@ -17,6 +16,10 @@ LED_PIN_GREEN = board.D5
 # --- Spannungen Bodenfeuchte Min / Max ---
 SOIL_MOISTURE_VOLTAGE_DRY: float = 2.21     #Spannung an der Luft
 SOIL_MOISTURE_VOLTAGE_WET: float = 0.935    #Spannung im Wasser
+
+# --- Spannungen Lichtsensor Min / Max ---
+LIGHT_SENSOR_VOLTAGE_DARK: float = 3.3      #Absolut dunkel
+LIGHT_SENSOR_VOLTAGE_BRIGHT: float = 0.2    #Absolut hell
 
 # --- Logik-Schwellwerte ---
 # Bodenfeuchte (Beispielwerte in %) todo aus cloud config laden

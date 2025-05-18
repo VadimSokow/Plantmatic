@@ -49,4 +49,3 @@ class PumpActuatorInterface(ActuatorInterface):
             time.sleep(duration_seconds)
             self.pump_off()
             print("Pumpe ausgeschaltet.")
-    #todo Methode um den aktuellen Status der Pumpe abzufragen
