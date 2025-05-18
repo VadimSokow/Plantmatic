@@ -5,7 +5,7 @@ export const msalConfig = {
   auth: {
     clientId: 'eedbd612-f827-4bfc-bb2b-668615b9a8f6',
     authority: 'https://PlantmaticID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880/v2.0',
-    redirectUri: 'http://localhost:3001/auth/callback',
+    redirectUri: '/auth/callback',
     postLogoutRedirectUri: '/',
     navigateToLoginRequestUrl: false,
     knownAuthorities: ['PlantmaticID.ciamlogin.com'],

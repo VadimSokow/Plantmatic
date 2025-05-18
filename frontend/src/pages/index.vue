@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="device in devices" :key="device.id" cols="12" md="4">
+      <v-col v-for="device in devices.values()" :key="device.id" cols="12" md="4">
         <DeviceCard
           :connection="device.connection_state"
           :device-id="device.id"
@@ -12,40 +12,11 @@
       </v-col>
     </v-row>
 
-    <v-overlay
-      class="align-center justify-center"
-      :model-value="isLoading"
-      persistent
-      scrim="black"
-    >
-      <v-progress-circular
-        color="primary"
-        indeterminate
-        size="64"
-      />
-    </v-overlay>
-
-    <v-dialog
-      v-model="showError"
-      persistent
-      width="auto"
-    >
-      <v-card>
-        <v-card-text>
-          {{ error }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            @click="clearError"
-          >
-            Schließen
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
+    <LoadAndError
+      :error="deviceStore.error"
+      :is-loading="deviceStore.isLoading"
+      @error-cleared="deviceStore.$patch({ error: null })"
+    />
   </v-container>
 </template>
 
@@ -56,20 +27,9 @@
   import { usePlantStore } from '@/stores/plants.ts';
 
   const deviceStore = useDeviceStore();
-  const { devices, isLoading, error } = storeToRefs(deviceStore);
+  const { devices } = storeToRefs(deviceStore);
 
   const plantStore = usePlantStore();
-
-  const clearErrorPressed = ref(false);
-  const showError = computed(() => error.value != null && !clearErrorPressed.value);
-
-  const clearError = () => {
-    clearErrorPressed.value = true;
-    setTimeout(() => {
-      deviceStore.$patch({ error: null });
-      clearErrorPressed.value = false;
-    }, 300);
-  };
 
   onMounted(() => {
     deviceStore.fetchDevices().then(() => {

@@ -13,8 +13,11 @@ declare module 'vue' {
     AppHeader: typeof import('./components/AppHeader.vue')['default']
     AuthButton: typeof import('./components/AuthButton.vue')['default']
     DeviceCard: typeof import('./components/cards/DeviceCard.vue')['default']
+    DevicePanel: typeof import('./components/panel/DevicePanel.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     LineChart: typeof import('./components/LineChart.vue')['default']
+    LoadAndError: typeof import('./components/LoadAndError.vue')['default']
+    PlantCard: typeof import('./components/cards/PlantCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
