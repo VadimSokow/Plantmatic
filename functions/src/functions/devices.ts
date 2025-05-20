@@ -24,7 +24,7 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
                 console.error("Benutzer nicht da")
                 return{
                     status: 401,
-                    body: "Das hier sollte eigentlich gar nciht passieren",
+                    body: "",
                 }
             }
     
