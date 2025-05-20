@@ -11,7 +11,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
         context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
         return {
             status: 500,
-            body: "Something was not ok."
+            body: ""
         }
     }
 
