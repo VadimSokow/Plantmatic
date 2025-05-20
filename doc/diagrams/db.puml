@@ -11,7 +11,7 @@ entity Device {
     --
     name
     owner: User
-    standort: string
+    location: string
     config: DeviceConfig(JSON)
 }
 
@@ -31,6 +31,7 @@ entity ModellConfigField {
 
 entity ModelSensor {
     sensorId
+    name
     plant-slot
     field-name
 }
@@ -40,29 +41,29 @@ entity Sensor {
     --
     name
     type
-    genauigkeit
+    accuracy
     unit
     min-value
     max-value
 }
 
-' Pflanze an einem Gerät für einem Nutzer
-entity Pflanze {
+' Plant an einem Gerät für einem Nutzer
+entity Plant {
     id
     --
     name
     slot
-    config: PflanzenConfig
+    config: PlantConfig
 }
 
-entity PflanzeModell {
+entity PlantModell {
     lat-name
     --
     name
-    default: PflanzenConfig
+    default: PlantConfig
 }
 
-entity PflanzenConfig {
+entity PlantConfig {
     min-humidity
     max-humidity
     min-soil-moisture
@@ -75,13 +76,13 @@ entity PflanzenConfig {
     max-light-time
 }
 
-Pflanze }|--|| Device
+Plant }|--|| Device
 Modell ||--|| Device
 ModellConfigField ||--|| Modell
 ModelSensor |o--|| Modell
 ModelSensor ||--|| Sensor
-Pflanze ||--|| PflanzeModell
-Pflanze ||--|| PflanzenConfig
-PflanzeModell ||--|| PflanzenConfig
+Plant ||--|| PlantModell
+Plant ||--|| PlantConfig
+PlantModell ||--|| PlantConfig
 
 @enduml
