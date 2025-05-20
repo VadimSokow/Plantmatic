@@ -4,7 +4,7 @@ import { CosmosClient } from "@azure/cosmos"
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
 const cosmosKey = process.env.CosmosDBKey;
 
-export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export async function getDevices(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const cosmosConnection = process.env.CosmosDBConnection
 
     if (!cosmosEndpoint || !cosmosKey) {
@@ -47,5 +47,5 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
 app.http('devices', {
     methods: ['GET'],
     authLevel: 'anonymous',
-    handler: getPlants
+    handler: getDevices
 })
