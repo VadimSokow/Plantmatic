@@ -8,10 +8,10 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
     const cosmosConnection = process.env.CosmosDBConnection
 
     if (!cosmosEndpoint || !cosmosKey) {
-        context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
+        context.error("CosmosDBEndpoint oder CosmosDBKey nicht gestzt")
         return {
-            status: 500,
-            body: "Something was not ok."
+            status: 500, //vielleicht was besseres finden?
+            body: "Interner Fehler"
         }
     }
 
@@ -21,8 +21,8 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             endpoint: cosmosEndpoint,
             key: cosmosKey,
         })
-        const dbName = "Plantmatic12"
-        const conName = "Plants"
+        const dbName = "Plantmatic"
+        const conName = "plants"
         const database = client.database(dbName)      
         const container = database.container(conName)         
 
@@ -44,7 +44,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
     }
 }
 
-app.http('getPlants', {
+app.http('plants', {
     methods: ['GET'],
     authLevel: 'anonymous',
     handler: getPlants
