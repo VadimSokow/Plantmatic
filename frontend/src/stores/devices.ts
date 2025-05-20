@@ -5,6 +5,7 @@ const internalDevices = [
     id: '1',
     name: 'Device 1',
     owner: 'Owner 1',
+    modell: '1',
     location: 'Location 1',
     connection_state: 'online',
     plant_ids: ['1', '2', '8', '9'],
@@ -13,6 +14,7 @@ const internalDevices = [
     id: '2',
     name: 'Device 2',
     owner: 'Owner 1',
+    modell: '1',
     location: 'Location 2',
     connection_state: 'offline',
     plant_ids: ['3'],
@@ -21,6 +23,7 @@ const internalDevices = [
     id: '3',
     name: 'Device 3',
     owner: 'Owner 1',
+    modell: '1',
     location: 'Location 3',
     connection_state: 'online',
     plant_ids: ['4', '5'],
@@ -31,9 +34,10 @@ export interface Device {
   id: string
   name: string
   owner: string
+  modell: string
   location: string
-  connection_state: 'online' | 'offline',
-  plant_ids: string[],
+  connection_state: 'online' | 'offline'
+  plant_ids: string[]
 }
 
 export const useDeviceStore = defineStore('devices', {

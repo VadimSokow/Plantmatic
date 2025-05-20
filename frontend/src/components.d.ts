@@ -18,6 +18,7 @@ declare module 'vue' {
     LineChart: typeof import('./components/LineChart.vue')['default']
     LoadAndError: typeof import('./components/LoadAndError.vue')['default']
     PlantCard: typeof import('./components/cards/PlantCard.vue')['default']
+    PlantCreateCard: typeof import('./components/cards/PlantCreateCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
