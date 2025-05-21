@@ -1,0 +1,77 @@
+erDiagram
+    User ||--o{ Device : manages
+    Device ||--o{ Plant : monitors
+    Device }o--|| DeviceModel : is_of_type
+    Plant }o--|| PlantTemplate : is_based_on
+    Device ||--o{ SensorReading : generates
+    Plant ||--o{ SensorReading : is_related_to
+    DeviceModel ||--o{ SensorDefinition : includes
+
+    User {
+        string id PK "Entra External ID (oid/sub)"
+        string email
+        json settings "e.g., language, timezone"
+    }
+
+    Device {
+        string id PK
+        string userId FK "Partition Key for co-location of user data"
+        string name
+        string modelId FK
+        datetime lastSeen "Timestamp of last contact"
+        string status "Derived from lastSeen, e.g., 'online/offline'"
+        json config "wateringSchedule, isActive"
+        string[] plantIds "Denormalized list of related plant IDs"
+    }
+
+    Plant {
+        string id PK
+        string userId FK "Partition Key for co-location of user data"
+        string deviceId FK
+        string name
+        string location
+        string plantTemplateId FK
+        json config "min/max values for sensors"
+        json currentSensorData "Optional: latest readings for UI"
+    }
+
+    DeviceModel {
+        string id PK
+        string name
+        string description
+        int maxPlants
+        bool hasPump
+        json[] supportedSensorConfigs "Array of objects linking to SensorDefinition"
+    }
+
+    PlantTemplate {
+        string id PK
+        string name
+        string description
+        float minTemperature
+        float maxTemperature
+        float minHumidityAir
+        float maxHumidityAir
+        float minHumiditySoil
+        float maxHumiditySoil
+        float minLightLux
+        float maxLightLux
+    }
+
+    SensorDefinition {
+        string id PK "e.g., 'tempSensor', 'soilHumSensor'"
+        string name "e.g., 'Temperature Sensor'"
+        string unit "e.g., 'Celsius', 'Percentage'"
+        string jsonField "e.g., 'temperature', 'soil_humidity' (as received from device)"
+        string description
+    }
+
+    SensorReading {
+        string id PK "Composite: deviceId_timestamp_sensorType or UUID"
+        string deviceId FK "Partition Key for efficient time-series queries"
+        string plantId FK "Optional: for direct plant-specific readings"
+        datetime timestamp
+        string sensorType "e.g., 'Temperature', 'HumiditySoil'"
+        float value
+        int ttl "Optional: Time To Live for automatic deletion"
+    }
