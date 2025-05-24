@@ -1,0 +1,109 @@
+erDiagram
+    User ||--o{ Device: owns
+    Device ||--o{ Plant: monitors
+    Device }o--|| Model: is_of_type
+    Plant }o--|| PlantType: is_based_on
+    Device ||--o{ Measurement: generates
+    Model ||--o{ ModelSensorConfig: defines_sensor
+    Model ||--o{ ModelActuatorConfig: defines_actuator
+    ModelSensorConfig }o--|| SensorDefinition: uses_type
+    ModelActuatorConfig }o--|| ActuatorDefinition: uses_type
+    PlantType ||--o{ PlantConfigFieldDefinition: defines_field
+
+    User {
+        string id PK "Entra External ID (oid/sub)"
+        string email
+        json settings "User preferences (optional)"
+    }
+
+    Device {
+        string id PK
+        string userId FK "Partition Key: for UserManagedData Container"
+        string name
+        string location
+        string modelId FK "Reference to Model"
+        string[] plantIds "Denormalized list of associated Plant IDs"
+    %% datetime lastSeen "Timestamp of last contact (optional, from IoT Hub)"
+    %% string status "Derived from lastSeen (optional)"
+        json config "e.g., wateringSchedule for device-global settings"
+    }
+
+    Plant {
+        string id PK
+        string userId FK "Partition Key: for UserManagedData Container"
+        string deviceId FK "Reference to Device"
+        string name "User-defined plant name"
+        string plantTypeId FK "Reference to PlantType.latName"
+    %% json config removed, defaults now in PlantConfigFieldDefinition
+        json currentSensorData "Optional: latest readings for UI display"
+    }
+
+    Model {
+        string id PK "Partition Key: for ConfigurationData Container"
+        string name
+        int slot_count "Number of physical plant slots on this model"
+    }
+
+    ModelSensorConfig {
+        string id PK "Unique ID for this config within Model (e.g., GUID)"
+        string modelId FK "Reference to Model"
+        string type "e.g., 'device' or 'plant'"
+        string sensorDefinitionId FK "Reference to SensorDefinition.id"
+        string fieldName "Raw JSON field name from device, e.g., 'temp_air'"
+        int plantSlot "Optional: for plant-specific sensors (e.g., 1, 2)"
+    }
+
+    ModelActuatorConfig {
+        string id PK "Unique ID for this config within Model (e.g., GUID)"
+        string modelId FK "Reference to Model"
+        string actuatorDefinitionId FK "Reference to ActuatorDefinition.id"
+        string purpose "e.g., 'Watering Pump for Slot 1', 'Grow Light'"
+        string fieldName "Raw JSON field name for device commands, e.g., 'pump_p1'"
+        int[] plantSlots "Optional: Array of plant slots influenced by this actuator"
+    %% isGlobal removed, inferred from plantSlots
+    }
+
+    SensorDefinition {
+        string id PK "e.g., 'tempSensor', 'soilHumSensor'"
+        string name "e.g., 'Temperature Sensor'"
+        string type "Category, e.g., 'Temperature', 'Humidity', 'Light'"
+        string unit "e.g., 'Celsius', 'Percentage', 'Lux'"
+        string description
+        number accuracy
+        number min_val "Physical min value sensor can measure"
+        number max_val "Physical max value sensor can measure"
+    }
+
+    ActuatorDefinition {
+        string id PK "e.g., 'waterPump', 'lightRelay'"
+        string name "e.g., 'Water Pump', 'Grow Light Relay'"
+        string type "Category, e.g., 'Pump', 'Relay'"
+        string description
+    }
+
+    PlantType {
+        string latName PK "e.g., 'Ocimum basilicum' (Latin name for lookup)"
+        string commonName "e.g., 'Basilikum'"
+        string description
+    }
+
+    PlantConfigFieldDefinition {
+        string plantTypeId PK, FK "Composite PK with field_name"
+        string field_name PK "e.g., 'minTemperature', 'maxSoilMoisture'"
+        string unit "e.g., 'Celsius', 'Percentage'"
+        string description
+        number defaultValue "Default target value for this plant type"
+    %% dataType removed (inferred from unit)
+    }
+
+    Measurement {
+        string id PK "Cosmos DB generated UUID"
+        string deviceId FK "Partition Key: for SensorReadings Container"
+        string plantId FK "Optional: if sensor is plant-specific"
+        datetime timestamp
+        string sensorDefinitionId FK "Reference to SensorDefinition.id"
+        string fieldName "Denormalized: original field name from device, e.g., 'temp_air'"
+        string sensorType "Denormalized: e.g., 'Temperature'"
+        number value
+        int ttl "Time to Live for data expiry (optional)"
+    }
