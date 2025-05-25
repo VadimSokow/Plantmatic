@@ -1,44 +1,42 @@
 import { defineStore } from 'pinia'
+import { type Device } from '@/types/device.ts';
 
-const internalDevices = [
+const internalDevices: Device[] = [
   {
     id: '1',
     name: 'Device 1',
-    owner: 'Owner 1',
-    modell: '1',
+    userId: 'Owner 1',
+    modelId: '1',
     location: 'Location 1',
-    connection_state: 'online',
-    plant_ids: ['1', '2', '8', '9'],
+    plantSlots: [
+      { slotNumber: 1, plantId: '1' },
+      { slotNumber: 2, plantId: '2' },
+      { slotNumber: 3, plantId: '8' },
+      { slotNumber: 4, plantId: '9' },
+    ],
   },
   {
     id: '2',
     name: 'Device 2',
-    owner: 'Owner 1',
-    modell: '1',
+    userId: 'Owner 1',
+    modelId: '1',
     location: 'Location 2',
-    connection_state: 'offline',
-    plant_ids: ['3'],
+    plantSlots: [
+      { slotNumber: 2, plantId: '3' },
+    ],
   },
   {
     id: '3',
     name: 'Device 3',
-    owner: 'Owner 1',
-    modell: '1',
+    userId: 'Owner 1',
+    modelId: '2',
     location: 'Location 3',
-    connection_state: 'online',
-    plant_ids: ['4', '5'],
+    plantSlots: [
+      { slotNumber: 1, plantId: '4' },
+      { slotNumber: 2, plantId: '5' },
+    ],
   },
 ];
-
-export interface Device {
-  id: string
-  name: string
-  owner: string
-  modell: string
-  location: string
-  connection_state: 'online' | 'offline'
-  plant_ids: string[]
-}
 
 export const useDeviceStore = defineStore('devices', {
   state: () => ({
@@ -54,8 +52,9 @@ export const useDeviceStore = defineStore('devices', {
     getAllPlantIds: state => {
       const plantIds: string[] = [];
       state.devices.forEach(device => {
-        device.plant_ids.forEach(plantId => {
-          if (!plantIds.includes(plantId)) {
+        device.plantSlots.forEach(slot => {
+          const plantId = slot.plantId;
+          if (plantId && !plantIds.includes(plantId)) {
             plantIds.push(plantId);
           }
         });

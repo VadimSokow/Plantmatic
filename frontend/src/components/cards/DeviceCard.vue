@@ -1,10 +1,10 @@
 <template>
-  <v-card class="device-card" :to="`/devices/${deviceId}`" variant="outlined">
-    <v-card-title class="text-h5">{{ name }}</v-card-title>
+  <v-card v-if="device" class="device-card" :to="`/devices/${deviceId}`" variant="outlined">
+    <v-card-title class="text-h5">{{ device.name }}</v-card-title>
     <v-card-subtitle>Geräte ID: {{ deviceId }}</v-card-subtitle>
     <v-card-text>
-      <p>Verbindung: {{ connection }}</p>
-      <p>Standort: {{ location }}</p>
+      <p>Standort: {{ device.location }}</p>
+      <p>Slots: {{ plantNames.length }} / {{ deviceModel?.slot_count }}</p>
       <div v-if="plantNames.length > 0" class="plants-section">
         <p class="text-subtitle-1">Pflanzen:</p>
         <ul class="plant-list">
@@ -23,37 +23,42 @@
 
 <script setup lang="ts">
   import { usePlantStore } from '@/stores/plants.ts';
-
-  const plantStore = usePlantStore();
+  import { useDeviceModelStore } from '@/stores/deviceModels.ts';
+  import { useDeviceStore } from '@/stores/devices.ts';
+  import type { Device, DeviceModel } from '@/types/device.ts';
 
   const props = defineProps({
     deviceId: {
       type: String,
       required: true,
     },
-    name: {
-      type: String,
-      required: true,
-    },
-    connection: {
-      type: String,
-      required: true,
-    },
-    location: {
-      type: String,
-      required: true,
-    },
-    plantIds: {
-      type: Array<string>,
-      default: () => [],
-    },
   });
 
+  const plantStore = usePlantStore();
+  const deviceStore = useDeviceStore();
+  const deviceModelStore = useDeviceModelStore();
+
+  const device = ref<Device | undefined>(undefined);
+  const deviceModel = ref<DeviceModel | undefined>(undefined);
+
   const plantNames = computed(() => {
-    return props.plantIds.map(plantId => {
-      const plant = plantStore.getPlantById(plantId);
-      return plant ? plant.name : 'Unbekannte Pflanze';
+    if (!device.value) return [];
+    return device.value.plantSlots.map(slot => {
+      if (!slot.plantId) return null;
+      const plant = plantStore.getPlantById(slot.plantId);
+      return plant ? plant.name : null;
     });
+  });
+
+  onMounted(() => {
+    device.value = deviceStore.getDeviceById(props.deviceId);
+    if (device.value) {
+      deviceModelStore.fetchDeviceModel(device.value.modelId).then(data => {
+        if (data) {
+          deviceModel.value = data;
+        }
+      })
+    }
   });
 </script>
 

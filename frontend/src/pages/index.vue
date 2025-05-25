@@ -2,13 +2,7 @@
   <v-container>
     <v-row>
       <v-col v-for="device in devices.values()" :key="device.id" cols="12" md="4">
-        <DeviceCard
-          :connection="device.connection_state"
-          :device-id="device.id"
-          :location="device.location"
-          :name="device.name"
-          :plant-ids="device.plant_ids"
-        />
+        <DeviceCard :device-id="device.id" />
       </v-col>
     </v-row>
 

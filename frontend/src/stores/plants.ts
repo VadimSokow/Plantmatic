@@ -1,62 +1,92 @@
 import { defineStore } from 'pinia'
+import type { Plant } from '@/types/plant.ts';
 
-const internalPlants = [
+const internalPlants: Plant[] = [
   {
     id: '1',
     name: 'Plant 1',
-    slot: 1,
-    type: {
-      lat_name: 'Lat Name 1',
-      common_name: 'Common Name 1',
+    userId: '1',
+    deviceId: '1',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 22.5,
+      soil_moisture: 45,
+      timestamp: new Date().getTime(),
     },
   },
   {
     id: '2',
     name: 'Plant 2',
-    slot: 2,
-    type: {
-      lat_name: 'Lat Name 2',
-      common_name: 'Common Name 2',
+    userId: '1',
+    deviceId: '1',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 23.0,
+      soil_moisture: 50,
+      timestamp: new Date().getTime(),
     },
   },
   {
     id: '3',
     name: 'Plant 3',
-    slot: 3,
-    type: {
-      lat_name: 'Lat Name 3',
-      common_name: 'Common Name 3',
+    userId: '1',
+    deviceId: '2',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 21.0,
+      soil_moisture: 40,
+      timestamp: new Date().getTime(),
+    },
+  },
+  {
+    id: '4',
+    name: 'Plant 4',
+    userId: '1',
+    deviceId: '3',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 21.0,
+      soil_moisture: 40,
+      timestamp: new Date().getTime(),
+    },
+  },
+  {
+    id: '5',
+    name: 'Plant 5',
+    userId: '1',
+    deviceId: '3',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 21.0,
+      soil_moisture: 40,
+      timestamp: new Date().getTime(),
     },
   },
   {
     id: '8',
     name: 'Plant 8',
-    slot: 8,
-    type: {
-      lat_name: 'Lat Name 8',
-      common_name: 'Common Name 8',
+    userId: '1',
+    deviceId: '1',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 24.0,
+      soil_moisture: 55,
+      timestamp: new Date().getTime(),
     },
   },
   {
     id: '9',
     name: 'Plant 9',
-    slot: 9,
-    type: {
-      lat_name: 'Lat Name 9',
-      common_name: 'Common Name 9',
+    userId: '1',
+    deviceId: '1',
+    plantTypeId: 'Ocidium basilicum',
+    currentSensorData: {
+      temperature: 22.0,
+      soil_moisture: 48,
+      timestamp: new Date().getTime(),
     },
   },
 ]
-
-export interface Plant {
-  id: string,
-  name: string,
-  slot: number,
-  type: {
-    lat_name: string,
-    common_name: string,
-  },
-}
 
 export const usePlantStore = defineStore('plants', {
   state: () => ({

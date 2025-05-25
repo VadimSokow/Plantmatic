@@ -5,14 +5,15 @@
       {{ plant.name }}
     </v-card-title>
     <v-card-text>
-      <p>Art: {{ plant.type.common_name }}</p>
-      <p>Latein: {{ plant.type.lat_name }}</p>
+      <!--      <p>Art: {{ plant.type.common_name }}</p>-->
+      <!--      <p>Latein: {{ plant.type.lat_name }}</p>-->
     </v-card-text>
   </v-card>
 </template>
 
 <script setup lang="ts">
-  import { type Plant, usePlantStore } from '@/stores/plants.ts';
+  import { type Plant } from '@/types/plant.ts';
+  import { usePlantStore } from '@/stores/plants.ts';
   import { ref } from 'vue';
 
   const plantStore = usePlantStore();

@@ -3,26 +3,26 @@
     <!-- left panel - Device Info -->
     <v-col cols="auto">
       <DevicePanel
-        :connection="device.connection_state"
         :device-id="device.id"
         :location="device.location"
         :name="device.name"
-        :plant-ids="device.plant_ids"
+        :slots-total="4"
+        :slots-used="2"
       />
     </v-col>
     <!-- vertical line as separator -->
     <v-divider vertical />
     <!-- right panel - Plants -->
-    <v-row style="margin: 10px">
-      <v-col
-        v-for="plantId in device?.plant_ids"
-        :key="plantId"
-        cols="12"
-        md="6"
-      >
-        <PlantCard :plant-id="plantId" />
-      </v-col>
-    </v-row>
+    <!--    <v-row style="margin: 10px">-->
+    <!--      <v-col-->
+    <!--        v-for="plantId in device?.plant_ids"-->
+    <!--        :key="plantId"-->
+    <!--        cols="12"-->
+    <!--        md="6"-->
+    <!--      >-->
+    <!--        <PlantCard :plant-id="plantId" />-->
+    <!--      </v-col>-->
+    <!--    </v-row>-->
   </v-row>
 
   <v-overlay
@@ -63,7 +63,8 @@
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
-  import { type Device, useDeviceStore } from '@/stores/devices.ts';
+  import { type Device } from '@/types/device.ts';
+  import { useDeviceStore } from '@/stores/devices.ts';
 
   const deviceStore = useDeviceStore();
 

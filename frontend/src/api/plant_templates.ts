@@ -1,4 +1,4 @@
-import type { PlantTemplate } from '@/types/plant_templates.ts';
+import type { PlantTemplate } from '@/types/plant.ts';
 import { apiClient } from '@/api/client.ts';
 
 export const fetchPlantTemplates = async (): Promise<PlantTemplate[]> => {
