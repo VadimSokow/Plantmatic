@@ -22,7 +22,7 @@ erDiagram
         string name
         string location
         string modelId FK "Reference to Model"
-        string[] plantIds "Denormalized list of associated Plant IDs"
+        json[] plantSlots "Array mapping slotNumber to plantId"
     %% datetime lastSeen "Timestamp of last contact (optional, from IoT Hub)"
     %% string status "Derived from lastSeen (optional)"
         json config "e.g., wateringSchedule for device-global settings"
@@ -60,7 +60,6 @@ erDiagram
         string purpose "e.g., 'Watering Pump for Slot 1', 'Grow Light'"
         string fieldName "Raw JSON field name for device commands, e.g., 'pump_p1'"
         int[] plantSlots "Optional: Array of plant slots influenced by this actuator"
-    %% isGlobal removed, inferred from plantSlots
     }
 
     SensorDefinition {
@@ -93,7 +92,6 @@ erDiagram
         string unit "e.g., 'Celsius', 'Percentage'"
         string description
         number defaultValue "Default target value for this plant type"
-    %% dataType removed (inferred from unit)
     }
 
     Measurement {
