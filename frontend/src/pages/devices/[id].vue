@@ -1,29 +1,31 @@
 <template>
-  <v-row v-if="device != undefined">
-    <!-- left panel - Device Info -->
-    <v-col cols="auto">
-      <DevicePanel
-        :device-id="device.id"
-        :location="device.location"
-        :name="device.name"
-        :slots-total="4"
-        :slots-used="2"
-      />
-    </v-col>
-    <!-- vertical line as separator -->
-    <v-divider vertical />
-    <!-- right panel - Plants -->
-    <!--    <v-row style="margin: 10px">-->
-    <!--      <v-col-->
-    <!--        v-for="plantId in device?.plant_ids"-->
-    <!--        :key="plantId"-->
-    <!--        cols="12"-->
-    <!--        md="6"-->
-    <!--      >-->
-    <!--        <PlantCard :plant-id="plantId" />-->
-    <!--      </v-col>-->
-    <!--    </v-row>-->
-  </v-row>
+  <v-container fluid v-if="device != undefined">
+    <v-row>
+      <!-- left panel - Device Info -->
+      <v-col cols="auto">
+        <DevicePanel
+          :device-id="device.id"
+          :location="device.location"
+          :name="device.name"
+          :slots-total="4"
+          :slots-used="2"
+        />
+      </v-col>
+      <!-- right panel - Plants-->
+      <v-row style="margin: 10px" md="8" lg="9">
+        <v-col
+          v-for="slot in device.plantSlots"
+          :key="slot.plantId"
+          cols="12"
+          sm="6"
+          md="6"
+          lg="4"
+        >
+          <PlantCard :plant-id="slot.plantId" />
+        </v-col>
+      </v-row>
+    </v-row>
+  </v-container>
 
   <LoadAndError
     :error="deviceStore.error"
