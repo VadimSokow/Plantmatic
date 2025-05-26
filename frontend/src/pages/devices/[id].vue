@@ -25,39 +25,11 @@
     <!--    </v-row>-->
   </v-row>
 
-  <v-overlay
-    class="align-center justify-center"
-    :model-value="isLoading"
-    persistent
-    scrim="black"
-  >
-    <v-progress-circular
-      color="primary"
-      indeterminate
-      size="64"
-    />
-  </v-overlay>
-
-  <v-dialog
-    v-model="showError"
-    persistent
-    width="auto"
-  >
-    <v-card>
-      <v-card-text>
-        {{ error }}
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn
-          color="primary"
-          @click="clearError"
-        >
-          Schließen
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <LoadAndError
+    :error="deviceStore.error"
+    :is-loading="deviceStore.isLoading"
+    @error-cleared="deviceStore.$patch({ error: null })"
+  />
 </template>
 
 <script setup lang="ts">
@@ -69,20 +41,8 @@
   const deviceStore = useDeviceStore();
 
   const route = useRoute('/devices/[id]');
-  const { isLoading, error } = storeToRefs(deviceStore);
   const id = ref<string>(route.params.id);
   const device = ref<Device | undefined>(undefined);
-
-  const clearErrorPressed = ref(false);
-  const showError = computed(() => error.value != null && !clearErrorPressed.value);
-
-  const clearError = () => {
-    clearErrorPressed.value = true;
-    setTimeout(() => {
-      deviceStore.$patch({ error: null });
-      clearErrorPressed.value = false;
-    }, 300);
-  };
 
   onMounted(() => {
     deviceStore.resolveDeviceById(id.value).then(data => {
