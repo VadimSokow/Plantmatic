@@ -105,6 +105,6 @@ export const useDeviceInfo = (deviceId: string) => {
     deviceInfo,
     loadDeviceInfo,
     isLoading: computed(() => isLoading.value),
-    error: computed(() => error.value),
+    error,
   };
 }

@@ -15,6 +15,7 @@ export interface ModelSensorConfig {
   id: string;
   type: 'device' | 'plant';
   sensorDefinitionId: string;
+  unit: string;
   fieldName: string;
   plantSlot?: number;
 }

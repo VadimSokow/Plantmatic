@@ -4,7 +4,7 @@ import type { PlantType } from '@/types/plant.ts';
 const internalPlantTypes: PlantType[] = [
   {
     latName: 'Ocidium basilicum',
-    commonName: 'Basil',
+    commonName: 'Basilikum',
     description: 'A popular herb used in cooking.',
     plantConfigFieldsDefinition: [
       {

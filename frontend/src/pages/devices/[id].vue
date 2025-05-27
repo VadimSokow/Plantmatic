@@ -1,60 +1,66 @@
 <template>
-  <v-container fluid v-if="device != undefined">
+  <v-container v-if="deviceIsOk" fluid>
     <v-row>
       <!-- left panel - Device Info -->
       <v-col cols="auto">
         <DevicePanel
-          :device-id="device.id"
-          :location="device.location"
-          :name="device.name"
-          :slots-total="4"
-          :slots-used="2"
+          :device-id="dev.device.id"
+          :location="dev.device.location"
+          :name="dev.device.name"
+          :slots-total="dev.model.slot_count"
+          :slots-used="dev.device.plantSlots.length"
         />
       </v-col>
       <!-- right panel - Plants-->
-      <v-row style="margin: 10px" md="8" lg="9">
+      <v-row lg="9" md="8" style="margin: 10px">
         <v-col
-          v-for="slot in device.plantSlots"
-          :key="slot.plantId"
+          v-for="plant in plants"
+          :key="plant.plantId"
           cols="12"
-          sm="6"
-          md="6"
           lg="4"
+          md="6"
+          sm="6"
         >
-          <PlantCard :plant-id="slot.plantId" />
+          <PlantCard
+            :device-model-id="dev.model.id"
+            :device-plant-slot="plant.slotNumber"
+            :plant-id="plant.plantId"
+          />
         </v-col>
       </v-row>
     </v-row>
   </v-container>
 
   <LoadAndError
-    :error="deviceStore.error"
-    :is-loading="deviceStore.isLoading"
-    @error-cleared="deviceStore.$patch({ error: null })"
+    :error="deviceInfo.error.value"
+    :is-loading="deviceInfo.isLoading.value"
+    @error-cleared="deviceInfo.error.value = null"
   />
 </template>
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
-  import { type Device } from '@/types/device.ts';
-  import { useDeviceStore } from '@/stores/devices.ts';
-
-  const deviceStore = useDeviceStore();
+  import { useDeviceInfo } from '@/composition-api/useDeviceInfo.ts';
 
   const route = useRoute('/devices/[id]');
   const id = ref<string>(route.params.id);
-  const device = ref<Device | undefined>(undefined);
+
+  const deviceInfo = useDeviceInfo(id.value);
+  const dev = deviceInfo.deviceInfo;
+
+  const deviceIsOk = computed(() => {
+    return dev.value != undefined && dev.value.device != undefined && dev.value.model != undefined;
+  })
+
+  const plants = computed(() => {
+    return dev.value.device.plantSlots.filter(plantId => plantId.plantId != null).map(plant => plant as {
+      plantId: string,
+      slotNumber: number,
+    });
+  })
 
   onMounted(() => {
-    deviceStore.resolveDeviceById(id.value).then(data => {
-      if (data) {
-        device.value = data;
-      } else {
-        console.error('Device not found');
-      }
-    }).catch(error => {
-      console.error('Error fetching device:', error);
-    })
+    deviceInfo.loadDeviceInfo();
   });
 </script>
