@@ -13,12 +13,10 @@ import router from '../router'
 import type { App } from 'vue'
 import { msalPlugin } from '@/plugins/msalPlugin.ts';
 import { msalInstance } from '@/authConfig.ts';
-import VueApexCharts from 'vue3-apexcharts';
 
 export function registerPlugins (app: App) {
   app
     .use(vuetify)
-    .use(VueApexCharts)
     .use(router)
     .use(pinia)
     .use(msalPlugin, msalInstance)
