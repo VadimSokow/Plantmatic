@@ -25,7 +25,7 @@
   "paths": {
     "/devices": {
       "get": {
-        "description": "Gibt eine Liste von Geräte, auf die der Nutzer zugriff hat, zurück.",
+        "description": "Gibt eine Liste von Geräten mit ihren Modellen, auf die der Nutzer zugriff hat, zurück.",
         "responses": {
           "200": {
             "description": "OK",
@@ -358,8 +358,8 @@
         }
       }
     },
-    "/devices/new": {
-      "put": {
+    "/devices": {
+      "post": {
         "description": "Ermöglicht das Hinzufügen eines neuen Gerätes",
         "responses": {
           "201": {
@@ -404,8 +404,8 @@
         }
       }
     },
-    "/plants/new": {
-      "put": {
+    "/plants/": {
+      "post": {
         "description": "Ermöglicht das Hinzufügen einer neuen Vorlage",
         "responses": {
           "201": {
