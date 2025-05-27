@@ -6,28 +6,33 @@ import { getUser } from "./user";
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
 const cosmosKey = process.env.CosmosDBKey;
 
+
 export async function getDevices(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const cosmosConnection = process.env.CosmosDBConnection
 
-    if (!cosmosEndpoint || !cosmosKey) {
-        context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
-        return {
-            status: 500,
-            body: ""
-        }
-    }
+    /*
+     const header = request.headers.get("authorization")
+             const user = getUser(header)
 
-    const header = request.headers.get("authorization")
-            const user = getUser(header)
-    
-            if (!user){
-                console.error("Benutzer nicht da")
-                return{
-                    status: 401,
-                    body: "",
-                }
-            }
-    
+             if (!user){
+                 console.error("Benutzer nicht da")
+                 return{
+                     status: 401,
+                     body: "Das hier sollte eigentlich gar nciht passieren",
+                 }
+             }
+
+     if (!cosmosEndpoint || !cosmosKey) {
+         context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
+         return {
+             status: 500,
+             body: ""
+         }
+     }
+
+     */
+
+
 
 
     try {
@@ -36,23 +41,55 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
             key: cosmosKey,
         })
         const dbName = "Plantmatic"
-        const conName = "devices"
-        const database = client.database(dbName)      
-        const container = database.container(conName)         
+        const deviceConName = "devices"
+        const modelConName = "models"
+        const database = client.database(dbName)
+        const deviceContainer = database.container(deviceConName)
+        const modelContainer = database.container(modelConName)
+        const testOwner = "u37952@hs-harz.de"
+        /*
+                const query = {
+                    query : "SELECT * FROM c where c.owner = @owner",
+                    parameters: [
+                        {name : "owner", value: testOwner }
+                    ]
+                }
 
-        const query = {
-            query : "SELECT * FROM c where c.owner = @owner",
-            parameters: [
-                {name : "owner", value: user }
-            ]
+
+
+         */
+        const result = [];
+        const  deviceQuery = "SELECT * FROM c where c.userid = 'u37952@hs-harz.de'"
+        const { resources: devices } = await deviceContainer.items.query(deviceQuery).fetchAll()
+
+        for (const deviceNr in devices){
+            const device = devices[deviceNr]
+            const modelQuery = {
+                query : "SELECT * FROM c where c.modelid = @id",
+                parameters : [
+                    {name: "@id", value: device.modelid}
+                ],
+            }
+            const {resources: models} = await modelContainer.items.query(modelQuery).fetchAll()
+
+            const model = models[0]
+
+
+
+            result.push(
+                {
+                    device,
+                    model
+                }
+            );
+
         }
-        const { resources: items } = await container.items.query(query).fetchAll()
 
         return {
             status: 200,
             headers: { "Content-Type": "application/json" },
             //body: items
-            body: JSON.stringify(items)
+            body: JSON.stringify(result)
         }
     } catch (error) {
         context.log("Error1 querying Cosmos DB:", error)
@@ -62,6 +99,7 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         }
     }
 }
+
 
 app.http('devices', {
     methods: ['GET'],
