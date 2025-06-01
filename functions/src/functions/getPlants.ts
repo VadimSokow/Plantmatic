@@ -7,13 +7,8 @@ const cosmosKey = process.env.CosmosDBKey;
 export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const cosmosConnection = process.env.CosmosDBConnection
 
-    if (!cosmosEndpoint || !cosmosKey) {
-        context.error("CosmosDBEndpoint oder CosmosDBKey nicht gestzt")
-        return {
-            status: 500, //vielleicht was besseres finden?
-            body: ""
-        }
-    }
+
+
 
 
     try {
@@ -22,18 +17,56 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             key: cosmosKey,
         })
         const dbName = "Plantmatic"
-        const conName = "plants"
-        const database = client.database(dbName)      
-        const container = database.container(conName)         
+        const plantConName = "plants"
+        const plantTypeConName = "plantType"
+        const database = client.database(dbName)
+        const plantContainer = database.container(plantConName)
+        const plantTypeContainer = database.container(plantTypeConName)
+        const testOwner = "u37952@hs-harz.de"
+        /*
+                const query = {
+                    query : "SELECT * FROM c where c.owner = @owner",
+                    parameters: [
+                        {name : "owner", value: testOwner }
+                    ]
+                }
 
-        const query = "SELECT * FROM c"
-        const { resources: items } = await container.items.query(query).fetchAll()
+
+
+         */
+        const result = [];
+        const  plantQuery = "SELECT * FROM c where c.userid = 'u37952@hs-harz.de'"
+        const { resources: plants } = await plantContainer.items.query(plantQuery).fetchAll()
+
+        for (const plantNr in plants){
+            const plant = plants[plantNr]
+            console.log("DeviceModelID: ", plant.plantypeid)
+            const modelQuery = {
+                query : "SELECT * FROM c where c.latname = @id",
+                parameters : [
+                    {name: "@id", value: plant.plantypeid}
+                ],
+            }
+            const {resources: models} = await plantTypeContainer.items.query(modelQuery).fetchAll()
+
+            const model = models[0]
+
+
+
+            result.push(
+                {
+                    plant,
+                    model
+                }
+            );
+
+        }
 
         return {
             status: 200,
             headers: { "Content-Type": "application/json" },
             //body: items
-            body: JSON.stringify(items)
+            body: JSON.stringify(result)
         }
     } catch (error) {
         context.log("Error1 querying Cosmos DB:", error)
