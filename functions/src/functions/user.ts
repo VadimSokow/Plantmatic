@@ -10,8 +10,8 @@ export function getUser(authHeader: string): string | null {
     return null
   }
 
-  const token = authHeader.substring(7)
-
+    const token = authHeader.substring(7)
+    const decoder = require('jsonwebtoken')
   try {
     const decoded = jwt.decode(token) as JwtPayload | null
 
