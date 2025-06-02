@@ -35,28 +35,30 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
 
          */
         const result = [];
-        const  plantQuery = "SELECT * FROM c where c.userid = 'u37952@hs-harz.de'"
+        const  plantQuery = "SELECT c.id, c.plantid, c.userid, c.deviceid, c.name, c.plantypeid, c.currentSensorData FROM c where c.userid = 'u37952@hs-harz.de'"
         const { resources: plants } = await plantContainer.items.query(plantQuery).fetchAll()
 
         for (const plantNr in plants){
             const plant = plants[plantNr]
             console.log("DeviceModelID: ", plant.plantypeid)
             const modelQuery = {
-                query : "SELECT * FROM c where c.latname = @id",
+                query : "SELECT c.latname, c.conname, c.description, c.configfields FROM c where c.latname = @id",
                 parameters : [
                     {name: "@id", value: plant.plantypeid}
                 ],
             }
-            const {resources: models} = await plantTypeContainer.items.query(modelQuery).fetchAll()
+            const {resources: types} = await plantTypeContainer.items.query(modelQuery).fetchAll()
 
-            const model = models[0]
+            const type = types[0]
 
+
+            plant.plantypeid = undefined
+            plant.type = type
 
 
             result.push(
                 {
                     plant,
-                    model
                 }
             );
 
