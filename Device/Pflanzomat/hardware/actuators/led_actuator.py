@@ -5,11 +5,7 @@ from ...interfaces.actuator_interface import \
     LedColor
 
 class LedActuator(LedActuatorInterface):
-    def __init__(
-            self,
-            red_pin: int,
-            yellow_pin: int,
-            green_pin: int):
+    def __init__(self, red_pin: int, yellow_pin: int, green_pin: int):
         self.red_pin = red_pin
         self.yellow_pin = yellow_pin
         self.green_pin = green_pin
