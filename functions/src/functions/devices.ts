@@ -74,12 +74,14 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
 
             const model = models[0]
 
+            device.modelid = undefined
+            device.model = model
+
 
 
             result.push(
                 {
                     device,
-                    model
                 }
             );
 
