@@ -10,27 +10,29 @@ const cosmosKey = process.env.CosmosDBKey;
 export async function getDevices(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const cosmosConnection = process.env.CosmosDBConnection
 
-    /*
-     const header = request.headers.get("authorization")
-             const user = getUser(header)
 
-             if (!user){
-                 console.error("Benutzer nicht da")
-                 return{
-                     status: 401,
-                     body: "Das hier sollte eigentlich gar nciht passieren",
-                 }
-             }
+
+    const header = request.headers.get("authorization")
+    const email = getUser(header)
+    console.log("E-mail: " , email)
+
+    if (!email){
+        return {
+            status: 401,
+        }
+    }
+
+
+
 
      if (!cosmosEndpoint || !cosmosKey) {
          context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
          return {
              status: 500,
-             body: ""
          }
      }
 
-     */
+
 
 
 
@@ -46,20 +48,13 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         const database = client.database(dbName)
         const deviceContainer = database.container(deviceConName)
         const modelContainer = database.container(modelConName)
-        const testOwner = "u37952@hs-harz.de"
-        /*
-                const query = {
-                    query : "SELECT * FROM c where c.owner = @owner",
-                    parameters: [
-                        {name : "owner", value: testOwner }
-                    ]
-                }
 
-
-
-         */
         const result = [];
-        const  deviceQuery = "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = 'u37952@hs-harz.de'"
+        const  deviceQuery = {
+            query: "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = @owner",
+            parameters: [ {name: "@owner", value: email}
+            ]
+        }
         const { resources: devices } = await deviceContainer.items.query(deviceQuery).fetchAll()
 
         for (const deviceNr in devices){
