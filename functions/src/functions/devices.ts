@@ -59,31 +59,27 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
 
          */
         const result = [];
-        const  deviceQuery = "SELECT c.id, c.name, c.userid, c.location, c.modelid, c.plantslots, c.config FROM c where c.userid = 'u37952@hs-harz.de'"
+        const  deviceQuery = "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = 'u37952@hs-harz.de'"
         const { resources: devices } = await deviceContainer.items.query(deviceQuery).fetchAll()
 
         for (const deviceNr in devices){
             const device = devices[deviceNr]
             const modelQuery = {
-                query : "SELECT c.id, c.modelid, c.name, c.slot_count FROM c where c.modelid = @id",
+                query : "SELECT c.id, c.name, c.slotCount FROM c where c.modelId = @id",
                 parameters : [
-                    {name: "@id", value: device.modelid}
+                    {name: "@id", value: device.modelId}
                 ],
             }
             const {resources: models} = await modelContainer.items.query(modelQuery).fetchAll()
 
             const model = models[0]
 
-            device.modelid = undefined
+            device.modelId = undefined
             device.model = model
 
 
 
-            result.push(
-                {
-                    device,
-                }
-            );
+            result.push(device);
 
         }
 
