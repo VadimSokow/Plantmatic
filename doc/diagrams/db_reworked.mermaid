@@ -6,8 +6,6 @@ erDiagram
     Device ||--o{ Measurement: generates
     Model ||--o{ Sensor: defines_sensor
     Model ||--o{ Actuator: defines_actuator
-    ModelSensorConfig }o--|| SensorDefinition: uses_type
-    ModelActuatorConfig }o--|| ActuatorDefinition: uses_type
     PlantType ||--o{ PlantConfigFieldDefinition: defines_field
 
     User {
