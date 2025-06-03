@@ -1,6 +1,6 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import { CosmosClient } from "@azure/cosmos"
-import { getUser } from "./user";
+import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
+import {CosmosClient} from "@azure/cosmos"
+import {getUser} from "./user";
 
 
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
@@ -11,30 +11,23 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
     const cosmosConnection = process.env.CosmosDBConnection
 
 
-
     const header = request.headers.get("authorization")
     const email = getUser(header)
-    console.log("E-mail: " , email)
+    console.log("E-mail: ", email)
 
-    if (!email){
+    if (!email) {
         return {
             status: 401,
         }
     }
 
 
-
-
-     if (!cosmosEndpoint || !cosmosKey) {
-         context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
-         return {
-             status: 500,
-         }
-     }
-
-
-
-
+    if (!cosmosEndpoint || !cosmosKey) {
+        context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
+        return {
+            status: 500,
+        }
+    }
 
 
     try {
@@ -50,18 +43,18 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         const modelContainer = database.container(modelConName)
 
         const result = [];
-        const  deviceQuery = {
+        const deviceQuery = {
             query: "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = @owner",
-            parameters: [ {name: "@owner", value: email}
+            parameters: [{name: "@owner", value: email}
             ]
         }
-        const { resources: devices } = await deviceContainer.items.query(deviceQuery).fetchAll()
+        const {resources: devices} = await deviceContainer.items.query(deviceQuery).fetchAll()
 
-        for (const deviceNr in devices){
+        for (const deviceNr in devices) {
             const device = devices[deviceNr]
             const modelQuery = {
-                query : "SELECT c.id, c.name, c.slotCount FROM c where c.modelId = @id",
-                parameters : [
+                query: "SELECT c.id, c.name, c.slotCount FROM c where c.modelId = @id",
+                parameters: [
                     {name: "@id", value: device.modelId}
                 ],
             }
@@ -73,14 +66,13 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
             device.model = model
 
 
-
             result.push(device);
 
         }
 
         return {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             //body: items
             body: JSON.stringify(result)
         }

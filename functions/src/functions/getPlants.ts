@@ -1,5 +1,5 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import { CosmosClient } from "@azure/cosmos"
+import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
+import {CosmosClient} from "@azure/cosmos"
 import {getUser} from "./user";
 
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
@@ -10,14 +10,13 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
 
     const header = request.headers.get("authorization")
     const email = getUser(header)
-    console.log("E-mail: " , email)
+    console.log("E-mail: ", email)
 
-    if (!email){
+    if (!email) {
         return {
             status: 401,
         }
     }
-
 
 
     try {
@@ -33,23 +32,22 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
         const plantTypeContainer = database.container(plantTypeConName)
 
 
-
         const result = [];
-        const  plantQuery = {
-            query: "SELECT c.id, c.plantId, c.userId, c.deviceId, c.name, c.plantTypeId, c.currentSensorData FROM c where c.userId = @owner",
+        const plantQuery = {
+            query: "SELECT c.id, c.plantId, c.userId, c.deviceId, c.name, c.latName, c.currentSensorData FROM c where c.userId = @owner",
             parameters: [
                 {name: "@owner", value: email}
             ]
         }
-        const { resources: plants } = await plantContainer.items.query(plantQuery).fetchAll()
+        const {resources: plants} = await plantContainer.items.query(plantQuery).fetchAll()
 
-        for (const plantNr in plants){
+        for (const plantNr in plants) {
             const plant = plants[plantNr]
             console.log("DeviceModelID: ", plant.plantTypeId)
             const plantTypeQuery = {
-                query : "SELECT c.latName, c.comName, c.description, c.configFields FROM c where c.latName = @id",
-                parameters : [
-                    {name: "@id", value: plant.plantTypeId}
+                query: "SELECT c.latName, c.comName, c.description, c.configFields FROM c where c.latName = @id",
+                parameters: [
+                    {name: "@id", value: plant.latName}
                 ],
             }
             const {resources: types} = await plantTypeContainer.items.query(plantTypeQuery).fetchAll()
@@ -67,7 +65,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
 
         return {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             //body: items
             body: JSON.stringify(result)
         }
