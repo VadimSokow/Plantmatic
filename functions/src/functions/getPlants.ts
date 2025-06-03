@@ -45,7 +45,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             const plant = plants[plantNr]
             console.log("DeviceModelID: ", plant.plantTypeId)
             const plantTypeQuery = {
-                query: "SELECT c.conName, c.description, c.configFields FROM c where c.latName = @id",
+                query: "SELECT c.comName, c.description, c.configFields FROM c where c.latName = @id",
                 parameters: [
                     {name: "@id", value: plant.latName}
                 ],
