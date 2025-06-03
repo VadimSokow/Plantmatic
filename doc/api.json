@@ -373,27 +373,7 @@
     },
     "/plants": {
       "get": {
-        "description": "Gibt alle möglichen Pflanzenvorlagen zurück",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/plants/{user}": {
-      "get": {
-        "description": "Gibt alle vom Nutzer verwendten Pflanzenvorlagen zurück",
-        "parameters": [
-          {
-            "name": "user",
-            "in": "body",
-            "schema": {}
-          }
-        ],
+        "description": "Gibt alle vom Nutzer verwalteten Pflanzen zurück nach Identitätsüberprüfung",
         "responses": {
           "200": {
             "description": "OK"
