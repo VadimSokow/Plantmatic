@@ -15,11 +15,20 @@
 </template>
 
 <script setup lang="ts">
-  import { useMsal } from '../composition-api/useMsal';
+  import { useMsal } from '../composition/msal'
 
-  const { instance } = useMsal();
+  const { instance } = useMsal()
 
-  const username = instance.getAllAccounts()[0]?.username || null;
+  const username = instance.getAllAccounts()[0]?.username || null
 
-  const logout = () => instance.logoutRedirect();
+  const logout = () => {
+    if (instance.getAllAccounts().length === 0) {
+      console.warn('No accounts available for logout.')
+      alert('No accounts available for logout.')
+      // redirect to login page
+      window.location.href = '/login'
+      return
+    }
+    instance.logoutRedirect()
+  }
 </script>

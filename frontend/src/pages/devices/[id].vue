@@ -1,66 +1,69 @@
 <template>
-  <v-container v-if="deviceIsOk" fluid>
+  <v-container v-if="device">
     <v-row>
       <!-- left panel - Device Info -->
       <v-col cols="auto">
-        <DevicePanel
-          :device-id="dev.device.id"
-          :location="dev.device.location"
-          :name="dev.device.name"
-          :slots-total="dev.model.slot_count"
-          :slots-used="dev.device.plantSlots.length"
-        />
+        <DevicePanel :device="device" :slots="deviceSlots" />
       </v-col>
       <!-- right panel - Plants-->
       <v-row lg="9" md="8" style="margin: 10px">
         <v-col
           v-for="plant in plants"
-          :key="plant.plantId"
+          :key="plant.id"
           cols="12"
           lg="4"
           md="6"
           sm="6"
         >
           <PlantCard
-            :device-model-id="dev.model.id"
-            :device-plant-slot="plant.slotNumber"
-            :plant-id="plant.plantId"
+            :plant="plant"
+            :slot-number="resolvePlantSlot(plant.id)"
+            :sensors="device.model.sensors"
           />
         </v-col>
       </v-row>
     </v-row>
   </v-container>
-
   <LoadAndError
-    :error="deviceInfo.error.value"
-    :is-loading="deviceInfo.isLoading.value"
-    @error-cleared="deviceInfo.error.value = null"
+    :error="error"
+    :is-loading="isLoading"
+    @error-cleared="clearError()"
   />
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from 'vue';
-  import { useRoute } from 'vue-router';
-  import { useDeviceInfo } from '@/composition-api/useDeviceInfo.ts';
+import { useRoute } from 'vue-router'
+import { useDeviceWithPlants } from '@/composition/deviceWithPlants.ts'
 
-  const route = useRoute('/devices/[id]');
-  const id = ref<string>(route.params.id);
+const route = useRoute('/devices/[id]')
+const id = ref<string>(route.params.id)
 
-  const deviceInfo = useDeviceInfo(id.value);
-  const dev = deviceInfo.deviceInfo;
+const {
+  device,
+  plants,
+  isLoading,
+  error,
+  loadAllData,
+  clearError,
+} = useDeviceWithPlants(id.value)
 
-  const deviceIsOk = computed(() => {
-    return dev.value != undefined && dev.value.device != undefined && dev.value.model != undefined;
-  })
+const deviceSlots = computed(() => {
+  return {
+    total: device.value.model.slotCount,
+    used: plants.value.length,
+  }
+})
 
-  const plants = computed(() => {
-    return dev.value.device.plantSlots.filter(plantId => plantId.plantId != null).map(plant => plant as {
-      plantId: string,
-      slotNumber: number,
-    });
-  })
+function resolvePlantSlot(plantId: string): number | null {
+  for (let plantSlot of device.value.plantSlots) {
+    if (!plantSlot.plantId) continue
+    if (plantSlot.plantId == plantId)
+      return plantSlot.slotNumber
+  }
+  return null
+}
 
-  onMounted(() => {
-    deviceInfo.loadDeviceInfo();
-  });
+onMounted(() => {
+  loadAllData()
+})
 </script>

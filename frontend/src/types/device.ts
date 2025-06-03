@@ -1,37 +1,50 @@
+import type { Plant } from '@/types/plant.ts'
+
 export interface Device {
-  id: string;
-  name: string;
-  userId: string;
-  modelId: string;
-  location: string;
+  id: string
+  name: string
+  userId: string
+  model: DeviceModel
+  location: string
   plantSlots: {
-    slotNumber: number;
-    plantId: string | null;
-  }[];
-  config?: object;
-}
-
-export interface ModelSensorConfig {
-  id: string;
-  type: 'device' | 'plant';
-  sensorDefinitionId: string;
-  unit: string;
-  fieldName: string;
-  plantSlot?: number;
-}
-
-export interface ModelActuatorConfig {
-  id: string;
-  actuatorDefinitionId: string;
-  purpose: string;
-  fieldName: string;
-  plantSlots?: number[];
+    slotNumber: number
+    plantId: string | null
+  }[]
+  config: Record<string, any>
 }
 
 export interface DeviceModel {
-  id: string;
-  name: string;
-  slot_count: number;
-  sensors: ModelSensorConfig[];
-  actuators: ModelActuatorConfig[];
+  id: string
+  name: string
+  slotCount: number
+  sensors: DeviceModelSensorConfig[]
+  actuators: DeviceModelActuatorConfig[]
+}
+
+export interface DeviceModelSensorConfig {
+  id: string
+  name: string
+  type: 'device' | 'plant'
+  sensorDefinitionId: string
+  fieldName: string
+  plantSlot?: number
+  unit: string,
+}
+
+export interface DeviceModelActuatorConfig {
+  id: string
+  actuatorDefinitionId: string
+  purpose: string
+  fieldName: string
+  plantSlots: number[]
+}
+
+export interface DeviceWithPlant {
+  device: Device
+  plant: Plant
+}
+
+export interface DeviceWithPlants {
+  device: Device
+  plants: Plant[]
 }

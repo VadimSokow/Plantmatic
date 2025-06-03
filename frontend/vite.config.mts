@@ -17,18 +17,14 @@ export default defineConfig({
   plugins: [
     VueRouter({
       dts: 'src/typed-router.d.ts',
-      routesFolder: 'src/pages',
     }),
-    Layouts({
-      defaultLayout: 'default',
-      layoutsDirs: 'src/layouts',
-    }),
+    Layouts(),
     AutoImport({
       imports: [
         'vue',
         VueRouterAutoImports,
         {
-          'pinia': ['defineStore', 'storeToRefs'],
+          pinia: ['defineStore', 'storeToRefs'],
         },
       ],
       dts: 'src/auto-imports.d.ts',
@@ -51,11 +47,14 @@ export default defineConfig({
       },
     }),
     Fonts({
-      google: {
-        families: [{
-          name: 'Roboto',
-          styles: 'wght@100;300;400;500;700;900',
-        }],
+      fontsource: {
+        families: [
+          {
+            name: 'Roboto',
+            weights: [100, 300, 400, 500, 700, 900],
+            styles: ['normal', 'italic'],
+          },
+        ],
       },
     }),
   ],
@@ -71,7 +70,7 @@ export default defineConfig({
   define: { 'process.env': {} },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('src', import.meta.url)),
     },
     extensions: [
       '.js',

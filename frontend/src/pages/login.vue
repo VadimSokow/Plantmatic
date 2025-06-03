@@ -19,17 +19,16 @@
 </template>
 
 <script setup lang="ts">
-  import { useMsal } from '../composition-api/useMsal';
-  import { loginRequest } from '../authConfig';
+  import { loginRequest } from '../authConfig'
+  import { useMsal } from '../composition/msal'
 
-  const { instance } = useMsal();
+  const { instance } = useMsal()
 
-  // eslint-disable-next-line no-undef
   definePage({
     meta: {
       layout: 'empty',
     },
   })
 
-  const login = () => instance.loginRedirect(loginRequest);
+  const login = () => instance.loginRedirect(loginRequest)
 </script>

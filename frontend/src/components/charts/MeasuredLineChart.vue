@@ -25,6 +25,7 @@ import {
   type ChartData,
   type ChartOptions,
 } from 'chart.js';
+import type { MeasuredValues } from '@/types/measurement.ts'
 
 ChartJS.register(
   Title,
@@ -35,11 +36,6 @@ ChartJS.register(
   CategoryScale,
   LinearScale
 );
-
-type MeasuredValues = {
-  timestamp: number; // Unix-Timestamp in MILLISEKUNDEN
-  value: number;
-}[];
 
 interface LineChartProps {
   title?: string;

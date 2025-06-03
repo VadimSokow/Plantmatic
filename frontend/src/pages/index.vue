@@ -1,34 +1,33 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="device in devices.values()" :key="device.id" cols="12" md="4">
-        <DeviceCard :device-id="device.id" />
+      <v-col v-for="combi in devicesWithPlants" :key="combi.device.id" cols="12" md="4">
+        <DeviceCard :data="combi" />
       </v-col>
     </v-row>
 
     <LoadAndError
-      :error="deviceStore.error"
-      :is-loading="deviceStore.isLoading"
-      @error-cleared="deviceStore.$patch({ error: null })"
+      :error="error"
+      :is-loading="isLoading"
+      @error-cleared="clearError()"
     />
   </v-container>
 </template>
 
 <script lang="ts" setup>
-  import { storeToRefs } from 'pinia';
-  import { onMounted } from 'vue';
-  import { useDeviceStore } from '@/stores/devices.ts';
-  import { usePlantStore } from '@/stores/plants.ts';
+import { useDevicesWithPlants } from '@/composition/devicesWithPlants.ts'
 
-  const deviceStore = useDeviceStore();
-  const { devices } = storeToRefs(deviceStore);
+const {
+  devicesWithPlants,
+  isLoading,
+  error,
+  loadAllData,
+  clearError,
+} = useDevicesWithPlants()
 
-  const plantStore = usePlantStore();
+const loaded = ref(false)
 
-  onMounted(() => {
-    deviceStore.fetchDevices().then(() => {
-      const plant_ids = deviceStore.getAllPlantIds
-      plantStore.fetchPlants(plant_ids);
-    });
-  });
+onMounted(() => {
+  loadAllData()
+})
 </script>

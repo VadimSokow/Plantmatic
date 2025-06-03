@@ -1,14 +1,16 @@
-import { type App, reactive } from 'vue';
+import type {
+  AccountInfo,
+  EventMessage,
+  PublicClientApplication,
+} from '@azure/msal-browser'
 import {
-  type AccountInfo,
-  type EventMessage,
   EventMessageUtils,
   EventType,
   InteractionStatus,
-  PublicClientApplication,
-} from '@azure/msal-browser';
+} from '@azure/msal-browser'
+import { type App, reactive } from 'vue'
 
-type AccountIdentifiers = Partial<Pick<AccountInfo, 'homeAccountId' | 'localAccountId' | 'username'>>;
+type AccountIdentifiers = Partial<Pick<AccountInfo, 'homeAccountId' | 'localAccountId' | 'username'>>
 
 /**
  * Helper function to determine whether 2 arrays are equal
@@ -18,28 +20,27 @@ type AccountIdentifiers = Partial<Pick<AccountInfo, 'homeAccountId' | 'localAcco
  */
 function accountArraysAreEqual (arrayA: Array<AccountIdentifiers>, arrayB: Array<AccountIdentifiers>): boolean {
   if (arrayA.length !== arrayB.length) {
-    return false;
+    return false
   }
 
-  const comparisonArray = [...arrayB];
+  const comparisonArray = [...arrayB]
 
   return arrayA.every(elementA => {
-    const elementB = comparisonArray.shift();
+    const elementB = comparisonArray.shift()
     if (!elementA || !elementB) {
-      return false;
+      return false
     }
 
-    return (elementA.homeAccountId === elementB.homeAccountId) &&
-      (elementA.localAccountId === elementB.localAccountId) &&
-      (elementA.username === elementB.username);
-  });
+    return (elementA.homeAccountId === elementB.homeAccountId)
+      && (elementA.localAccountId === elementB.localAccountId)
+      && (elementA.username === elementB.username)
+  })
 }
 
 export const msalPlugin = {
   install: (app: App, msalInstance: PublicClientApplication) => {
-
-    const inProgress = InteractionStatus.Startup;
-    const accounts = msalInstance.getAllAccounts();
+    const inProgress = InteractionStatus.Startup
+    const accounts = msalInstance.getAllAccounts()
 
     const state = reactive<{
       instance: PublicClientApplication
@@ -49,9 +50,9 @@ export const msalPlugin = {
       instance: msalInstance,
       inProgress,
       accounts,
-    });
+    })
 
-    app.config.globalProperties.$msal = state;
+    app.config.globalProperties.$msal = state
 
     msalInstance.addEventCallback((message: EventMessage) => {
       switch (message.eventType) {
@@ -65,18 +66,18 @@ export const msalPlugin = {
         case EventType.LOGOUT_END:
         case EventType.ACQUIRE_TOKEN_SUCCESS:
         case EventType.ACQUIRE_TOKEN_FAILURE: {
-          const currentAccounts = msalInstance.getAllAccounts();
+          const currentAccounts = msalInstance.getAllAccounts()
           if (!accountArraysAreEqual(currentAccounts, state.accounts)) {
-            state.accounts = currentAccounts;
+            state.accounts = currentAccounts
           }
-          break;
+          break
         }
       }
 
-      const status = EventMessageUtils.getInteractionStatusFromEvent(message, state.inProgress);
+      const status = EventMessageUtils.getInteractionStatusFromEvent(message, state.inProgress)
       if (status !== null) {
-        state.inProgress = status;
+        state.inProgress = status
       }
-    });
+    })
   },
 }

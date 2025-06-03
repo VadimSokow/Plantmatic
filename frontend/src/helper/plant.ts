@@ -1,7 +1,7 @@
-import type { ModelSensorConfig } from '@/types/device.ts';
+import type { DeviceModelSensorConfig } from '@/types/device.ts'
 
 export function plantFieldWithDataToStrings (
-  defs: ModelSensorConfig[],
+  defs: DeviceModelSensorConfig[],
   devicePlantSlot: number,
   data: Record<string, unknown> | undefined,
 ): string[] {
@@ -9,7 +9,7 @@ export function plantFieldWithDataToStrings (
 
   defs.forEach(def => {
     // Sicherer Zugriff mit optional chaining
-    let line = `${def.fieldName}: `;
+    let line = `${def.name}: `;
     if (data === undefined) {
       line += 'unknown';
       lines.push(line);
@@ -48,6 +48,8 @@ function resolveUnitToString (unit: string): string {
       return '%';
     case 'celsius':
       return '°C';
+    case 'lux':
+      return 'lx';
     default:
       return '';
   }

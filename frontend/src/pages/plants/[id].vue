@@ -1,56 +1,90 @@
 <template>
-  <v-container>
-    <h1>{{ plant.name }}</h1>
-    <p>Details für Pflanze mit ID: {{ id }}</p>
-
-    <MeasuredLineChart
-      v-if="measurementSoil"
-      :title="'Bodenfeuchte an der Pflanze'"
-      :data="measurementSoil.values"
-      :datasetLabel="'Bodenfeuchte (%)'"
-      :backgroundColor="'#2196F3'"
-      :borderColor="'#2196F3'"
-      :xAxisLabel="'Zeit'"
-      :yAxisLabel="'Bodenfeuchte'"
-    />
-    <v-spacer />
-    <MeasuredLineChart
-      v-if="measurementTemp"
-      :title="'Temperatur an der Pflanze'"
-      :data="measurementTemp.values"
-      :datasetLabel="'Temperatur (°C)'"
-      :backgroundColor="'#2196F3'"
-      :borderColor="'#2196F3'"
-      :xAxisLabel="'Zeit'"
-      :yAxisLabel="'Temperatur'"
-    />
-    <p v-else> Keine Daten Gefunden! </p>
+  <v-container v-if="!isLoading">
+    <v-row>
+      <v-col cols="auto">
+        <DevicePanel :device="device" :slots="null" />
+        <v-divider/>
+        <PlantPanel :plant="plant" :slot-number="slotNumber" :sensors="device.model.sensors"/>
+        <v-divider/>
+        <v-btn color="error" @click="openDeleteDialog()">
+          Pflanze löschen
+        </v-btn>
+      </v-col>
+      <v-col>
+        <PlantChartCard :plant="plant" :field-name="'temp_air'" :sensors="[]" />
+      </v-col>
+    </v-row>
   </v-container>
+
+  <DeletePlantDialog
+    ref="deletePlantDialogRef"
+    :plant="plant"
+    @confirm="handlePlantDeleteConfirmed"
+    @cancel="handleDeleteCanceled"
+  />
+
+  <LoadAndError
+    :error="error"
+    :is-loading="isLoading"
+    @error-cleared="clearError()"
+  />
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
-import {useRoute} from 'vue-router';
-import {type DeviceMeasurement, type PlantMeasurement, useMeasurementsStore} from "@/stores/measurements.ts";
+import { useDeviceWithPlant } from '@/composition/deviceWithPlant.ts'
+import DeletePlantDialog from '@/components/dialog/DeletePlantDialog.vue'
 
-const route = useRoute('/plants/[id]');
-const id = ref<string>(route.params.id);
-const plant = ref<{ name: string; details: string }>({name: '', details: ''});
+definePage({
+  meta: {
+    requireDevice: true,
+  },
+})
 
-const measurementStore = useMeasurementsStore();
+const route = useRoute('/plants/[id]')
+const id = ref<string>(route.params.id)
 
-const measurementSoil = ref<PlantMeasurement | undefined>(undefined);
-const measurementTemp = ref<DeviceMeasurement | undefined>(undefined);
+const {
+  device,
+  plant,
+  slotNumber,
+  isLoading,
+  error,
+  loadAllData,
+  clearError,
+} = useDeviceWithPlant(id.value)
+
+const deletePlantDialogRef = ref<InstanceType<typeof DeletePlantDialog> | null>(null);
+
+const openDeleteDialog = () => {
+  if (deletePlantDialogRef.value) {
+    deletePlantDialogRef.value.openDialog();
+  }
+}
+
+// --- Handler für die Bestätigung des Löschens ---
+const handlePlantDeleteConfirmed = async (plantId: string) => {
+  console.log(`Löschen der Pflanze mit ID: ${plantId} bestätigt.`);
+
+  // Hier würde der tatsächliche API-Aufruf zum Löschen stattfinden:
+  // try {
+  //   const plantStore = usePlantStore(); // Annahme: Du hast einen Plant Store
+  //   await plantStore.deletePlant(plantId); // Die Aktion in deinem Pinia Store
+  //   console.log(`Pflanze ${plantId} erfolgreich gelöscht!`);
+  //   // Optional: Benachrichtigung anzeigen (Snackbar)
+  //   // Optional: Zurück zur vorherigen Seite navigieren oder Liste aktualisieren
+  //   // router.back(); // Oder router.push('/plants');
+  // } catch (error) {
+  //   console.error(`Fehler beim Löschen der Pflanze ${plantId}:`, error);
+  //   // Fehlerbehandlung, z.B. Fehlermeldung im UI anzeigen
+  // }
+};
+
+// --- Handler, wenn das Löschen abgebrochen wird ---
+const handleDeleteCanceled = () => {
+  console.log('Löschen der Pflanze abgebrochen.');
+};
 
 onMounted(() => {
-  // Hier würdest du die Details für die Pflanze mit der ID vom Backend abrufen
-  console.log('Abrufen der Details für Pflanze:', id.value);
-  // Beispiel-Daten:
-  plant.value = {name: `Pflanze ${id.value}`, details: 'Weitere Informationen...'};
-
-  measurementStore.load().then(() => {
-    measurementSoil.value = measurementStore.getPlantMeasurements(id.value, 'soil_moisture_basic');
-    measurementTemp.value = measurementStore.getDeviceMeasurements('1', 'temp1');
-  });
-});
+  loadAllData(true)
+})
 </script>

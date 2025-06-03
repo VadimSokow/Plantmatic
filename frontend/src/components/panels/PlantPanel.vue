@@ -1,16 +1,13 @@
 <template>
-  <v-card :to="`/plants/${plant.id}`" variant="outlined">
-    <v-card-title>
-      <v-icon icon="mdi-leaf" />
-      {{ plant.name }}
-    </v-card-title>
-    <v-card-text>
-      <p>Art: {{ plant.type.commonName }}</p>
-      <div v-for="line in fields" :key="line">
-        <p>{{ line }}</p>
-      </div>
-    </v-card-text>
-  </v-card>
+<v-container>
+  <v-col>
+    <h2>{{ plant.name }}</h2>
+    <p>Art: {{ plant.type.commonName }}</p>
+    <div v-for="line in fields" :key="line">
+      <p>{{ line }}</p>
+    </div>
+  </v-col>
+</v-container>
 </template>
 
 <script setup lang="ts">

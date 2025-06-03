@@ -1,9 +1,18 @@
-import { createRouter, createWebHistory } from 'vue-router/auto'
+/**
+ * router/index.ts
+ *
+ * Automatic routes for `./src/pages/*.vue`
+ */
+
+import type { PublicClientApplication } from '@azure/msal-browser'
+import type { RouteLocationNormalized } from 'vue-router'
 import { setupLayouts } from 'virtual:generated-layouts'
+// eslint-disable-next-line import/no-duplicates
+import { createRouter, createWebHistory } from 'vue-router/auto'
+// eslint-disable-next-line import/no-duplicates
 import { routes } from 'vue-router/auto-routes'
-import { loginRequest, msalInstance } from '../authConfig';
-import { InteractionType, type PopupRequest, PublicClientApplication, type RedirectRequest } from '@azure/msal-browser';
-import type { RouteLocationNormalized } from 'vue-router';
+import { msalInstance } from '@/authConfig.ts'
+import { useDeviceStore } from '@/stores/device.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,12 +22,12 @@ const router = createRouter({
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
-    if (!localStorage.getItem('vuetify:dynamic-reload')) {
+    if (localStorage.getItem('vuetify:dynamic-reload')) {
+      console.error('Dynamic import error, reloading page did not fix it', err)
+    } else {
       console.log('Reloading page to fix dynamic import error')
       localStorage.setItem('vuetify:dynamic-reload', 'true')
       location.assign(to.fullPath)
-    } else {
-      console.error('Dynamic import error, reloading page did not fix it', err)
     }
   } else {
     console.error(err)
@@ -29,55 +38,44 @@ router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')
 })
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+router.beforeEach(async (to: RouteLocationNormalized) => {
+  // login page is always accessible, when user is already logged in
+  // it will redirect to the home page when click on the login button
   if (to.name === '/login') {
-    return true;
+    return true
   }
 
+  // always redirect to the home page after auth callback
   if (to.path.endsWith('/auth/callback')) {
-    return '/';
+    return '/'
   }
 
-  const request = {
-    ...loginRequest,
-    redirectStartPage: to.fullPath,
+  // check if the user is authenticated
+  const isAuthed: boolean = await isAuthenticated(msalInstance)
+  // when the user is not authenticated, redirect to the login page
+  if (!isAuthed) {
+    return '/login'
   }
-  const shouldProceed = await isAuthenticated(msalInstance, InteractionType.None, request);
-  if (!shouldProceed) {
-    return '/login';
+
+  const deviceStore = useDeviceStore()
+
+  if (to.meta.requireDevice && Object.keys(deviceStore.devices).length === 0 && !deviceStore.loading) {
+    return '/'
   }
-  return true;
-});
+
+  return true
+})
 
 export default router
 
-
-export async function isAuthenticated (instance: PublicClientApplication, interactionType: InteractionType, loginRequest: PopupRequest | RedirectRequest): Promise<boolean> {
-  // If your application uses redirects for interaction, handleRedirectPromise must be called and awaited on each page load before determining if a user is signed in or not
+/**
+ * Check if the user is authenticated.
+ * @param instance The MSAL PublicClientApplication instance.
+ * @return A promise that resolves to true if the user is authenticated, false otherwise.
+ */
+async function isAuthenticated (instance: PublicClientApplication): Promise<boolean> {
   return instance.handleRedirectPromise().then(() => {
-    const accounts = instance.getAllAccounts();
-    if (accounts.length > 0) {
-      return true;
-    }
-
-    // User is not signed in and attempting to access protected route. Sign them in.
-    if (interactionType === InteractionType.Popup) {
-      return instance.loginPopup(loginRequest).then(() => {
-        return true;
-      }).catch(() => {
-        return false;
-      })
-    } else if (interactionType === InteractionType.Redirect) {
-      return instance.loginRedirect(loginRequest).then(() => {
-        return true;
-      }).catch(() => {
-        return false;
-      });
-    }
-
-    return false;
-  }).catch(() => {
-    return false;
-  });
+    const accounts = instance.getAllAccounts()
+    return accounts.length > 0
+  })
 }
