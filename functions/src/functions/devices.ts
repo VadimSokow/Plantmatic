@@ -53,7 +53,7 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         for (const deviceNr in devices) {
             const device = devices[deviceNr]
             const modelQuery = {
-                query: "SELECT c.id, c.name, c.slotCount FROM c where c.modelId = @id",
+                query: "SELECT c.id, c.name, c.slotCount, c.sensors FROM c where c.modelId = @id",
                 parameters: [
                     {name: "@id", value: device.modelId}
                 ],
