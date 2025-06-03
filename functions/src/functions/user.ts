@@ -1,5 +1,5 @@
 
-import jwt, {JwtPayload} from "jsonwebtoken";
+import {JwtPayload} from "jsonwebtoken";
 
 
 export function getUser(authHeader: string): string | null {
@@ -13,7 +13,7 @@ export function getUser(authHeader: string): string | null {
     const token = authHeader.substring(7)
     const decoder = require('jsonwebtoken')
   try {
-    const decoded = jwt.decode(token) as JwtPayload | null
+    const decoded = decoder.decode(token) as JwtPayload | null
 
     if (!decoded){
         console.log("AuthHeader fehlerhaft oder nciht da")
