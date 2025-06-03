@@ -1,6 +1,6 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import { CosmosClient } from "@azure/cosmos"
-import { getUser } from "./user";
+import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
+import {CosmosClient} from "@azure/cosmos"
+import {getUser} from "./user";
 
 
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
@@ -10,29 +10,24 @@ const cosmosKey = process.env.CosmosDBKey;
 export async function getDevices(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const cosmosConnection = process.env.CosmosDBConnection
 
-    /*
-     const header = request.headers.get("authorization")
-             const user = getUser(header)
 
-             if (!user){
-                 console.error("Benutzer nicht da")
-                 return{
-                     status: 401,
-                     body: "Das hier sollte eigentlich gar nciht passieren",
-                 }
-             }
+    const header = request.headers.get("authorization")
+    const email = getUser(header)
+    console.log("E-mail: ", email)
 
-     if (!cosmosEndpoint || !cosmosKey) {
-         context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
-         return {
-             status: 500,
-             body: ""
-         }
-     }
-
-     */
+    if (!email) {
+        return {
+            status: 401,
+        }
+    }
 
 
+    if (!cosmosEndpoint || !cosmosKey) {
+        context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
+        return {
+            status: 500,
+        }
+    }
 
 
     try {
@@ -46,48 +41,38 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         const database = client.database(dbName)
         const deviceContainer = database.container(deviceConName)
         const modelContainer = database.container(modelConName)
-        const testOwner = "u37952@hs-harz.de"
-        /*
-                const query = {
-                    query : "SELECT * FROM c where c.owner = @owner",
-                    parameters: [
-                        {name : "owner", value: testOwner }
-                    ]
-                }
 
-
-
-         */
         const result = [];
-        const  deviceQuery = "SELECT * FROM c where c.userid = 'u37952@hs-harz.de'"
-        const { resources: devices } = await deviceContainer.items.query(deviceQuery).fetchAll()
+        const deviceQuery = {
+            query: "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = @owner",
+            parameters: [{name: "@owner", value: email}
+            ]
+        }
+        const {resources: devices} = await deviceContainer.items.query(deviceQuery).fetchAll()
 
-        for (const deviceNr in devices){
+        for (const deviceNr in devices) {
             const device = devices[deviceNr]
             const modelQuery = {
-                query : "SELECT * FROM c where c.modelid = @id",
-                parameters : [
-                    {name: "@id", value: device.modelid}
+                query: "SELECT c.id, c.name, c.slotCount, c.sensors FROM c where c.modelId = @id",
+                parameters: [
+                    {name: "@id", value: device.modelId}
                 ],
             }
             const {resources: models} = await modelContainer.items.query(modelQuery).fetchAll()
 
             const model = models[0]
 
+            device.modelId = undefined
+            device.model = model
 
 
-            result.push(
-                {
-                    device,
-                    model
-                }
-            );
+            result.push(device);
 
         }
 
         return {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             //body: items
             body: JSON.stringify(result)
         }
