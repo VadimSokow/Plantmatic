@@ -34,6 +34,7 @@ leds.setup()
 try:
     while True:
 
+
         # Temp und Luftfeuchte Auslesen
         temp, hum = dht_sensor.read_combined()
         if temp is not None and hum is not None:

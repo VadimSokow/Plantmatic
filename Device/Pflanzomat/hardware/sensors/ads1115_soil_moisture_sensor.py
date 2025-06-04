@@ -22,6 +22,7 @@ class ADS1115SoilSensor(SoilMoistureSensorInterface):
         self.i2c_address = i2c_address
         self.ads = None     #Analog Digital Wandler
         self.chan = None    #Sensor am ADC Pin
+        self.value_name = "soil_moisture_percent"
         self._setup()
 
     def _setup(self):
