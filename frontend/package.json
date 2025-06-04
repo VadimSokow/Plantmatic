@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
+    "@types/lodash": "^4.17.17",
     "@types/node": "^22.9.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/eslint-config-prettier": "^10.2.0",

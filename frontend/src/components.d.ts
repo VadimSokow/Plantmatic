@@ -16,7 +16,6 @@ declare module 'vue' {
     DeviceCard: typeof import('./components/cards/DeviceCard.vue')['default']
     DevicePanel: typeof import('./components/panels/DevicePanel.vue')['default']
     ErrorOverlay: typeof import('./components/helper/ErrorOverlay.vue')['default']
-    HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     LoadAndError: typeof import('./components/helper/LoadAndError.vue')['default']
     LoadOverlay: typeof import('./components/helper/LoadOverlay.vue')['default']
     MeasuredLineChart: typeof import('./components/charts/MeasuredLineChart.vue')['default']
