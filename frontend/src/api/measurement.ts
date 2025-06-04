@@ -2,7 +2,7 @@ import type { Measurement } from '@/types/measurement.ts'
 
 const timestep = 1000 * 60 * 5
 
-function generateDataSet(
+function generateDataSet (
   plantId: string,
   fieldName: string,
   startTime: number,
@@ -14,11 +14,11 @@ function generateDataSet(
   let time = startTime
   while (time < endTime) {
     const measurement: Measurement = {
-      id: Math.random().toString(),
-      plantId: plantId,
-      fieldName: fieldName,
+      deviceId: '1',
+      plantId,
+      fieldName,
       timestamp: new Date(time),
-      value: Math.random() * 20,
+      value: Math.random() * 30,
     }
     measurements.push(measurement)
 
@@ -35,5 +35,12 @@ export const fetchMeasurements = async (
   maxCount: number,
   pageIndex: number,
 ): Promise<Measurement[] | null> => {
-  return generateDataSet(plantId, fieldName, startTime, endTime, maxCount, pageIndex)
+  return generateDataSet(
+    plantId,
+    fieldName,
+    startTime,
+    endTime,
+    maxCount,
+    pageIndex,
+  )
 }
