@@ -20,6 +20,7 @@ class ADS1115LightSensor(LightSensorInterface):
         self.i2c_address = i2c_address
         self.ads = None     # Analog Digital Wandler Instanz
         self.chan = None    # Sensor am ADC Pin (AnalogIn Instanz)
+        self.value_name = "light_level_lux"
 
         if self.voltage_dark == self.voltage_bright:
             print("FEHLER: voltage_dark und voltage_bright dürfen nicht identisch sein! Lichtsensor nicht initialisiert.")
@@ -59,7 +60,7 @@ class ADS1115LightSensor(LightSensorInterface):
                 return None
 
             percent = 100.0 * (self.voltage_dark - current_voltage) / value_range
-
+            # TODO von percent zu Lux
             percent = max(0.0, min(100.0, percent))
             return percent
 

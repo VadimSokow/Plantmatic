@@ -52,10 +52,6 @@ SENSOR_READ_INTERVAL_SECONDS: int = 10      # Wie oft Sensoren lesen
 PUMP_ON_DURATION_SECONDS: float = 3.0       # Wie lange pumpen
 PUMP_COOLDOWN_SECONDS: int = 60 * 10        # Mindestpause zwischen Pumpvorgängen (10 Min)
 
-# Bodenfeuchte (Beispielwerte in %) todo aus cloud config laden und in die toml umziehen
-SOIL_MOISTURE_THRESHOLD_LOW = 30.0
-SOIL_MOISTURE_THRESHOLD_OK_LOW = 45.0
-SOIL_MOISTURE_THRESHOLD_OK_HIGH = 70.0
 
 
 

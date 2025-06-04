@@ -22,7 +22,7 @@ class Pump(PumpActuatorInterface):
         except Exception as e:
             print(f"FEHLER beim Setup für Pumpen-Pin {self.pin}: {e}")
 
-    def pump_on(self):
+    def __pump_on(self):
         """Schaltet die Pumpe an."""
         if not self.is_on:
             try:

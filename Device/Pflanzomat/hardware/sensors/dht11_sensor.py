@@ -1,9 +1,19 @@
+from contextlib import \
+    nullcontext
+
 import adafruit_dht
 import time
-from typing import Optional, Tuple
-from ...interfaces.sensor_interface import TempHumiditySensorInterface
+from typing import \
+    Optional, \
+    Tuple, \
+    Any
+from ...interfaces.sensor_interface import \
+    TempHumiditySensorInterface, \
+    HumiditySensorInterface, \
+    TemperatureSensorInterface
 
-class DHT11Sensor(TempHumiditySensorInterface):
+
+class DHT11Sensor(TempHumiditySensorInterface, HumiditySensorInterface, TemperatureSensorInterface):
     def __init__(self, pin):
         self.pin = pin
         self.dht_device = None
@@ -11,6 +21,8 @@ class DHT11Sensor(TempHumiditySensorInterface):
         self.min_interval = 2.0
         self.last_temp = None
         self.last_hum = None
+        self.temperature_value_name = "temperature_celsius"
+        self.humidity_value_name = "humidity_percent"
         self._setup()
 
     def _setup(self):
@@ -58,6 +70,64 @@ class DHT11Sensor(TempHumiditySensorInterface):
         except Exception as e:
             print(f"Unerwarteter Fehler beim Lesen des DHT11: {e}")
             return None, None
+
+    def get_humidity_percent(self) -> float | None:
+        current_time = time.monotonic()
+        if self.dht_device is None:
+            print("DHT11 nicht initialisiert.")
+            return None
+        # Prüfe, ob genug Zeit seit dem letzten Lesen vergangen ist
+        if (current_time - self.last_read_time) < self.min_interval:
+            # Gebe die zuletzt erfolgreich gelesenen Werte zurück, wenn zu früh
+            return self.last_hum
+        try:
+            humidity = self.dht_device.humidity
+            self.last_read_time = current_time
+
+            # prüfen, ob Sensorwerte gültig sind
+            if humidity is not None:
+                self.last_hum = humidity
+                return humidity
+            else:
+                # Wenn Sensorwerte ungültig, letzte gemessene Werte zurückgeben
+                print("DHT11 lieferte None, gebe letzte bekannte Werte zurück.")
+                return self.last_hum
+
+        except RuntimeError as error:
+            # bei Lesefehlern alte Werte zurückgeben
+            return self.last_hum
+        except Exception as e:
+            print(f"Unerwarteter Fehler beim Lesen des DHT11: {e}")
+            return None
+
+    def get_temperature_celsius(self) -> float | None:
+        current_time = time.monotonic()
+        if self.dht_device is None:
+            print("DHT11 nicht initialisiert.")
+            return None
+        # Prüfe, ob genug Zeit seit dem letzten Lesen vergangen ist
+        if (current_time - self.last_read_time) < self.min_interval:
+            # Gebe die zuletzt erfolgreich gelesenen Werte zurück, wenn zu früh
+            return self.last_temp
+        try:
+            temperature_c = self.dht_device.temperature
+            self.last_read_time = current_time
+            # prüfen, ob Sensorwerte gültig sind
+            if temperature_c is not None:
+                self.last_temp = temperature_c
+                return temperature_c
+            else:
+                # Wenn Sensorwerte ungültig, letzte gemessene Werte zurückgeben
+                print(
+                    "DHT11 lieferte None, gebe letzte bekannte Werte zurück.")
+                return self.last_temp
+
+        except RuntimeError as error:
+            # bei Lesefehlern alte Werte zurückgeben
+            return self.last_temp
+        except Exception as e:
+            print(f"Unerwarteter Fehler beim Lesen des DHT11: {e}")
+            return None
 
     def cleanup(self):
         """Gibt die Ressourcen des DHT-Sensors frei."""
