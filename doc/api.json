@@ -386,13 +386,16 @@
     },
     "/plants/": {
       "post": {
-        "description": "Ermöglicht das Hinzufügen einer neuen Vorlage",
+        "description": "Ermöglicht das Hinzufügen einer neuen Pflanze",
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created wenn die Pflanze erfolgreich erstellt wurde"
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized wenn kein gültiger Token übergeben wurde"
+          },
+          "400": {
+            "description": "Bad Request wenn ein Attribut zum Erstellen der Pflanze fehlt"
           }
         }
       }
