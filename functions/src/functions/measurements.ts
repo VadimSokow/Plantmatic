@@ -34,7 +34,7 @@ interface MeasurementQueryParameters {
 
 async function measurements(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // resolve user
-    let userMail = "u38079@hs-harz.de"
+    let userMail = ""
     try {
         userMail = extractUserEmail(request)
     } catch (error) {
@@ -113,7 +113,7 @@ async function measurements(request: HttpRequest, context: InvocationContext): P
     const offset = queryParams.page * queryParams.pageSize;
 
     const query = {
-        query: `SELECT c.deviceId, c.plantId, c.fieldName, c.timestamp, "c.value"
+        query: `SELECT c.deviceId, c.plantId, c.fieldName, c.timestamp, c["value"]
                 FROM c 
                 WHERE c.plantId = @plantId AND c.fieldName = @fieldName
                     AND c.timestamp >= @startTime AND c.timestamp <= @endTime
