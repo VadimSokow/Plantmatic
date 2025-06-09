@@ -2,12 +2,12 @@ import time
 import config
 import RPi.GPIO as GPIO
 
-from Pflanzomat.interfaces.actuator_interface import LedColor
-from Pflanzomat.hardware.sensors.dht11_sensor import DHT11Sensor
-from Pflanzomat.hardware.sensors.ads1115_soil_moisture_sensor import ADS1115SoilSensor
-from Pflanzomat.hardware.actuators.pump import Pump
-from Pflanzomat.hardware.sensors.ads1115_light_sensor import ADS1115LightSensor
-from Pflanzomat.hardware.actuators.led_actuator import LedActuator
+from src.interfaces.actuator_interface import LedColor
+from src.hardware.sensors.dht11_sensor import DHT11Sensor
+from src.hardware.sensors.ads1115_soil_moisture_sensor import ADS1115SoilSensor
+from src.hardware.actuators.pump import Pump
+from src.hardware.sensors.ads1115_light_sensor import ADS1115LightSensor
+from src.hardware.actuators.led_actuator import LedActuator
 
 # Temperatur- und Luftfeuchte Sensor initialisieren
 dht_sensor = DHT11Sensor(config.DHT11_PIN)
