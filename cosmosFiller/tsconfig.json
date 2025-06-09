@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",         // Ziel-ECMAScript-Version (z.B. ES2020 für moderne Node.js-Versionen)
+    "module": "CommonJS",       // Modulsystem, das Node.js verwendet
+    "outDir": "./dist",         // Ausgabeverzeichnis für kompilierte JS-Dateien
+    "strict": true,             // Aktiviert alle strikten Type-Checking-Optionen
+    "esModuleInterop": true,    // Ermöglicht die Standard-Import-Syntax für CommonJS-Module
+    "skipLibCheck": true,       // Überspringt die Typprüfung von Deklarationsdateien
+    "forceConsistentCasingInFileNames": true, // Erzwingt konsistente Groß-/Kleinschreibung bei Dateinamen
+    "resolveJsonModule": true   // Ermöglicht den Import von JSON-Dateien
+  },
+  "include": [
+    "src/main.ts",                  // Schließe deine Hauptdatei ein
+    "src/cosmos.ts"                 // Schließe deine Cosmos DB Datei ein
+    // Füge hier weitere .ts-Dateien hinzu, die kompiliert werden sollen
+  ],
+  "exclude": [
+    "node_modules"              // Schließe den node_modules Ordner aus
+  ]
+}
