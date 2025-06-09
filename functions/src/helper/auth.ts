@@ -1,5 +1,5 @@
 import {HttpRequest, HttpResponseInit} from "@azure/functions";
-import {JwtPayload} from "jsonwebtoken";
+import {jwtDecode} from "jwt-decode";
 
 export class AuthError extends Error {
     constructor(message: string, public readonly status: number) {
@@ -48,20 +48,21 @@ export function extractUserEmail(request: HttpRequest): string {
     }
 
     const token = authHeader.substring(7)
-    const jwt = require('jsonwebtoken')
 
-    let decoded: JwtPayload | null = null;
+    let decoded: Record<string, any> | null = null;
     try {
-        decoded = jwt.decode(token)
+        decoded = jwtDecode(token)
+        console.log(decoded)
     } catch (error) {
         console.error("Error decoding JWT token:", error);
         throw new ErrorJWTDecodeFailed();
     }
-    if (!decoded || typeof decoded.email !== 'string') {
+    // TODO: change preferred_username to something else (currently used by Azure AD)
+    if (!decoded || typeof decoded.preferred_username !== 'string') {
         throw new ErrorJWTDecodeFailed()
     }
     if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
         throw new ErrorJWTExpired()
     }
-    return decoded.email
+    return decoded.preferred_username
 }
