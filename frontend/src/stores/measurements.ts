@@ -1,4 +1,4 @@
-import type { MeasuredPlant, MeasuredValue } from '@/types/measurement.ts'
+import type { MeasuredPlant } from '@/types/measurement.ts'
 import { defineStore } from 'pinia'
 import { fetchMeasurements } from '@/api/measurement.ts'
 
@@ -15,14 +15,12 @@ export const useMeasurementsStore = defineStore('measurements', {
   },
 
   actions: {
-    async load (plantId: string, fieldName: string) {
+    async load (plantId: string, fieldName: string, startTime = 1_672_531_343_744, endTime = 1_672_609_412_225) {
       const result = await fetchMeasurements(
         plantId,
         fieldName,
-        Date.now() - 1000 * 60 * 60 * 24,
-        Date.now(),
-        1_000_000,
-        0,
+        startTime,
+        endTime,
       )
       if (!result) {
         return
@@ -30,17 +28,7 @@ export const useMeasurementsStore = defineStore('measurements', {
       if (!this.measurements[plantId]) {
         this.measurements[plantId] = {}
       }
-      this.measurements[plantId][fieldName] = {
-        deviceId: result[0].deviceId,
-        plantId,
-        fieldName,
-        values: result.map(({ timestamp, value }) => {
-          return {
-            timestamp,
-            value,
-          } as MeasuredValue
-        }),
-      }
+      this.measurements[plantId][fieldName] = result
     },
   },
 })

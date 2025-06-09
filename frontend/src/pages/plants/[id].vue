@@ -3,15 +3,15 @@
     <v-row>
       <v-col cols="auto">
         <DevicePanel :device="device" :slots="null" />
-        <v-divider/>
-        <PlantPanel :plant="plant" :slot-number="slotNumber" :sensors="device.model.sensors"/>
-        <v-divider/>
+        <v-divider />
+        <PlantPanel :plant="plant" :sensors="device.model.sensors" :slot-number="slotNumber" />
+        <v-divider />
         <v-btn color="error" @click="openDeleteDialog()">
           Pflanze löschen
         </v-btn>
       </v-col>
       <v-col>
-        <PlantChartCard :plant="plant" :field-name="'temp_air'" :sensors="[]" />
+        <PlantChartCard :field-name="'air_temp'" :plant="plant" :sensors="[]" />
       </v-col>
     </v-row>
   </v-container>
@@ -19,8 +19,8 @@
   <DeletePlantDialog
     ref="deletePlantDialogRef"
     :plant="plant"
-    @confirm="handlePlantDeleteConfirmed"
     @cancel="handleDeleteCanceled"
+    @confirm="handlePlantDeleteConfirmed"
   />
 
   <LoadAndError
@@ -31,39 +31,39 @@
 </template>
 
 <script setup lang="ts">
-import { useDeviceWithPlant } from '@/composition/deviceWithPlant.ts'
-import DeletePlantDialog from '@/components/dialog/DeletePlantDialog.vue'
+  import DeletePlantDialog from '@/components/dialog/DeletePlantDialog.vue'
+  import { useDeviceWithPlant } from '@/composition/deviceWithPlant.ts'
 
-definePage({
-  meta: {
-    requireDevice: true,
-  },
-})
+  definePage({
+    meta: {
+      requireDevice: true,
+    },
+  })
 
-const route = useRoute('/plants/[id]')
-const id = ref<string>(route.params.id)
+  const route = useRoute('/plants/[id]')
+  const id = ref<string>(route.params.id)
 
-const {
-  device,
-  plant,
-  slotNumber,
-  isLoading,
-  error,
-  loadAllData,
-  clearError,
-} = useDeviceWithPlant(id.value)
+  const {
+    device,
+    plant,
+    slotNumber,
+    isLoading,
+    error,
+    loadAllData,
+    clearError,
+  } = useDeviceWithPlant(id.value)
 
-const deletePlantDialogRef = ref<InstanceType<typeof DeletePlantDialog> | null>(null);
+  const deletePlantDialogRef = ref<InstanceType<typeof DeletePlantDialog> | null>(null)
 
-const openDeleteDialog = () => {
-  if (deletePlantDialogRef.value) {
-    deletePlantDialogRef.value.openDialog();
+  const openDeleteDialog = () => {
+    if (deletePlantDialogRef.value) {
+      deletePlantDialogRef.value.openDialog()
+    }
   }
-}
 
-// --- Handler für die Bestätigung des Löschens ---
-const handlePlantDeleteConfirmed = async (plantId: string) => {
-  console.log(`Löschen der Pflanze mit ID: ${plantId} bestätigt.`);
+  // --- Handler für die Bestätigung des Löschens ---
+  const handlePlantDeleteConfirmed = async (plantId: string) => {
+    console.log(`Löschen der Pflanze mit ID: ${plantId} bestätigt.`)
 
   // Hier würde der tatsächliche API-Aufruf zum Löschen stattfinden:
   // try {
@@ -77,14 +77,14 @@ const handlePlantDeleteConfirmed = async (plantId: string) => {
   //   console.error(`Fehler beim Löschen der Pflanze ${plantId}:`, error);
   //   // Fehlerbehandlung, z.B. Fehlermeldung im UI anzeigen
   // }
-};
+  }
 
-// --- Handler, wenn das Löschen abgebrochen wird ---
-const handleDeleteCanceled = () => {
-  console.log('Löschen der Pflanze abgebrochen.');
-};
+  // --- Handler, wenn das Löschen abgebrochen wird ---
+  const handleDeleteCanceled = () => {
+    console.log('Löschen der Pflanze abgebrochen.')
+  }
 
-onMounted(() => {
-  loadAllData(true)
-})
+  onMounted(() => {
+    loadAllData(true)
+  })
 </script>

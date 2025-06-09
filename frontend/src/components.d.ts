@@ -16,6 +16,7 @@ declare module 'vue' {
     DeviceCard: typeof import('./components/cards/DeviceCard.vue')['default']
     DevicePanel: typeof import('./components/panels/DevicePanel.vue')['default']
     ErrorOverlay: typeof import('./components/helper/ErrorOverlay.vue')['default']
+    GenericLineChart: typeof import('./components/charts/GenericLineChart.vue')['default']
     LoadAndError: typeof import('./components/helper/LoadAndError.vue')['default']
     LoadOverlay: typeof import('./components/helper/LoadOverlay.vue')['default']
     MeasuredLineChart: typeof import('./components/charts/MeasuredLineChart.vue')['default']
@@ -24,5 +25,7 @@ declare module 'vue' {
     PlantPanel: typeof import('./components/panels/PlantPanel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TemperatureChart: typeof import('./components/charts/TemperatureChart.vue')['default']
+    'TemperatureChart.vue`': typeof import('./components/charts/TemperatureChart.vue`.vue')['default']
   }
 }

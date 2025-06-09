@@ -1,14 +1,10 @@
 <template>
   <v-card>
-    <p>{{ plant.name }}</p>
-    <!--    <p v-if="measurement"> {{ measurement.values }} </p>-->
-    <!--    <p v-else> No measurement </p>-->
-    <!--    <MeasuredLineChart-->
-    <!--      v-if="!isLoading && measurement"-->
-    <!--      :data="measurement.values"-->
-    <!--      :labels="'Temperaturen'"-->
-    <!--      :title="'Lufttemperatur'"-->
-    <!--    />-->
+    <v-col>
+      <p>{{ plant.name }}</p>
+      <GenericLineChart v-if="measurement" :data="measurement" />
+      <p v-else>measurement is undefined!</p>
+    </v-col>
   </v-card>
   <LoadAndError
     :error="error"
