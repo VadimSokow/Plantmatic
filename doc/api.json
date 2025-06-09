@@ -59,6 +59,17 @@
             "description": "Unauthorized"
           }
         }
+      },
+      "post": {
+        "description": "Ermöglicht das Hinzufügen eines neuen Gerätes",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/devices/{id}": {
@@ -358,19 +369,6 @@
         }
       }
     },
-    "/devices": {
-      "post": {
-        "description": "Ermöglicht das Hinzufügen eines neuen Gerätes",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
     "/plants": {
       "get": {
         "description": "Gibt alle vom Nutzer verwalteten Pflanzen zurück nach Identitätsüberprüfung",
@@ -382,9 +380,7 @@
             "description": "Unauthorized"
           }
         }
-      }
-    },
-    "/plants/": {
+      },
       "post": {
         "description": "Ermöglicht das Hinzufügen einer neuen Pflanze",
         "responses": {
