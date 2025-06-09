@@ -4,8 +4,8 @@ import time
 from asyncio import Task
 from random import randint
 
-from src.Mqtt.DeviceClient import DeviceClient
-from src.logger import create_logger
+from Device.src.Mqtt.DeviceClient import DeviceClient
+from Device.src.logger import create_logger
 
 logger = create_logger(__name__)
 

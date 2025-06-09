@@ -2,11 +2,11 @@ import asyncio
 import time
 from asyncio import Event
 
-import src.helper.toml as toml
-from src.Mqtt.DeviceClient import DeviceClient
-from src.PlantManagement.Plant import Plant
-from src.PlantManagement.PlantManagerInterface import PlantManagerInterface
-from src.logger import create_logger
+import Device.src.helper.toml as toml
+from Device.src.Mqtt.DeviceClient import DeviceClient
+from Device.src.PlantManagement.Plant import Plant
+from Device.src.PlantManagement.PlantManagerInterface import PlantManagerInterface
+from Device.src.logger import create_logger
 
 logger = create_logger(__name__)
 
