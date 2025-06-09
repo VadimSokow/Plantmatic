@@ -52,7 +52,6 @@ export function extractUserEmail(request: HttpRequest): string {
     let decoded: Record<string, any> | null = null;
     try {
         decoded = jwtDecode(token)
-        console.log(decoded)
     } catch (error) {
         console.error("Error decoding JWT token:", error);
         throw new ErrorJWTDecodeFailed();
@@ -65,4 +64,24 @@ export function extractUserEmail(request: HttpRequest): string {
         throw new ErrorJWTExpired()
     }
     return decoded.preferred_username
+}
+
+export function handleExtractUserEmail(request: HttpRequest): string | HttpResponseInit {
+    let userMail = ""
+    try {
+        userMail = extractUserEmail(request)
+    } catch (error) {
+        if (error instanceof AuthError) {
+            return error.toResponse()
+        }
+        return {
+            status: 500,
+        }
+    }
+    if (!userMail) {
+        return {
+            status: 401,
+        }
+    }
+    return userMail
 }

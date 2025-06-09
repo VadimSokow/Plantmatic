@@ -1,80 +1,60 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
-import {CosmosClient} from "@azure/cosmos"
-import {getUser} from "./user";
-
-
-const cosmosEndpoint = process.env.CosmosDBEndpoint;
-const cosmosKey = process.env.CosmosDBKey;
-
+import {handleExtractUserEmail} from "../helper/auth";
+import {getCosmosBundle} from "../helper/cosmos";
 
 export async function getDevices(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    const cosmosConnection = process.env.CosmosDBConnection
-
-
-    const header = request.headers.get("authorization")
-    const email = getUser(header)
-    console.log("E-mail: ", email)
-
-    if (!email) {
-        return {
-            status: 401,
-        }
+    // resolve user
+    let email = handleExtractUserEmail(request)
+    if (typeof email !== 'string') {
+        return email;
     }
 
-
-    if (!cosmosEndpoint || !cosmosKey) {
-        context.error("CosmosDBEndpoint or CosmosDBKey was not set!")
-        return {
-            status: 500,
-        }
+    const deviceQuery = {
+        query: "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = @owner",
+        parameters: [{name: "@owner", value: email}]
     }
-
-
     try {
-        const client = new CosmosClient({
-            endpoint: cosmosEndpoint,
-            key: cosmosKey,
-        })
-        const dbName = "Plantmatic"
-        const deviceConName = "devices"
-        const modelConName = "models"
-        const database = client.database(dbName)
-        const deviceContainer = database.container(deviceConName)
-        const modelContainer = database.container(modelConName)
-
-        const result = [];
-        const deviceQuery = {
-            query: "SELECT c.id, c.name, c.userId, c.location, c.modelId, c.plantSlots, c.config FROM c where c.userId = @owner",
-            parameters: [{name: "@owner", value: email}
-            ]
+        const cosmos = getCosmosBundle()
+        if (!cosmos) {
+            return {status: 500, body: "Database not available"}
         }
-        const {resources: devices} = await deviceContainer.items.query(deviceQuery).fetchAll()
 
-        for (const deviceNr in devices) {
-            const device = devices[deviceNr]
-            const modelQuery = {
-                query: "SELECT c.id, c.name, c.slotCount, c.sensors FROM c where c.modelId = @id",
-                parameters: [
-                    {name: "@id", value: device.modelId}
-                ],
+        const {resources: devices} = await cosmos.query("devices", deviceQuery).fetchAll()
+        if (!devices || devices.length === 0) {
+            return {
+                status: 200,
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify([])
             }
-            const {resources: models} = await modelContainer.items.query(modelQuery).fetchAll()
+        }
 
-            const model = models[0]
+        // get all model ids
+        const modelIds = devices.map(device => device.modelId);
+        // remove duplicates
+        const uniqueModelIds = Array.from(new Set(modelIds));
 
-            device.modelId = undefined
-            device.model = model
-
-
-            result.push(device);
-
+        // fetch models for unique model ids
+        const deviceModels = [];
+        for (let uniqueModelId of uniqueModelIds) {
+            const modelQuery = {
+                query: "SELECT c.id, c.name, c.slotCount, c.sensors FROM c where c.id = @id",
+                parameters: [{name: "@id", value: uniqueModelId}],
+            }
+            const {resources: models} = await cosmos.query("models", modelQuery).fetchAll()
+            if (models && models.length > 0) {
+                deviceModels.push(models[0]);
+            } else {
+                console.warn(`Model with ID ${uniqueModelId} not found.`);
+            }
         }
 
         return {
             status: 200,
             headers: {"Content-Type": "application/json"},
-            //body: items
-            body: JSON.stringify(result)
+            body: JSON.stringify({
+                devices: devices,
+                models: deviceModels,
+            })
         }
     } catch (error) {
         context.log("Error1 querying Cosmos DB:", error)

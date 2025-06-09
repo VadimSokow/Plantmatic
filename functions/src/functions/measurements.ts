@@ -1,5 +1,5 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions";
-import {AuthError, extractUserEmail} from "../helper/auth";
+import {AuthError, extractUserEmail, handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 import {hasReadPermForPlant} from "../helper/permission";
 
@@ -34,24 +34,9 @@ interface MeasurementQueryParameters {
 
 async function measurements(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // resolve user
-    let userMail = ""
-    try {
-        userMail = extractUserEmail(request)
-    } catch (error) {
-        if (error instanceof AuthError) {
-            context.error("Authentication error: ", error.message);
-            return error.toResponse()
-        }
-        context.error("Unexpected error during authentication: ", error);
-        return {
-            status: 500,
-        }
-    }
-    if (!userMail) {
-        context.error("User email could not be extracted from request");
-        return {
-            status: 401,
-        }
+    let userMail = handleExtractUserEmail(request)
+    if (typeof userMail !== 'string') {
+        return userMail;
     }
 
     // extract query parameters
