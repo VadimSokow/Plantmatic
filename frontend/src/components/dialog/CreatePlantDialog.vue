@@ -62,7 +62,6 @@
   import { debounce } from 'lodash'
   import { computed, ref, watch } from 'vue'
 
-  // --- Typdefinitionen (können aus deinen types/plant.ts kommen) ---
   export interface PlantType {
     id?: string // PK in DB, könnte latName sein, hier generische ID
     latName: string
