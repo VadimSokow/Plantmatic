@@ -1,47 +1,50 @@
 import abc
 from enum import Enum, auto
-from typing import Optional # Für Type Hinting
+from typing import Optional
 
 class ActuatorInterface(abc.ABC):
-    """Basis-Interface für alle Aktoren."""
+    """Base Interface for all Actuators."""
     @abc.abstractmethod
     def setup(self):
-        """Führt Initialisierungen für den Aktor durch."""
+        """Initializes the Actuator."""
         pass
 
     @abc.abstractmethod
     def cleanup(self):
-        """Räumt Ressourcen auf, wenn der Aktor nicht mehr benötigt wird."""
+        """Cleans up the Actuator Resources."""
         pass
 
 class LedColor(Enum):
-    """Definiert mögliche Farben für die Status-LED."""
+    """Defines the colors an LED Actuator can use."""
     OFF = auto()
     RED = auto()
     YELLOW = auto()
     GREEN = auto()
 
 class LedActuatorInterface(ActuatorInterface):
-    """Interface für die Status-LED."""
+    """Interface for the status LEDs."""
     @abc.abstractmethod
     def set_status_color(self, color: LedColor):
-        """Setzt die Farbe der Status-LED."""
+        """Sets the color of the status LED."""
         pass
 
 class PumpActuatorInterface(ActuatorInterface):
-    """Interface für die Wasserpumpe."""
+    """Interface for the water pump"""
     @abc.abstractmethod
     def pump_on(self):
-        """Schaltet die Pumpe ein."""
+        """Turns the pump on."""
         pass
 
     @abc.abstractmethod
     def pump_off(self):
-        """Schaltet die Pumpe aus."""
+        """Turns the pump off."""
         pass
 
     def pump_for_duration(self, duration_seconds: float):
-        """Schaltet die Pumpe für eine bestimmte Dauer ein und dann wieder aus."""
+        """
+        Activates the pump for a specific duration
+        :param duration: pump duration in seconds
+        """
         import time
         if duration_seconds > 0:
             print(f"Pumpe für {duration_seconds:.1f} Sekunden einschalten...")

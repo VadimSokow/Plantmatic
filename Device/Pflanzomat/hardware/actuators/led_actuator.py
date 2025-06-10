@@ -19,7 +19,10 @@ class LedActuator(LedActuatorInterface):
         self.current_color = LedColor.OFF  # Software-seitiger Status
         print(f"LedActuator initialisiert für Pins R:{red_pin}, Y:{yellow_pin}, G:{green_pin}")
 
-    def setup(self):
+    def setup(self) -> None:
+        """
+        Configures all 3 LEDs of the LED Actuator.
+        """
         try:
             for pin in self.led_pins.values():
                 GPIO.setup(
@@ -32,6 +35,9 @@ class LedActuator(LedActuatorInterface):
             raise
 
     def _set_all_leds_off(self):
+        """
+        Turns all LEDs of the LED Actuator off.
+        """
         try:
             GPIO.output(
                 self.red_pin,
@@ -46,7 +52,10 @@ class LedActuator(LedActuatorInterface):
             print(f"FEHLER beim Ausschalten aller LEDs: {e}")
 
     def set_status_color(self,color: LedColor):
-        """Setzt die Farbe der Status-LEDs."""
+        """
+        Lights a specific color of the LED Actuator.
+        :param color: Specific color to set to the LED Actuator. E.g., LedColor.RED
+        """
         if color == self.current_color and color != LedColor.OFF:
             return  # Keine Änderung nötig, wenn Farbe schon gesetzt ist (außer bei OFF)
 
@@ -68,6 +77,6 @@ class LedActuator(LedActuatorInterface):
         self.current_color = color  # Software-Status aktualisieren
 
     def cleanup(self):
-        """Schaltet alle LEDs aus beim Aufräumen."""
+        """Turns of all LEDs of the LED Actuator off."""
         print("Cleanup für LedActuator: Schalte alle LEDs aus.")
         self.set_status_color(LedColor.OFF)

@@ -8,11 +8,11 @@ from ...interfaces.sensor_interface import LightSensorInterface
 class ADS1115LightSensor(LightSensorInterface):
     def __init__(self, adc_channel, voltage_dark: float, voltage_bright: float, i2c_address=0x48):
         """
-        Initialisiert den Lichtsensor.
-        :param adc_channel: Der zu verwendende ADC-Pin
-        :param voltage_dark: Kalibrierungswert für Dunkelheit (Volt).
-        :param voltage_bright: Kalibrierungswert für Helligkeit (Volt).
-        :param i2c_address: Die I2C-Adresse des ADS1115 (Standard 0x48).
+        Initialize the ADS1115 Light Sensor.
+        :param adc_channel: the adc chanel to use.
+        :param voltage_dark: Calibrations value for dark (Volt).
+        :param voltage_bright: Calibrations value for bright (Volt).
+        :param i2c_address: The I2C Address of the ADS1115 (Default 0x48).
         """
         self.adc_channel = adc_channel
         self.voltage_dark = voltage_dark
@@ -25,11 +25,14 @@ class ADS1115LightSensor(LightSensorInterface):
         if self.voltage_dark == self.voltage_bright:
             print("FEHLER: voltage_dark und voltage_bright dürfen nicht identisch sein! Lichtsensor nicht initialisiert.")
             return
+        self.voltage_range = self.voltage_dark - self.voltage_bright
+        if self.voltage_range <= 0:
+            raise ValueError("Spannung bei 0 Lux muss größer sein als bei 800 Lux für dieses Modell!")
 
         self._setup()
 
     def _setup(self):
-        """Initialisiert die I2C-Verbindung und den ADC für diesen Sensor."""
+        """Initialises the I2C Connection and the ADC for the Sensor."""
         try:
             i2c = busio.I2C(board.SCL, board.SDA)
             self.ads = ADS.ADS1115(i2c, address=self.i2c_address)
@@ -45,24 +48,23 @@ class ADS1115LightSensor(LightSensorInterface):
             self.ads = None
             self.chan = None
 
-    def get_light_level_percent(self) -> Optional[float]:
-        """Liest die Spannung und rechnet sie in einen Lichtprozentsatz um."""
+    def get_light_level_lux(self) -> Optional[float]:
+        """
+        Returns the current light level of the sensor.
+        :return: Current light level of the sensor in lux.
+        """
         if not self.chan or not self.ads: # Prüft ob _setup erfolgreich war
             return None
 
         try:
             current_voltage = self.chan.voltage
-            # print(f"DEBUG Lichtsensor: Spannung={current_voltage:.3f}V")
+            #print(f"DEBUG Lichtsensor: Spannung={current_voltage:.3f}V")
 
-            value_range = self.voltage_dark - self.voltage_bright
-            if value_range == 0:
-                print("FEHLER (Lichtsensor): Kalibrierungsbereich (dark-bright) ist Null.")
-                return None
-
-            percent = 100.0 * (self.voltage_dark - current_voltage) / value_range
-            # TODO von percent zu Lux
-            percent = max(0.0, min(100.0, percent))
-            return percent
+            brightness_fraction = (self.voltage_dark - current_voltage) / self.voltage_range
+            lux_value = 800.0 * brightness_fraction
+            lux_value = max( 0.0,lux_value)
+            # todo gibt immer ca. 700 Lux raus. Problem mit verkabelung? soil funktioniert
+            return lux_value
 
         except OSError as e:
             print(f"Fehler beim Lesen von I2C/ADS1115 (Lichtsensor): {e}")

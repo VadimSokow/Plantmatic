@@ -36,11 +36,14 @@ class Slot:
         self.dht11_sensor = dht11_sensor
 
     def get_all_sensor_values(self) -> str:
-        # Alle Werte aus den Sensoren holen
+        """
+        Builds a JSON String of all sensor values.
+        :return: A JSON with all Sensor values.
+        """
         humidity_percent = self.dht11_sensor.get_humidity_percent()
         temperature_c = self.dht11_sensor.get_temperature_celsius()
         soil_moisture_percent = self.soil_sensor.get_moisture_percent()
-        light_level_lux = self.light_sensor.get_light_level_percent()
+        light_level_lux = self.light_sensor.get_light_level_lux()
         # Dict mit allen Sensorwerten bauen
         sensor_values = {
             self.dht11_sensor.humidity_value_name: humidity_percent,
@@ -51,9 +54,17 @@ class Slot:
         return json.dumps(sensor_values)
 
     def pump_for_duration(self, duration: int):
+        """
+        Activates the pump in that slot for a specific duration
+        :param duration: pump duration in seconds
+        """
         self.pump.pump_for_duration(duration)
 
     def led_set_status_color(self, color: LedColor):
+        """
+        Sets the LED Actuator to a specific color.
+        :param color: to set the LED Actuator to. E.g., LedColor.RED
+        """
         self.leds.set_status_color(color)
 
 

@@ -8,12 +8,10 @@ from typing import \
     Tuple, \
     Any
 from ...interfaces.sensor_interface import \
-    TempHumiditySensorInterface, \
-    HumiditySensorInterface, \
-    TemperatureSensorInterface
+    TempHumiditySensorInterface
 
 
-class DHT11Sensor(TempHumiditySensorInterface, HumiditySensorInterface, TemperatureSensorInterface):
+class DHT11Sensor(TempHumiditySensorInterface):
     def __init__(self, pin):
         self.pin = pin
         self.dht_device = None

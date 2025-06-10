@@ -10,11 +10,11 @@ class ADS1115SoilSensor(SoilMoistureSensorInterface):
 
     def __init__(self, adc_channel, voltage_dry: float, voltage_wet: float, i2c_address=0x48):
         """
-        Initialisiert den Sensor.
-        :param adc_channel: ADC-Pin
-        :param voltage_dry: Kalibrierungswert für trockenen Zustand (Volt).
-        :param voltage_wet: Kalibrierungswert für nassen Zustand (Volt).
-        :param i2c_address: Die I2C-Adresse des ADS1115 (Standard 0x48).
+        Initializes the sensor.
+        :param adc_channel: ADC pin
+        :param voltage_dry: Calibration value for dry state (Volts).
+        :param voltage_wet: Calibration value for wet state (Volts).
+        :param i2c_address: The I2C address of the ADS1115 (default 0x48).
         """
         self.adc_channel = adc_channel
         self.voltage_dry = voltage_dry
@@ -26,7 +26,7 @@ class ADS1115SoilSensor(SoilMoistureSensorInterface):
         self._setup()
 
     def _setup(self):
-        """Initialisiert die I2C-Verbindung und den ADC."""
+        """Initializes the I2C connection and the ADC."""
         try:
             i2c = busio.I2C(board.SCL, board.SDA)
             self.ads = ADS.ADS1115(i2c, address=self.i2c_address)
@@ -43,9 +43,9 @@ class ADS1115SoilSensor(SoilMoistureSensorInterface):
             self.chan = None
 
     def get_moisture_percent(self) -> Optional[float]:
-        """Liest die Spannung und rechnet sie in Prozent um.
-        :return percent: Bodenfeuchte als Prozentwert (0-100).
-        :return None: Falls ein Fehler mit dem Sensor oder der Sensorkommunikation aufgetreten ist
+        """Reads the voltage and converts it to percent.
+        :return percent: Soil moisture as a percentage value (0-100).
+        :return None: If an error occurred with the sensor or sensor communication
         """
         if not self.chan or not self.ads:
             print("Fehler: ADS1115 Kanal nicht initialisiert.")

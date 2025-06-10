@@ -1,23 +1,29 @@
 import abc
-from typing import Tuple, Optional # Für Type Hinting
+from typing import Tuple, Optional
 
 class SensorInterface(abc.ABC):
-    """Basis-Interface für alle Sensoren."""
+    """Base Interface for all Sensors."""
     @abc.abstractmethod
     def read(self):
-        """Liest den Sensorwert aus."""
+        """Reads all sensor values."""
         pass
 
     @abc.abstractmethod
     def get_value(self) -> Optional[float]:
-         """Gibt den primären Sensorwert zurück oder None bei Fehler."""
-         pass
+        """
+        Returns the main sensor value.
+        :return: Main sensor value.
+        """
+        pass
 
 class TemperatureSensorInterface(SensorInterface):
-    """Interface für Temperatursensoren."""
+    """Interface for Temperature Sensors."""
     @abc.abstractmethod
     def get_temperature_celsius(self) -> Optional[float]:
-        """Gibt die Temperatur in Grad Celsius zurück oder None bei Fehler."""
+        """
+        Returns the temperature in celsius.
+        :return: Temperature in celsius.
+        """
         pass
 
     def get_value(self) -> Optional[float]:
@@ -27,10 +33,13 @@ class TemperatureSensorInterface(SensorInterface):
         return self.get_temperature_celsius()
 
 class HumiditySensorInterface(SensorInterface):
-    """Interface für Feuchtigkeitssensoren."""
+    """Interface for Humidity Sensors."""
     @abc.abstractmethod
     def get_humidity_percent(self) -> Optional[float]:
-        """Gibt die relative Luftfeuchtigkeit in Prozent zurück oder None bei Fehler."""
+        """
+        Returns the humidity in percent.
+        :return: Humidity in percent.
+        """
         pass
 
     def get_value(self) -> Optional[float]:
@@ -40,10 +49,13 @@ class HumiditySensorInterface(SensorInterface):
         return self.get_humidity_percent()
 
 class SoilMoistureSensorInterface(SensorInterface):
-    """Interface für Bodenfeuchtesensoren."""
+    """Interface for Soil Moisture Sensors."""
     @abc.abstractmethod
     def get_moisture_percent(self) -> Optional[float]:
-        """Gibt die Bodenfeuchte als normalisierten Prozentwert (0-100) zurück oder None bei Fehler."""
+        """
+        Returns the moisture in relative percent.
+        :return: Moisture in relative percent.
+        """
         pass
 
     def get_value(self) -> Optional[float]:
@@ -53,32 +65,44 @@ class SoilMoistureSensorInterface(SensorInterface):
         return self.get_moisture_percent()
 
 class LightSensorInterface(SensorInterface):
-    """Interface für Lichtsensoren."""
+    """Interface for Light Sensors."""
     @abc.abstractmethod
-    def get_light_level_percent(self) -> Optional[float]:
-        """Gibt die Lichtintensität als normalisierten Prozentwert (0-100) zurück oder None bei Fehler."""
+    def get_light_level_lux(self) -> Optional[float]:
+        """
+        Returns the light level in lux.
+        :return: Light level in lux.
+        """
         pass
 
     def get_value(self) -> Optional[float]:
-        return self.get_light_level_percent()
+        return self.get_light_level_lux()
 
     def read(self):
-        return self.get_light_level_percent()
+        return self.get_light_level_lux()
 
 class TempHumiditySensorInterface(TemperatureSensorInterface, HumiditySensorInterface):
-    """Interface für Sensoren, die Temperatur und Feuchtigkeit messen."""
+    """Interface for Temperature and Humidity Sensors."""
     @abc.abstractmethod
     def read_combined(self) -> Tuple[Optional[float], Optional[float]]:
-        """Gibt ein Tupel (Temperatur C, Feuchtigkeit %) zurück."""
+        """
+        Returns the combined temperature and humidity.
+        :return: Tupel of temperature and humidity.
+        """
         pass
 
     def get_temperature_celsius(self) -> Optional[float]:
-        temp, _ = self.read_combined()
-        return temp
+        """
+        Returns the temperature in celsius.
+        :return: Temperature in celsius.
+        """
+        pass
 
     def get_humidity_percent(self) -> Optional[float]:
-        _, hum = self.read_combined()
-        return hum
+        """
+        Returns the humidity in percent.
+        :return: Humidity in percent.
+        """
+        pass
 
     def get_value(self):
          return self.get_temperature_celsius()

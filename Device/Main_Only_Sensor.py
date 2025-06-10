@@ -1,5 +1,5 @@
 import time
-import config
+import Config.pin_config as config
 import RPi.GPIO as GPIO
 
 from Pflanzomat.interfaces.actuator_interface import LedColor
@@ -13,7 +13,7 @@ from Pflanzomat.hardware.actuators.led_actuator import LedActuator
 dht_sensor = DHT11Sensor(config.DHT11_PIN)
 # Bodenfeuchte Sensor initialisieren
 soil_sensor = ADS1115SoilSensor(
-    adc_channel=config.SOIL_MOISTURE_ADC_CHANNEL,
+    adc_channel=config.SOIL_MOISTURE_ADC_CHANNEL_SLOT0,
     voltage_dry=config.SOIL_MOISTURE_VOLTAGE_DRY,
     voltage_wet=config.SOIL_MOISTURE_VOLTAGE_WET
 )
@@ -25,10 +25,10 @@ light_sensor = ADS1115LightSensor(
 )
 # Pumpe initialisieren
 GPIO.setmode(GPIO.BCM) #für die Verwendung des Pins im setup der Pump.py
-pump = Pump(config.RELAY_PIN_PUMP.id)
+pump = Pump(config.RELAY_PIN_PUMP_SLOT0.id)
 pump.setup()
 # LEDs initialisieren
-leds = LedActuator(config.LED_PIN_RED.id,config.LED_PIN_YELLOW.id,config.LED_PIN_GREEN.id)
+leds = LedActuator(config.LED_PIN_RED_SLOT0.id,config.LED_PIN_YELLOW_SLOT0.id,config.LED_PIN_GREEN_SLOT0.id)
 leds.setup()
 
 try:
@@ -48,9 +48,8 @@ try:
         else:
             print("Bodenfeuchte: Konnte nicht gelesen werden.")
 
-        light = light_sensor.get_light_level_percent()
-        print(f"Lichtintensität: {light:.1f}%")
-
+        light = light_sensor.get_light_level_lux()
+        print(f"Lichtintensität: {light:.1f}Lux")
 
         # Sicherheitsabschaltung, wenn Sensorwert fehlt
         if moisture is None:
