@@ -1,5 +1,0 @@
-[plant_config]
-"$version" = 69
-max_humidity = 80
-measuring_interval = 9
-min_humidity = 40

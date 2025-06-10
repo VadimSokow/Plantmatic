@@ -1,13 +1,10 @@
 <template>
   <v-card>
-    <p> {{ plant.name }} </p>
-    <!--    <p v-if="measurement"> {{ measurement.values }} </p>-->
-    <!--    <p v-else> No measurement </p>-->
-    <MeasuredLineChart v-if="!isLoading && measurement"
-                       :title="'Lufttemperatur'"
-                       :data="measurement.values"
-                       :labels="'Temperaturen'"
-    />
+    <v-col>
+      <p>{{ plant.name }}</p>
+      <GenericLineChart v-if="measurement" :data="measurement" />
+      <p v-else>measurement is undefined!</p>
+    </v-col>
   </v-card>
   <LoadAndError
     :error="error"
@@ -17,25 +14,20 @@
 </template>
 
 <script setup lang="ts">
-import type { Plant } from '@/types/plant.ts'
-import type { DeviceModelSensorConfig } from '@/types/device.ts'
-import { usePlantMeasurement } from '@/composition/measurements.ts'
+  import type { DeviceModelSensorConfig } from '@/types/device.ts'
+  import type { Plant } from '@/types/plant.ts'
+  import { usePlantMeasurement } from '@/composition/measurements.ts'
 
-const props = defineProps<{
-  plant: Plant,
-  sensors: DeviceModelSensorConfig[],
-  fieldName: string,
-}>()
+  const props = defineProps<{
+    plant: Plant
+    sensors: DeviceModelSensorConfig[]
+    fieldName: string
+  }>()
 
-const {
-  measurement,
-  isLoading,
-  error,
-  loadAllData,
-  clearError,
-} = usePlantMeasurement(props.plant.id, props.fieldName)
+  const { measurement, isLoading, error, loadAllData, clearError }
+    = usePlantMeasurement(props.plant.id, props.fieldName)
 
-onMounted(() => {
-  loadAllData()
-})
+  onMounted(() => {
+    loadAllData()
+  })
 </script>

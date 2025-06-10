@@ -1,7 +1,6 @@
-import { defineStore } from 'pinia'
 import type { MeasuredPlant } from '@/types/measurement.ts'
+import { defineStore } from 'pinia'
 import { fetchMeasurements } from '@/api/measurement.ts'
-
 
 export const useMeasurementsStore = defineStore('measurements', {
   state: () => ({
@@ -11,26 +10,25 @@ export const useMeasurementsStore = defineStore('measurements', {
   }),
 
   getters: {
-    getMeasuredPlant: state => (plantId: string, fieldName: string) => state.measurements[plantId]?.[fieldName] as MeasuredPlant | undefined,
+    getMeasuredPlant: state => (plantId: string, fieldName: string) =>
+      state.measurements[plantId]?.[fieldName] as MeasuredPlant | undefined,
   },
 
   actions: {
-    async load(plantId: string, fieldName: string) {
-      const result = await fetchMeasurements(plantId, fieldName, Date.now() - (1000 * 60 * 60 * 24), Date.now(), 1000000, 0)
-      if (!result) return;
+    async load (plantId: string, fieldName: string, startTime = 1_672_531_343_744, endTime = 1_672_609_412_225) {
+      const result = await fetchMeasurements(
+        plantId,
+        fieldName,
+        startTime,
+        endTime,
+      )
+      if (!result) {
+        return
+      }
       if (!this.measurements[plantId]) {
         this.measurements[plantId] = {}
       }
-      this.measurements[plantId][fieldName] = {
-        plantId: plantId,
-        fieldName: fieldName,
-        values: result.map(({ timestamp, value }) => {
-          return {
-            timestamp: timestamp,
-            value: value
-          }
-        })
-      };
-    }
+      this.measurements[plantId][fieldName] = result
+    },
   },
 })

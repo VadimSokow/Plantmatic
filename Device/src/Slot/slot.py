@@ -1,21 +1,17 @@
 import \
     json
 
-from Device.Main_Only_Sensor import \
-    light_sensor
-from Device.Pflanzomat.hardware.actuators.led_actuator import \
+from Device.src.hardware.actuators.led_actuator import \
     LedActuator
-from Device.Pflanzomat.hardware.actuators.pump import \
+from Device.src.hardware.actuators.pump import \
     Pump
-from Device.Pflanzomat.hardware.sensors import \
-    dht11_sensor
-from Device.Pflanzomat.hardware.sensors.ads1115_light_sensor import \
+from Device.src.hardware.sensors.ads1115_light_sensor import \
     ADS1115LightSensor
-from Device.Pflanzomat.hardware.sensors.ads1115_soil_moisture_sensor import \
+from Device.src.hardware.sensors.ads1115_soil_moisture_sensor import \
     ADS1115SoilSensor
-from Device.Pflanzomat.hardware.sensors.dht11_sensor import \
+from Device.src.hardware.sensors.dht11_sensor import \
     DHT11Sensor
-from Device.Pflanzomat.interfaces.actuator_interface import \
+from Device.src.interfaces.actuator_interface import \
     LedColor
 
 class Slot:

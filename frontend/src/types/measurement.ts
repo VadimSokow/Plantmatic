@@ -1,20 +1,19 @@
 export interface Measurement {
-  id: string;
-  plantId: string;
-  timestamp: Date;
-  //sensorDefinitionId: string;
-  fieldName: string;
-  //sensorType: string;
-  value: number;
+  deviceId: string
+  plantId: string
+  fieldName: string
+  timestamp: Date
+  value: number
 }
 
 export interface MeasuredPlant {
+  deviceId: string
   plantId: string
   fieldName: string
-  values: MeasuredValues
+  values: MeasuredValue[]
 }
 
-export type MeasuredValues = {
-  timestamp: number; // Unix-Timestamp in MILLISEKUNDEN
-  value: number;
-}[];
+export interface MeasuredValue {
+  timestamp: Date
+  value: number
+}

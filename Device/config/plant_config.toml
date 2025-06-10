@@ -1,0 +1,11 @@
+[Baum]
+max_humidity = 8
+measuring_interval = 10078
+min_humidity = 40
+slot_num = 1
+
+[Achim]
+max_humidity = 8
+measuring_interval = 6640
+min_humidity = 46
+slot_num = 1

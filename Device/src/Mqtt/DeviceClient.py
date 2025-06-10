@@ -1,18 +1,20 @@
-# from ..hardware.sensors import dht11_sensor, ads1115_soil_moisture_sensor
-from Device.Config.useToml import update_toml, load_toml_config
-from Device.Pflanzomat.interfaces import actuator_interface
+import json
+
 from azure.iot.device import IoTHubDeviceClient, Message, MethodResponse
 from azure.iot.device.iothub.pipeline.pipeline_events_iothub import MethodRequestEvent
 
-from Device.Pflanzomat.interfaces.actuator_interface import ActuatorInterface
+from Device.src.PlantManagement.PlantManagerInterface import PlantManagerInterface
+from Device.src.logger import create_logger
+
+logger = create_logger(__name__)
 
 
-class Device_Client():
-    def __init__(self, config: dict[str, any], plant_toml_path:str):
+class DeviceClient:
+    def __init__(self, config: dict[str, any], plant_manager:PlantManagerInterface): # plant_helper:Plant_Config_Helper_Object
         self.config: dict[str, any] = config
-        self.plant_toml_path = plant_toml_path
+        self.plant_manager = plant_manager
         self.device_client = self.get_device_Client()
-        self.plant_config_hasChanged = False
+        
 
 
     def get_device_Client(self) -> IoTHubDeviceClient:
@@ -92,41 +94,23 @@ class Device_Client():
         Function that will be called when something changed in the device twin in IoTHub.
 
         '''
-        print("<twin_patch_handler>")
-        print(patch)
-        for key, value in patch.items():
-
-            print(self.plant_toml_path)
-            okay = update_toml("plant_config", key, value, self.plant_toml_path)
-            if(not okay):
-                print("Beim upadten der Toml ist etwas schief gelaufen (twin patch handler)")
-        self.plant_config_hasChanged = True
-        self.twin_report()
-        print("</twin_patch_handler>")
+        logger.info(f"received new config {patch}")
+        self.plant_manager.push_new_plant_config(patch)
 
 
-    def twin_report(self):
-        print("<twin_report>")
-        plant_config = load_toml_config(self.plant_toml_path)
-        plant_config_raw = plant_config["plant_config"]
-        plant_config_clean = {k: v for k, v in plant_config_raw.items() if k != "$version"} #keine $version in Device Twin weil reserviert
-        print("plant_config_clean Inhalt:", plant_config_clean)
-        self.device_client.patch_twin_reported_properties(plant_config_clean)
-        # fügt neue tags hinzu und ersetzt die Werte in denen die er kennt. Nicht aktualisierte bleiben erhalten.
-        # Zum löschen eines Tags auf None setzen
-        print("</twin_report>")
+    def report_device_twin(self, patch):
+        logger.info(f"report to device twin: {patch}")
+        self.device_client.patch_twin_reported_properties(patch)
 
 
     def send_message(self, measurement_data: str):
-        print("<send_message>")
-        print(f"{measurement_data}")
+        logger.info(f"sending message: {measurement_data}")
         message = Message(measurement_data)
         try:
             self.device_client.send_message(message)
         except Exception as e:
-            print(f"Fehler beim senden der Message {e}")
+            logger.error(f"Fehler beim senden der Message {e}")
             # hier nochmal versuchen
-        print("</send_message>")
 
 
     def disconnect_device_client(self):
@@ -135,8 +119,6 @@ class Device_Client():
 
 
 
-    #ab hier kommt in extra skript
-
     def watering_sec(sec: int):
         # TODO wie steuer ich die Pumpe?
         print("Bewässerung läuft für Sekunden")
@@ -144,12 +126,3 @@ class Device_Client():
     def watering_perc(perc: int):
         # Bewässern bis Prozent Bodenfeuchte
         print("Bewässerung läuft bis Bodenfeuchte")
-
-
-
-    # pip install azure-iot-device
-    # pip install toml (in neueren Versionen von Python schon dabei, aber man weiß ja nie) import von Toml != Tomli (Funktionen anscheinend anders)
-
-
-
-

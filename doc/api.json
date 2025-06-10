@@ -59,6 +59,17 @@
             "description": "Unauthorized"
           }
         }
+      },
+      "post": {
+        "description": "Ermöglicht das Hinzufügen eines neuen Gerätes",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/devices/{id}": {
@@ -358,19 +369,6 @@
         }
       }
     },
-    "/devices": {
-      "post": {
-        "description": "Ermöglicht das Hinzufügen eines neuen Gerätes",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
     "/plants": {
       "get": {
         "description": "Gibt alle vom Nutzer verwalteten Pflanzen zurück nach Identitätsüberprüfung",
@@ -382,17 +380,90 @@
             "description": "Unauthorized"
           }
         }
-      }
-    },
-    "/plants/": {
+      },
       "post": {
-        "description": "Ermöglicht das Hinzufügen einer neuen Vorlage",
+        "description": "Ermöglicht das Hinzufügen einer neuen Pflanze",
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created wenn die Pflanze erfolgreich erstellt wurde"
+          },
+          "401": {
+            "description": "Unauthorized wenn kein gültiger Token übergeben wurde"
+          },
+          "400": {
+            "description": "Bad Request wenn ein Attribut zum Erstellen der Pflanze fehlt"
+          }
+        }
+      }
+    },
+    "/measurements": {
+      "get": {
+        "description": "Gibt alle Messwerte innerhalb eines bestimmten Zeitraums zurück.",
+        "parameters": [
+          {
+            "name": "plantId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fieldName",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "measurements": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/measurement"
+                  }
+                },
+                "pagination": {
+                  "$ref": "#/definitions/pagination"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         }
       }
@@ -440,6 +511,46 @@
         "max_humidity_percent": {
           "type": "integer",
           "description": "Die maximale Luftfeuchtigkeit, bei der die Pumpe ausgeschaltet wird."
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "description": "Die aktuelle Seite der Ergebnisse."
+        },
+          "pageSize": {
+          "type": "integer",
+          "description": "Die Anzahl der Ergebnisse pro Seite."
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "description": "Die ID des Gerätes, von dem die Messung stammt."
+        },
+        "plantId": {
+          "type": "string",
+          "description": "Die ID der Pflanze, zu der die Messung gehört."
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Der Zeitpunkt der Messung als Unix-Zeitstempel."
+        },
+        "fieldName": {
+          "type": "string",
+          "description": "Der Name des Feldes, das gemessen wurde (z.B. 'temperature_celsius')."
+        },
+        "value": {
+          "type": "number",
+          "format": "float",
+          "description": "Der gemessene Wert."
         }
       }
     }

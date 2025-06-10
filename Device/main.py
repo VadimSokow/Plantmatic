@@ -1,4 +1,0 @@
-from Device.plant_management_device import Plant_Management_Device
-
-plant_management_device = Plant_Management_Device()
-plant_management_device.start_measuring()

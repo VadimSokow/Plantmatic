@@ -17,8 +17,8 @@
         >
           <PlantCard
             :plant="plant"
-            :slot-number="resolvePlantSlot(plant.id)"
             :sensors="device.model.sensors"
+            :slot-number="resolvePlantSlot(plant.id)"
           />
         </v-col>
       </v-row>
@@ -32,38 +32,38 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { useDeviceWithPlants } from '@/composition/deviceWithPlants.ts'
+  import { useRoute } from 'vue-router'
+  import { useDeviceWithPlants } from '@/composition/deviceWithPlants.ts'
 
-const route = useRoute('/devices/[id]')
-const id = ref<string>(route.params.id)
+  const route = useRoute('/devices/[id]')
+  const id = ref<string>(route.params.id)
 
-const {
-  device,
-  plants,
-  isLoading,
-  error,
-  loadAllData,
-  clearError,
-} = useDeviceWithPlants(id.value)
+  const {
+    device,
+    plants,
+    isLoading,
+    error,
+    loadAllData,
+    clearError,
+  } = useDeviceWithPlants(id.value)
 
-const deviceSlots = computed(() => {
-  return {
-    total: device.value.model.slotCount,
-    used: plants.value.length,
+  const deviceSlots = computed(() => {
+    return {
+      total: device.value.model.slotCount,
+      used: plants.value.length,
+    }
+  })
+
+  function resolvePlantSlot (plantId: string): number | null {
+    for (const plantSlot of device.value.plantSlots) {
+      if (!plantSlot.plantId) continue
+      if (plantSlot.plantId == plantId)
+        return plantSlot.slotNumber
+    }
+    return null
   }
-})
 
-function resolvePlantSlot(plantId: string): number | null {
-  for (let plantSlot of device.value.plantSlots) {
-    if (!plantSlot.plantId) continue
-    if (plantSlot.plantId == plantId)
-      return plantSlot.slotNumber
-  }
-  return null
-}
-
-onMounted(() => {
-  loadAllData()
-})
+  onMounted(() => {
+    loadAllData()
+  })
 </script>
