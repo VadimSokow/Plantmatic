@@ -3,8 +3,8 @@ import json
 from azure.iot.device import IoTHubDeviceClient, Message, MethodResponse
 from azure.iot.device.iothub.pipeline.pipeline_events_iothub import MethodRequestEvent
 
-from Device.src.PlantManagement.PlantManagerInterface import PlantManagerInterface
-from Device.src.logger import create_logger
+from PlantManagement.PlantManagerInterface import PlantManagerInterface
+from logger import create_logger
 
 logger = create_logger(__name__)
 

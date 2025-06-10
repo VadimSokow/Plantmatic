@@ -1,7 +1,7 @@
 import os
 import unittest
 
-import Device.src.helper.toml as toml
+import helper.toml as toml
 
 toml_file_content = """
 [blume]

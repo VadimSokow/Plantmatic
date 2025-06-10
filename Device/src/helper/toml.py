@@ -1,7 +1,7 @@
 import tomllib
 from typing import Any
 import tomli_w
-from Device.src.logger import create_logger
+from logger import create_logger
 
 logger = create_logger(__name__)
 
