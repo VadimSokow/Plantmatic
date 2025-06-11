@@ -40,7 +40,7 @@ class Slot:
             self.soil_sensor.value_name: soil_moisture_percent,
             self.light_sensor.value_name: light_level_lux,
         }
-        return json.dumps(sensor_values)
+        return sensor_values
 
     def pump_for_duration(self, duration: int):
         """
