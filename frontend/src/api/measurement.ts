@@ -1,4 +1,8 @@
-import type { MeasuredPlant, MeasuredValue, Measurement } from '@/types/measurement.ts'
+import type {
+  MeasuredPlant,
+  MeasuredValue,
+  Measurement,
+} from '@/types/measurement.ts'
 import { apiClient } from '@/api/client.ts'
 
 type MeasurementResult = {
@@ -66,7 +70,14 @@ export const fetchMeasurements = async (
   while (true) {
     // fetch data from API
     const response = await apiClient.get<MeasurementResult>('/measurements', {
-      params: { plantId, fieldName, startTime, endTime, pageSize, page: pageCount },
+      params: {
+        plantId,
+        fieldName,
+        startTime,
+        endTime,
+        pageSize,
+        page: pageCount,
+      },
     })
 
     const data = response.data
@@ -97,21 +108,21 @@ export const fetchMeasurements = async (
   return result
 }
 
-export const fetchMeasurementsOld = async (
-  plantId: string,
-  fieldName: string,
-  startTime: number,
-  endTime: number,
-  maxCount: number,
-  pageIndex: number,
-): Promise<Measurement[] | null> => {
-  // return generateDataSet(
-  //   plantId,
-  //   fieldName,
-  //   startTime,
-  //   endTime,
-  //   maxCount,
-  //   pageIndex,
-  // )
-  return null
-}
+// export const fetchMeasurementsOld = async (
+//   plantId: string,
+//   fieldName: string,
+//   startTime: number,
+//   endTime: number,
+//   maxCount: number,
+//   pageIndex: number,
+// ): Promise<Measurement[] | null> => {
+//   // return generateDataSet(
+//   //   plantId,
+//   //   fieldName,
+//   //   startTime,
+//   //   endTime,
+//   //   maxCount,
+//   //   pageIndex,
+//   // )
+//   return null
+// }
