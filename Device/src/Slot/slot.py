@@ -1,17 +1,17 @@
 import \
     json
 
-from Device.src.hardware.actuators.led_actuator import \
+from hardware.actuators.led_actuator import \
     LedActuator
-from Device.src.hardware.actuators.pump import \
+from hardware.actuators.pump import \
     Pump
-from Device.src.hardware.sensors.ads1115_light_sensor import \
+from hardware.sensors.ads1115_light_sensor import \
     ADS1115LightSensor
-from Device.src.hardware.sensors.ads1115_soil_moisture_sensor import \
+from hardware.sensors.ads1115_soil_moisture_sensor import \
     ADS1115SoilSensor
-from Device.src.hardware.sensors.dht11_sensor import \
+from hardware.sensors.dht11_sensor import \
     DHT11Sensor
-from Device.src.interfaces.actuator_interface import \
+from interfaces.actuator_interface import \
     LedColor
 
 class Slot:

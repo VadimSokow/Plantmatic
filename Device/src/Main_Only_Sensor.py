@@ -1,4 +1,5 @@
 import time
+import Config.pin_config as config
 import RPi.GPIO as GPIO
 
 from Device import \
