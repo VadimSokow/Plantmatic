@@ -40,7 +40,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
         const plantTypes = [];
         for (let uniqueTypeId of uniqueTypeIds) {
             const typeQuery = {
-                query: "SELECT c.latname, c.commonName, c.description, c.configFields FROM c where c.latname = @id",
+                query: "SELECT c.latName, c.commonName, c.description, c.configFields FROM c where c.latName = @id",
                 parameters: [{name: "@id", value: uniqueTypeId}],
             }
             const {resources: types} = await cosmos.query("plantType", typeQuery).fetchAll()
