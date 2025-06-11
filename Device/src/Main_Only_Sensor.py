@@ -1,7 +1,8 @@
 import time
-import Config.pin_config as config
 import RPi.GPIO as GPIO
 
+from Device import \
+    config
 from Device.src.interfaces.actuator_interface import LedColor
 from Device.src.hardware.sensors.dht11_sensor import DHT11Sensor
 from Device.src.hardware.sensors.ads1115_soil_moisture_sensor import ADS1115SoilSensor

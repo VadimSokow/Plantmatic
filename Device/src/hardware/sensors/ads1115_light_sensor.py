@@ -63,7 +63,7 @@ class ADS1115LightSensor(LightSensorInterface):
             brightness_fraction = (self.voltage_dark - current_voltage) / self.voltage_range
             lux_value = 800.0 * brightness_fraction
             lux_value = max( 0.0,lux_value)
-            # todo gibt immer ca. 700 Lux raus. Problem mit verkabelung? soil funktioniert
+            # todo gibt immer ca. 700 Lux raus. Problem mit Verkabelung? soil funktioniert
             return lux_value
 
         except OSError as e:

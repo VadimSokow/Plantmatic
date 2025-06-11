@@ -1,0 +1,60 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam componentStyle uml2
+skinparam class {
+    BackgroundColor #LightSteelBlue
+    BorderColor #444
+}
+skinparam interface {
+    BackgroundColor #FFF68F
+    BorderColor #8B833E
+}
+skinparam artifact {
+    BackgroundColor #EFEFEF
+    BorderColor #888
+}
+
+' The configuration source
+artifact "<b>config.py</b>" as Config
+
+' The definition of contracts (the "what")
+package "Schnittstellen (interfaces)" {
+    interface "ActuatorInterface" as IActuator
+    interface "SensorInterface" as ISensor
+}
+
+' The concrete implementation of hardware drivers (the "how")
+package "Hardware-Abstraktion (hardware)" {
+    component "Pump"
+    component "LedActuator"
+    component "DHT11Sensor"
+    component "ADS1115SoilSensor"
+    component "ADS1115LightSensor"
+}
+
+' --- Define Relationships ---
+
+' The hardware classes get their configuration from config.py
+(Hardware-Abstraktion) <.. Config : liest Pins & Kalibrierung
+
+' The hardware classes are the concrete implementations of the interfaces
+Pump ..|> IActuator
+LedActuator ..|> IActuator
+DHT11Sensor ..|> ISensor
+ADS1115SoilSensor ..|> ISensor
+ADS1115LightSensor ..|> ISensor
+
+' The Slot class is composed of the concrete hardware objects
+Slot o-- "1" Pump
+Slot o-- "1" LedActuator
+Slot o-- "1" DHT11Sensor
+Slot o-- "1" ADS1115SoilSensor
+Slot o-- "1" ADS1115LightSensor
+
+' A note explaining the creation process, which is outside the scope of these components
+note "Eine übergeordnete Logik (z.B. in <b>main.py</b>):\n1. Liest die <b>config.py</b>\n2. Erstellt die konkreten <b>Hardware</b>-Objekte\n3. Erstellt ein <b>Slot</b>-Objekt und übergibt die Hardware-Instanzen" as CreationNote
+CreationNote ..> Slot
+CreationNote ..> Config
+
+@enduml
