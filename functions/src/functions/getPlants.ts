@@ -1,11 +1,7 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
-import {CosmosClient} from "@azure/cosmos"
-import {getUser} from "./user";
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 
-const cosmosEndpoint = process.env.CosmosDBEndpoint;
-const cosmosKey = process.env.CosmosDBKey;
 
 export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
 
@@ -43,11 +39,11 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
         // fetch models for unique model ids
         const plantTypes = [];
         for (let uniqueTypeId of uniqueTypeIds) {
-            const modelQuery = {
+            const typeQuery = {
                 query: "SELECT c.latName, c.comName, c.description, c.configFields FROM c where c.latName = @id",
                 parameters: [{name: "@id", value: uniqueTypeId}],
             }
-            const {resources: types} = await cosmos.query("models", modelQuery).fetchAll()
+            const {resources: types} = await cosmos.query("plantType", typeQuery).fetchAll()
             if (types && types.length > 0) {
                 plantTypes.push(types[0]);
             } else {
