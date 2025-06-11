@@ -3,7 +3,7 @@ import axios from 'axios'
 import { msalInstance, tokenRequest } from '../authConfig'
 
 export const apiClient = axios.create({
-  baseURL: 'https://plantfun.azurewebsites.net/api',
+  baseURL: 'https://plantmatic.azurewebsites.net/api',
   headers: {
     'Content-Type': 'application/json',
   },

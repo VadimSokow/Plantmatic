@@ -3,19 +3,24 @@ import { LogLevel, PublicClientApplication } from '@azure/msal-browser'
 // Config object to be passed to Msal on creation
 export const msalConfig = {
   auth: {
-    clientId: 'eedbd612-f827-4bfc-bb2b-668615b9a8f6',
-    authority: 'https://PlantmaticID.ciamlogin.com/ecb007b7-2fe6-4285-85da-a28ec3437880/v2.0',
+    clientId: '3f165d44-ce8d-4a7d-974e-c05586e49628',
+    authority:
+      'https://plantauth.ciamlogin.com/f83be7dc-9d01-45cb-8c03-c841f2b10153/v2.0',
     redirectUri: '/auth/callback',
     postLogoutRedirectUri: '/',
     navigateToLoginRequestUrl: false,
-    knownAuthorities: ['PlantmaticID.ciamlogin.com'],
+    knownAuthorities: ['plantauth.ciamlogin.com'],
   },
   cache: {
     cacheLocation: 'localStorage',
   },
   system: {
     loggerOptions: {
-      loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
+      loggerCallback: (
+        level: LogLevel,
+        message: string,
+        containsPii: boolean,
+      ) => {
         if (containsPii) {
           return
         }
@@ -54,5 +59,5 @@ export const loginRequest = {
 }
 
 export const tokenRequest = {
-  scopes: ['api://05048acd-bf0d-46d1-9c77-1fa3c8c218a4/API.use'],
+  scopes: ['api://3cc05a01-b350-43ae-aa8e-9dd2ce3a28fd/API.use'],
 }

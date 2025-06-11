@@ -8,10 +8,10 @@ const plants: Plant[] = [
     userId: 'u38079@hs-harz.de',
     deviceId: '1',
     type: {
-      'latName': 'Euphorbia leuconeura',
-      'commonName': 'Spuckpalme',
-      'description': 'Eine spuckende Palme im Bad',
-      'configFields': [],
+      latName: 'Euphorbia leuconeura',
+      commonName: 'Spuckpalme',
+      description: 'Eine spuckende Palme im Bad',
+      configFields: [],
     },
   },
   {
@@ -20,25 +20,35 @@ const plants: Plant[] = [
     userId: 'u38079@hs-harz.de',
     deviceId: '2',
     type: {
-      'latName': 'Echeveria ssp',
-      'commonName': 'Echeveria',
-      'description': 'Eine Echeveria Palme im Wohnzimmer',
-      'configFields': [],
+      latName: 'Echeveria ssp',
+      commonName: 'Echeveria',
+      description: 'Eine Echeveria Palme im Wohnzimmer',
+      configFields: [],
     },
   },
 ]
 
 export const fetchPlants = async (): Promise<Plant[]> => {
   try {
-    // const response = await apiClient.get<Plant[]>('/plants')
-    // const data = response.data
-    // return data
-    return plants
-    // return data.map(d => {
-    //   const plant = d['plant'] as Plant
-    //   plant.type = d['model'] as PlantType
-    //   return plant
-    // })
+    const response = await apiClient('/plants')
+    console.log('Plants', response)
+
+    const types: PlantType[] = response.data['types']
+    const getPlantTypeById = (latName: string): PlantType | undefined => {
+      return types.find(type => type.latName === latName)
+    }
+
+    const plants: Array<Record<string, any>> = response.data['plants']
+    return plants.map(plant => {
+      const type = getPlantTypeById(plant.latName)
+      if (!type) {
+        console.warn(`type ${plant.latName} not found for ${plant.id}`)
+      }
+      return {
+        ...plant,
+        type,
+      } as Plant
+    })
   } catch (error: unknown) {
     console.error('Fehler beim Laden der Geräte:', error)
     throw error
