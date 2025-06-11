@@ -7,8 +7,6 @@ class DHT11Sensor(TempHumiditySensorInterface):
     def __init__(self, pin):
         self.pin = pin
         self.dht_device = None
-        self.last_read_time = 0
-        self.min_interval = 2.0
         self.last_temp = None
         self.last_hum = None
         self.temperature_value_name = "temperature_celsius"
