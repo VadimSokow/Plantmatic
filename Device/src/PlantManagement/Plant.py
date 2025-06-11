@@ -13,7 +13,8 @@ logger = create_logger(__name__)
 
 
 class Plant:
-    def __init__(self, name: str, measuring_interval: int, min_humidity: int, max_humidity: int, slot_num: int, slot: Slot):
+    def __init__(self, name: str, measuring_interval: int, min_humidity: int, max_humidity: int, slot_num: int,
+                 slot: Slot):
         """
         Initialize a Plant with provided values.
         :param name: The name of the Plant.
@@ -28,7 +29,7 @@ class Plant:
         self.max_humidity = max_humidity
         self.slot_num = slot_num
         self.monitoring: Task | None = None
-        self.last_monitored : float = 0 #In sekunden von 1970
+        self.last_monitored: float = 0  # In sekunden von 1970
         self.slot: Slot = slot
 
     def to_string(self) -> str:
@@ -50,13 +51,13 @@ class Plant:
         }
         return data
 
-    def monitor(self, device_client: DeviceClient, current_time : float) -> None:
+    def monitor(self, device_client: DeviceClient, current_time: float) -> None:
         """
         The monitor function. It will run until the coroutine is killed.
         :param device_client: The device client to push data into the cloud.
         :param current_time: Hallo
         """
-        #Prüfen, ob schon genug Zeit vergangen ist
+        # Prüfen, ob schon genug Zeit vergangen ist
         logger.info(f"Check interval of Plant: {self.name}")
         if current_time - self.last_monitored < self.measuring_interval:
             return
@@ -74,13 +75,12 @@ class Plant:
         """
         logger.info("creating message with dummy data")
         # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}}
-        #measurement_data = get_measurement_test_data()
-        #data = {f"{self.name}": measurement_data}
-        #data = json.dumps(data)
-        data = self.slot.get_all_sensor_values()
+        # measurement_data = get_measurement_test_data()
+        measurement_data = self.slot.get_all_sensor_values()
+        data = {f"{self.name}": measurement_data}
+        data = json.dumps(data)
         print(data)
         return data
-
 
 
     def __eq__(self, other):
