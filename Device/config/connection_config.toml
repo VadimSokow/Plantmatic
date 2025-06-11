@@ -1,3 +1,3 @@
 [Connection]
-Connection_String = ""
+Connection_String = "HostName=planthub.azure-devices.net;DeviceId=Raspi;SharedAccessKey=2z8NxHeOsWjLyByVVfA8Dt2igkEirpUeZ0nwwDoey3w="
 Websockets = true

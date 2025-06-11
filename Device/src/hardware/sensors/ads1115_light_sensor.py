@@ -3,7 +3,7 @@ import board # Hinzugefügt
 import busio # Hinzugefügt
 import adafruit_ads1x15.ads1115 as ADS # Hinzugefügt
 from adafruit_ads1x15.analog_in import AnalogIn
-from ...interfaces.sensor_interface import LightSensorInterface
+from ..interfaces.sensor_interface import LightSensorInterface
 
 class ADS1115LightSensor(LightSensorInterface):
     def __init__(self, adc_channel, voltage_dark: float, voltage_bright: float, i2c_address=0x48):

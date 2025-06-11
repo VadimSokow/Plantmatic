@@ -1,18 +1,18 @@
 import time
-import Config.pin_config as config
 import RPi.GPIO as GPIO
 
-from Device import \
+from Device.src import \
     config
-from Device.src.interfaces.actuator_interface import LedColor
-from Device.src.hardware.sensors.dht11_sensor import DHT11Sensor
-from Device.src.hardware.sensors.ads1115_soil_moisture_sensor import ADS1115SoilSensor
-from Device.src.hardware.actuators.pump import Pump
-from Device.src.hardware.sensors.ads1115_light_sensor import ADS1115LightSensor
-from Device.src.hardware.actuators.led_actuator import LedActuator
+from src.hardware.interfaces.actuator_interface import LedColor
+from src.hardware.sensors.dht11_sensor import DHT11Sensor
+from src.hardware.sensors.ads1115_soil_moisture_sensor import ADS1115SoilSensor
+from src.hardware.actuators.pump import Pump
+from src.hardware.sensors.ads1115_light_sensor import ADS1115LightSensor
+from src.hardware.actuators.led_actuator import LedActuator
 
 # Temperatur- und Luftfeuchte Sensor initialisieren
-dht_sensor = DHT11Sensor(config.DHT11_PIN)
+dht_sensor = DHT11Sensor(
+    config.DHT11_PIN)
 # Bodenfeuchte Sensor initialisieren
 soil_sensor = ADS1115SoilSensor(
     adc_channel=config.SOIL_MOISTURE_ADC_CHANNEL_SLOT0,
@@ -27,16 +27,16 @@ light_sensor = ADS1115LightSensor(
 )
 # Pumpe initialisieren
 GPIO.setmode(GPIO.BCM) #für die Verwendung des Pins im setup der Pump.py
-pump = Pump(config.RELAY_PIN_PUMP_SLOT0.id)
-pump.setup()
+pump = Pump(
+    config.RELAY_PIN_PUMP_SLOT0.id)
 # LEDs initialisieren
-leds = LedActuator(config.LED_PIN_RED_SLOT0.id,config.LED_PIN_YELLOW_SLOT0.id,config.LED_PIN_GREEN_SLOT0.id)
-leds.setup()
+leds = LedActuator(
+    config.LED_PIN_RED_SLOT0.id,
+    config.LED_PIN_YELLOW_SLOT0.id,
+    config.LED_PIN_GREEN_SLOT0.id)
 
 try:
     while True:
-
-
         # Temp und Luftfeuchte Auslesen
         temp, hum = dht_sensor.read_combined()
         if temp is not None and hum is not None:
@@ -70,13 +70,17 @@ try:
         if moisture > 60:
             pump.pump_on()
             print("Pumpe eingeschaltet.")
-            leds.set_status_color(LedColor.RED)
         else:
             pump.pump_off()
             print("Pumpe ausgeschaltet.")
-            leds.set_status_color(LedColor.GREEN)
 
-        time.sleep(3)
+        time.sleep(1)
+        leds.set_status_color(LedColor.RED)
+        time.sleep(1)
+        leds.set_status_color(LedColor.YELLOW)
+        time.sleep(1)
+        leds.set_status_color(LedColor.GREEN)
+
 
 except KeyboardInterrupt:
     print("\nTest gestoppt.")

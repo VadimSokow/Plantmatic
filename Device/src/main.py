@@ -23,7 +23,7 @@ def get_config_path() -> str:
     """
     main_path = os.path.abspath(__file__)
     main_path = os.path.dirname(main_path)
-    return os.path.join(os.path.dirname(main_path), "config")
+    return os.path.join(os.path.dirname(main_path), "Config")
 
 def signal_handler(sig, frame):
     """
@@ -52,7 +52,7 @@ async def main():
     config_path = get_config_path()
     logger.info(f"Config path: {config_path}")
 
-    plant_manager = PlantManager(os.path.join(config_path, config_plant_file))
+    plant_manager = PlantManager(os.path.join(config_path, config_plant_file)) # Adresse von der PlantConfig wird gebaut
 
     connection_config = toml.load_file(os.path.join(config_path, config_connection_file))
     device_client = DeviceClient(connection_config, plant_manager)

@@ -13,7 +13,7 @@ Slot Sensoren:
 '''
 # --- Pin Konfiguration (BCM Nummerierung) ---
 DHT11_PIN = board.D4
-LIGHT_SENSOR_ADC_CHANNEL = ADS.P2  # A2 todo checken, ob wirklich an Chanel 2 oder doch chanel 1
+LIGHT_SENSOR_ADC_CHANNEL = ADS.P2  # A2
 SOIL_MOISTURE_ADC_CHANNEL_SLOT0 = ADS.P0  # A0
 SOIL_MOISTURE_ADC_CHANNEL_SLOT1 = ADS.P1  # A1
 SOIL_MOISTURE_ADC_CHANNEL_SLOT2 = ADS.P3  # A1

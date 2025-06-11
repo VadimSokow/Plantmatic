@@ -7,11 +7,13 @@ from random import randint
 from Mqtt.DeviceClient import DeviceClient
 from logger import create_logger
 
+from Slot.slot import Slot
+
 logger = create_logger(__name__)
 
 
 class Plant:
-    def __init__(self, name: str, measuring_interval: int, min_humidity: int, max_humidity: int, slot_num: int):
+    def __init__(self, name: str, measuring_interval: int, min_humidity: int, max_humidity: int, slot_num: int, slot: Slot):
         """
         Initialize a Plant with provided values.
         :param name: The name of the Plant.
@@ -27,6 +29,7 @@ class Plant:
         self.slot_num = slot_num
         self.monitoring: Task | None = None
         self.last_monitored : float = 0 #In sekunden von 1970
+        self.slot: Slot = slot
 
     def to_string(self) -> str:
         """
@@ -71,11 +74,14 @@ class Plant:
         """
         logger.info("creating message with dummy data")
         # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}}
-        measurement_data = get_measurement_test_data()
-        data = {f"{self.name}": measurement_data}
-        data = json.dumps(data)
-        # print(data)
+        #measurement_data = get_measurement_test_data()
+        #data = {f"{self.name}": measurement_data}
+        #data = json.dumps(data)
+        data = self.slot.get_all_sensor_values()
+        print(data)
         return data
+
+
 
     def __eq__(self, other):
         if not isinstance(other, Plant):

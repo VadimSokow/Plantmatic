@@ -1,18 +1,11 @@
-import \
-    json
+import json
 
-from hardware.actuators.led_actuator import \
-    LedActuator
-from hardware.actuators.pump import \
-    Pump
-from hardware.sensors.ads1115_light_sensor import \
-    ADS1115LightSensor
-from hardware.sensors.ads1115_soil_moisture_sensor import \
-    ADS1115SoilSensor
-from hardware.sensors.dht11_sensor import \
-    DHT11Sensor
-from interfaces.actuator_interface import \
-    LedColor
+from hardware.actuators.led_actuator import LedActuator
+from hardware.actuators.pump import Pump
+from hardware.sensors.ads1115_light_sensor import ADS1115LightSensor
+from hardware.sensors.ads1115_soil_moisture_sensor import ADS1115SoilSensor
+from hardware.sensors.dht11_sensor import DHT11Sensor
+from hardware.interfaces.actuator_interface import LedColor
 
 class Slot:
     def __init__(
@@ -22,16 +15,16 @@ class Slot:
             leds: LedActuator,
             light_sensor: ADS1115LightSensor,
             soil_sensor: ADS1115SoilSensor,
-            dht11_sensor: DHT11Sensor
+            dht11_sensor: DHT11Sensor,
     ):
-        self.slot_id = slot_num
+        self.slot_num = slot_num
         self.pump = pump
         self.leds = leds
         self.light_sensor = light_sensor
         self.soil_sensor = soil_sensor
         self.dht11_sensor = dht11_sensor
 
-    def get_all_sensor_values(self) -> str:
+    def get_all_sensor_values(self) -> str | None:
         """
         Builds a JSON String of all sensor values.
         :return: A JSON with all Sensor values.
@@ -62,5 +55,3 @@ class Slot:
         :param color: to set the LED Actuator to. E.g., LedColor.RED
         """
         self.leds.set_status_color(color)
-
-

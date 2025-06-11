@@ -1,15 +1,7 @@
-from contextlib import \
-    nullcontext
-
 import adafruit_dht
 import time
-from typing import \
-    Optional, \
-    Tuple, \
-    Any
-from ...interfaces.sensor_interface import \
-    TempHumiditySensorInterface
-
+from typing import Optional, Tuple
+from ..interfaces.sensor_interface import TempHumiditySensorInterface
 
 class DHT11Sensor(TempHumiditySensorInterface):
     def __init__(self, pin):
@@ -42,15 +34,9 @@ class DHT11Sensor(TempHumiditySensorInterface):
             print("DHT11 nicht initialisiert.")
             return None, None
 
-        # Prüfe, ob genug Zeit seit dem letzten Lesen vergangen ist
-        if (current_time - self.last_read_time) < self.min_interval:
-            # Gebe die zuletzt erfolgreich gelesenen Werte zurück, wenn zu früh
-            return self.last_temp, self.last_hum
-
         try:
             temperature_c = self.dht_device.temperature
             humidity = self.dht_device.humidity
-            self.last_read_time = current_time
 
             # prüfen, ob Sensorwerte gültig sind
             if temperature_c is not None and humidity is not None:
@@ -70,17 +56,12 @@ class DHT11Sensor(TempHumiditySensorInterface):
             return None, None
 
     def get_humidity_percent(self) -> float | None:
-        current_time = time.monotonic()
         if self.dht_device is None:
             print("DHT11 nicht initialisiert.")
             return None
-        # Prüfe, ob genug Zeit seit dem letzten Lesen vergangen ist
-        if (current_time - self.last_read_time) < self.min_interval:
-            # Gebe die zuletzt erfolgreich gelesenen Werte zurück, wenn zu früh
-            return self.last_hum
+
         try:
             humidity = self.dht_device.humidity
-            self.last_read_time = current_time
 
             # prüfen, ob Sensorwerte gültig sind
             if humidity is not None:
@@ -99,17 +80,11 @@ class DHT11Sensor(TempHumiditySensorInterface):
             return None
 
     def get_temperature_celsius(self) -> float | None:
-        current_time = time.monotonic()
         if self.dht_device is None:
             print("DHT11 nicht initialisiert.")
             return None
-        # Prüfe, ob genug Zeit seit dem letzten Lesen vergangen ist
-        if (current_time - self.last_read_time) < self.min_interval:
-            # Gebe die zuletzt erfolgreich gelesenen Werte zurück, wenn zu früh
-            return self.last_temp
         try:
             temperature_c = self.dht_device.temperature
-            self.last_read_time = current_time
             # prüfen, ob Sensorwerte gültig sind
             if temperature_c is not None:
                 self.last_temp = temperature_c

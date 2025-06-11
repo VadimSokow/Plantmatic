@@ -1,8 +1,6 @@
 import RPi.GPIO as GPIO
 
-from ...interfaces.actuator_interface import \
-    LedActuatorInterface, \
-    LedColor
+from ..interfaces.actuator_interface import LedActuatorInterface, LedColor
 
 class LedActuator(LedActuatorInterface):
     def __init__(self, red_pin: int, yellow_pin: int, green_pin: int):
@@ -17,9 +15,10 @@ class LedActuator(LedActuatorInterface):
             LedColor.GREEN: self.green_pin
         }
         self.current_color = LedColor.OFF  # Software-seitiger Status
-        print(f"LedActuator initialisiert für Pins R:{red_pin}, Y:{yellow_pin}, G:{green_pin}")
+        self._setup()
+        #print(f"LedActuator initialisiert für Pins R:{red_pin}, Y:{yellow_pin}, G:{green_pin}")
 
-    def setup(self) -> None:
+    def _setup(self) -> None:
         """
         Configures all 3 LEDs of the LED Actuator.
         """
@@ -33,6 +32,9 @@ class LedActuator(LedActuatorInterface):
         except Exception as e:
             print(f"FEHLER beim Setup der LED-Pins: {e}")
             raise
+
+    def setup(self):
+        self._setup()
 
     def _set_all_leds_off(self):
         """

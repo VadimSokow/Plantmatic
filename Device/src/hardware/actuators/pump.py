@@ -1,6 +1,5 @@
 import RPi.GPIO as GPIO
-import time
-from ...interfaces.actuator_interface import PumpActuatorInterface
+from ..interfaces.actuator_interface import PumpActuatorInterface
 
 # Relais schaltet bei LOW Signal!
 RELAY_ON_STATE = GPIO.LOW   # Relais AN bei GPIO.LOW
@@ -14,14 +13,18 @@ class Pump(PumpActuatorInterface):
         """
         self.pin = pin
         self.is_on = False
+        self._setup()
 
-    def setup(self):
+    def _setup(self):
         """Sets up the Pump as an output."""
         try:
             GPIO.setup(self.pin, GPIO.OUT, initial=RELAY_OFF_STATE) #  Pin als Output festlegen, Initial LOW/0
             self.is_on = (RELAY_OFF_STATE == RELAY_ON_STATE) # Setze initialen Zustand Aus/False
         except Exception as e:
             print(f"FEHLER beim Setup für Pumpen-Pin {self.pin}: {e}")
+
+    def setup(self):
+        self._setup()
 
     def pump_on(self):
         """Turns the pump on."""

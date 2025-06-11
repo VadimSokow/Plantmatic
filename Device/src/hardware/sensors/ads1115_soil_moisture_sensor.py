@@ -1,10 +1,9 @@
-import time
 from typing import Optional
 import board
 import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
-from ...interfaces.sensor_interface import SoilMoistureSensorInterface
+from ..interfaces.sensor_interface import SoilMoistureSensorInterface
 
 class ADS1115SoilSensor(SoilMoistureSensorInterface):
 
