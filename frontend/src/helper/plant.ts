@@ -1,56 +1,61 @@
 import type { DeviceModelSensorConfig } from '@/types/device.ts'
 
 export function plantFieldWithDataToStrings (
-  defs: DeviceModelSensorConfig[],
+  defs: Record<string, DeviceModelSensorConfig>,
   devicePlantSlot: number,
   data: Record<string, unknown> | undefined,
 ): string[] {
-  const lines: string[] = [];
+  console.log('defs', defs)
+  const lines: string[] = []
 
-  defs.forEach(def => {
+  for (const def of Object.values(defs)) {
     // Sicherer Zugriff mit optional chaining
-    let line = `${def.name}: `;
+    let line = `${def.name}: `
     if (data === undefined) {
-      line += 'unknown';
-      lines.push(line);
-      return;
+      line += 'unknown'
+      lines.push(line)
+      continue
     }
 
     // Überspringen, wenn der Sensor für eine andere Pflanze konfiguriert ist
     if (def.type === 'plant' && def.plantSlot !== devicePlantSlot) {
-      return;
+      continue
     }
 
-    const fieldValue = data[def.fieldName];
+    const fieldValue = data[def.fieldName]
 
     // Prüfen, ob der Wert existiert und ein String ist
     if (typeof fieldValue === 'string') {
-      line += fieldValue;
-      line += resolveUnitToString(def.unit);
+      line += fieldValue
+      line += resolveUnitToString(def.unit)
     } else if (fieldValue === undefined || fieldValue === null) {
       // Optional: Was tun, wenn der Wert nicht existiert oder null ist?
       // Z.B. einen leeren String setzen oder gar nicht erst hinzufügen
-      line += 'unknown';
+      line += 'unknown'
     } else {
-      line += String(fieldValue);
-      line += resolveUnitToString(def.unit);
+      line += String(fieldValue)
+      line += resolveUnitToString(def.unit)
     }
 
-    lines.push(line);
-  });
+    lines.push(line)
+  }
 
-  return lines;
+  return lines
 }
 
 function resolveUnitToString (unit: string): string {
   switch (unit) {
-    case 'percent':
-      return '%';
-    case 'celsius':
-      return '°C';
-    case 'lux':
-      return 'lx';
-    default:
-      return '';
+    case 'percent': {
+      return '%'
+    }
+    case 'celsius': {
+      return '°C'
+    }
+    case 'lux': {
+      return 'lx'
+    }
+    default: {
+      return ''
+    }
   }
 }

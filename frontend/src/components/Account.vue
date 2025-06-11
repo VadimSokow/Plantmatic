@@ -19,7 +19,19 @@
 
   const { instance } = useMsal()
 
-  const username = instance.getAllAccounts()[0]?.username || null
+  const username = computed(() => {
+    const account = instance.getAllAccounts()[0]
+    console.log(account)
+    if (!account.idTokenClaims) {
+      return account.username.length === 0 ? 'unknown' : account.username
+    }
+    const mail = account.idTokenClaims['email']
+    // check if mail is a string
+    if (typeof mail === 'string') {
+      return mail.length === 0 ? 'unknown' : mail
+    }
+    return 'unknown'
+  })
 
   const logout = () => {
     if (instance.getAllAccounts().length === 0) {
