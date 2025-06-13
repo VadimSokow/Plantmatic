@@ -48,6 +48,7 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         ]
     }
     try {
+
         const cosmos = getCosmosBundle()
         if (!cosmos) {
             return {status: 500, body: "Database not available"}
