@@ -54,7 +54,8 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
             return {status: 500, body: "Database not available"}
         }
 
-        const {resources: devices} = await cosmos.query("devices", deviceQuery).fetchAll()
+        const iterator = cosmos.query("devices", deviceQuery)
+        const {resources: devices} = await iterator.fetchAll()
         if (!devices || devices.length === 0) {
             return {
                 status: 200,
@@ -89,6 +90,11 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
             body: JSON.stringify({
                 devices: devices,
                 models: deviceModels,
+                pagination: {
+                    page: queryParams.page,
+                    pageSize: queryParams.pageSize,
+                    isEnd: devices.length < queryParams.pageSize
+                }
             })
         }
     } catch (error) {
