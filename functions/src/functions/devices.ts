@@ -44,7 +44,7 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         parameters: [
             {name: "@owner", value: email},
             {name: "@offset", value: offset},
-            {name: "@limt", value: queryParams.pageSize}
+            {name: "@limit", value: queryParams.pageSize}
         ]
     }
     try {
@@ -60,7 +60,15 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
             return {
                 status: 200,
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify([])
+                body: JSON.stringify({
+                    devices: [],
+                    models: [],
+                    pagination: {
+                        page: queryParams.page,
+                        pageSize: queryParams.pageSize,
+                        isEnd: true
+                    }
+                })
             }
         }
 
