@@ -1,29 +1,17 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions";
-import {AuthError, extractUserEmail, handleExtractUserEmail} from "../helper/auth";
+import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 import {hasReadPermForPlant} from "../helper/permission";
+import {InvalidQueryParameterError} from "../error/invalidQuery";
 
-app.http('measurements', {
+app.http('measurementsHistory', {
     methods: ['GET'],
     authLevel: 'anonymous',
+    route: 'measurements',
     handler: measurements,
 })
 
-const cosmosEndpoint = process.env.CosmosDBEndpoint;
-const cosmosKey = process.env.CosmosDBKey;
-
-class InvalidQueryParameterError extends Error {
-    constructor(message: string = 'One or more query parameters are invalid or missing.', parameterName?: string) {
-        super(message);
-        this.name = 'InvalidQueryParameterError';
-        if (parameterName) {
-            this.message = `Invalid or missing query parameter: '${parameterName}'. ${message}`;
-        }
-        Object.setPrototypeOf(this, InvalidQueryParameterError.prototype);
-    }
-}
-
-interface MeasurementQueryParameters {
+interface MeasurementHistoryQueryParameters {
     plantId: string
     fieldName: string
     startTime: number
@@ -40,7 +28,7 @@ async function measurements(request: HttpRequest, context: InvocationContext): P
     }
 
     // extract query parameters
-    let queryParams: MeasurementQueryParameters;
+    let queryParams: MeasurementHistoryQueryParameters;
     try {
         queryParams = validateMeasurementQueryParams(request);
         context.log("Validierte Query-Parameter:", queryParams);
@@ -50,10 +38,10 @@ async function measurements(request: HttpRequest, context: InvocationContext): P
             const body = {
                 error: error.name,
                 message: error.message,
-                code: 403,
+                code: 400,
             }
             return {
-                status: 403,
+                status: 400,
                 body: JSON.stringify(body),
             }
         }
@@ -62,14 +50,6 @@ async function measurements(request: HttpRequest, context: InvocationContext): P
             status: 500,
             body: "An internal server error occurred while processing parameters."
         };
-    }
-
-    // check if CosmosDB connection is set
-    if (!cosmosEndpoint || !cosmosKey) {
-        context.error("CosmosDBEndpoint or CosmosDBKey was not set!");
-        return {
-            status: 500,
-        }
     }
 
     // connect to CosmosDB
@@ -137,7 +117,7 @@ async function measurements(request: HttpRequest, context: InvocationContext): P
  * @returns Ein Objekt vom Typ MeasurementQueryParameters, wenn die Validierung erfolgreich ist.
  * @throws {InvalidQueryParameterError} Wenn ein Parameter fehlt, das falsche Format hat oder ungültig ist.
  */
-export function validateMeasurementQueryParams(request: HttpRequest): MeasurementQueryParameters {
+export function validateMeasurementQueryParams(request: HttpRequest): MeasurementHistoryQueryParameters {
     const rawParams = request.query;
     console.log("rawParams: ", rawParams);
     const errors: string[] = [];
@@ -211,4 +191,3 @@ export function validateMeasurementQueryParams(request: HttpRequest): Measuremen
         pageSize: pageSize as number,
     };
 }
-
