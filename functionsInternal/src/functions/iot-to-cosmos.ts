@@ -1,50 +1,74 @@
-import { app, EventGridEvent, InvocationContext } from "@azure/functions";
-import { CosmosClient } from "@azure/cosmos";
+import {app, EventGridEvent, InvocationContext} from "@azure/functions";
+import {CosmosClient} from "@azure/cosmos";
+import {getCosmosBundle} from "../helper/cosmos";
 
-//---Cosmos DB Config---
-const cosmosEndpoint = process.env.CosmosDBEndpoint;
-const cosmosKey = process.env.CosmosDBKey;
-const cosmosDatabase = process.env.CosmosDBDatabaseId;
-const cosmosContainer = process.env.CosmosDBContainerId;
-
-const cosmosClient = new CosmosClient({
-  endpoint: cosmosEndpoint,
-  key: cosmosKey,
-});
-
-export async function deviceTelemetry(
-  event: EventGridEvent,
-  context: InvocationContext,
-): Promise<void> {
-  // log event
-  context.warn("Processing device telemetry event:", event);
-  // // check if data is present
-  if (!event.data) {
-    context.log("No data in EventGridEvent!");
-    return;
-  }
-  try {
-    const db = cosmosClient.database(cosmosDatabase);
-    const container = db.container(cosmosContainer);
-
-    const data = event.data;
-    const body: Record<string, any> = data.body;
-    const deviceId = data.systemProperties["iothub-connection-device-id"];
-
-    const dbEntry = {
-      deviceId: deviceId,
-      timestamp: event.eventTime,
-      temperature: body.temperature,
-      humidity: body.humidity,
-    };
-
-    const { resource: createdItem } = await container.items.create(dbEntry);
-    context.log("Successfully wrote item into Cosmos DB:", createdItem?.id);
-  } catch (error) {
-    context.error("Error writing to Cosmos DB:", error);
-  }
+type DBMeasurement = {
+    plantId: string
+    fieldName: string
+    timestamp: number
+    value: number
 }
 
-app.eventGrid("deviceTelemetry", {
-  handler: deviceTelemetry,
+type TelemetryMessage = Record<string, any>
+
+export async function handleDeviceTelemetry(
+    event: EventGridEvent,
+    context: InvocationContext,
+): Promise<void> {
+    context.debug("Received telemetry event:", event);
+    // Extract the telemetry data from the event
+    const telemetryData: Record<string, TelemetryMessage> = event.data;
+    if (!telemetryData) {
+        context.error("Invalid telemetry data received:", telemetryData);
+        return;
+    }
+
+    const entries = Object.entries(telemetryData);
+    if (entries.length === 0) {
+        context.warn("No telemetry data found in the event.");
+        return;
+    }
+
+    const cosmos = getCosmosBundle()
+    if (!cosmos) {
+        context.error("Failed to connect to CosmosDB");
+        return;
+    }
+
+    for (let entry of entries) {
+        const plantId = entry[0];
+        const sensorData = entry[1];
+        const data = sensorDataToObjects(plantId, sensorData)
+        if (data.length === 0) {
+            context.warn(`No valid sensor data found for plant ${plantId}.`);
+            continue;
+        }
+
+        try {
+            const result = await cosmos.insert('measurements', data);
+            context.log(`Inserted ${result.length} measurements for plant ${plantId}.`);
+        } catch (error) {
+            context.error(`Failed to insert measurements for plant ${plantId}:`, error);
+        }
+    }
+}
+
+function sensorDataToObjects(plantId: string, sensorData: TelemetryMessage): DBMeasurement[] {
+    return Object.entries(sensorData).map(([key, value]) => {
+        // convert the value to a number, else error
+        if (typeof value !== 'number') {
+            throw new Error(`Invalid value for field '${key}': ${value}. Expected a number.`);
+        }
+        const valueNumber = Number(value)
+        return {
+            plantId: plantId,
+            fieldName: key,
+            timestamp: Date.now(),
+            value: valueNumber,
+        }
+    })
+}
+
+app.eventGrid("handleDeviceTelemetry", {
+    handler: handleDeviceTelemetry,
 });
