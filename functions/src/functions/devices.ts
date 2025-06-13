@@ -1,31 +1,14 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
-
+import {InvalidQueryParameterError} from "../error/invalidQuery";
 
 interface DeviceQueryParameters {
-    id: string
-    name: string
-    userId: string
-    location: string
-    modelId: string
-    plantSlots: {}
-    config: {}
     page: number
     pageSize: number
 }
 
 
-class InvalidQueryParameterError extends Error {
-    constructor(message: string = 'One or more query parameters are invalid or missing.', parameterName?: string) {
-        super(message);
-        this.name = 'InvalidQueryParameterError';
-        if (parameterName) {
-            this.message = `Invalid or missing query parameter: '${parameterName}'. ${message}`;
-        }
-        Object.setPrototypeOf(this, InvalidQueryParameterError.prototype);
-    }
-}
 
 export async function getDevices(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // resolve user
@@ -49,7 +32,6 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
                 body: JSON.stringify(body)
             }
         }
-
         return {
             status: 500,
             body: "An internal server error occurred while processing parameters."
@@ -66,12 +48,14 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
         ]
     }
     try {
+
         const cosmos = getCosmosBundle()
         if (!cosmos) {
             return {status: 500, body: "Database not available"}
         }
 
-        const {resources: devices} = await cosmos.query("devices", deviceQuery).fetchAll()
+        const iterator = cosmos.query("devices", deviceQuery)
+        const {resources: devices} = await iterator.fetchAll()
         if (!devices || devices.length === 0) {
             return {
                 status: 200,
@@ -106,6 +90,11 @@ export async function getDevices(request: HttpRequest, context: InvocationContex
             body: JSON.stringify({
                 devices: devices,
                 models: deviceModels,
+                pagination: {
+                    page: queryParams.page,
+                    pageSize: queryParams.pageSize,
+                    isEnd: devices.length < queryParams.pageSize
+                }
             })
         }
     } catch (error) {
@@ -122,28 +111,8 @@ export function validateDeviceQueryParameters(request: HttpRequest) {
     console.log("rawParams: ", rawParams);
     const errors: string[] = [];
 
-    let id: string | undefined = rawParams.get('id')
-    let name: string | undefined = rawParams.get('name')
-    let userId: string | undefined = rawParams.get("userId")
-    let location: string | undefined = rawParams.get("location")
-    let modelId: string | undefined = rawParams.get("modelId")
-    let plantSlots: {} | undefined = rawParams.get("plantSlots")
-    let config: {} | undefined = rawParams.get("config")
     let page: number | undefined
     let pageSize: number | undefined
-
-
-    const checkStringParam = (paramName: string, value: string) => {
-        if (typeof value != 'string' || value.trim() === '') {
-            errors.push("Query paramater " + paramName + " is required and must be a non-empyt string")
-        }
-    }
-
-    checkStringParam('id', id)
-    checkStringParam('userId', userId)
-    checkStringParam('location', location)
-    checkStringParam('modelId', modelId)
-
 
     const parseNumberParam = (paramName: string, value: string | undefined, required: boolean = true): number | undefined => {
         if (value === undefined || value.trim() === '') {
@@ -164,24 +133,23 @@ export function validateDeviceQueryParameters(request: HttpRequest) {
     page = parseNumberParam('page', rawParams.get('page'));
     pageSize = parseNumberParam('pageSize', rawParams.get('pageSize'));
 
+    if (page !== undefined && page < 0) {
+        errors.push("'page' cannot be negative.");
+    }
+    if (pageSize !== undefined && pageSize <= 0) {
+        errors.push("'pageSize' must be a positive number.");
+    }
+
     if (errors.length > 0) {
         throw new InvalidQueryParameterError(errors.join(' '));
     }
 
     return {
-        id: id as string,
-        name: name as string,
-        userId: userId as string,
-        location: location as string,
-        modelId: modelId as string,
-        plantSlots: JSON.stringify(plantSlots),
-        config: JSON.stringify(config),
         page: page as number,
         pageSize: pageSize as number
     }
 
 }
-
 
 app.http('devices', {
     methods: ['GET'],

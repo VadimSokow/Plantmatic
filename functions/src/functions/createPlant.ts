@@ -1,6 +1,5 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
 import {CosmosClient} from "@azure/cosmos"
-import {getUser} from "./user";
 
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
 const cosmosKey = process.env.CosmosDBKey;
@@ -9,6 +8,7 @@ const cosmosKey = process.env.CosmosDBKey;
 export async function createPlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
 
 
+    /*
     const header = request.headers.get("authorization")
     const email = getUser(header)
     console.log("E-mail: ", email)
@@ -18,6 +18,8 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
             status: 401,
         }
     }
+
+     */
 
 
     try {
@@ -34,11 +36,12 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
 
         const body: any = await request.json()
 
-        const userId = email
+
         const deviceId = body.deviceId
         const name = body.name
         const latname = body.latName
 
+        /*
         if (!userId || !deviceId || !name || !latname) {
             return {
                 status: 400
@@ -46,8 +49,10 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
 
         }
 
+         */
+
         const newPlant = {
-            userId,
+            //userId,
             deviceId,
             name,
             latname,
