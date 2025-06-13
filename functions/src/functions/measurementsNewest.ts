@@ -17,11 +17,10 @@ interface MeasurementsNewestQueryParameters {
 }
 
 async function newestMeasurementsForPlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    // let userMail = handleExtractUserEmail(request)
-    // if (typeof userMail !== 'string') {
-    //     return userMail;
-    // }
-    let userMail = 'u38079@hs-harz.de'
+    let userMail = handleExtractUserEmail(request)
+    if (typeof userMail !== 'string') {
+        return userMail;
+    }
 
     // extract query parameters
     let queryParams: MeasurementsNewestQueryParameters;
