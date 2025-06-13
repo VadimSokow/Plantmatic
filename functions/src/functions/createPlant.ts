@@ -36,11 +36,12 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
 
         const body: any = await request.json()
 
-        const userId = email
+
         const deviceId = body.deviceId
         const name = body.name
         const latname = body.latName
 
+        /*
         if (!userId || !deviceId || !name || !latname) {
             return {
                 status: 400
@@ -48,8 +49,10 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
 
         }
 
+         */
+
         const newPlant = {
-            userId,
+            //userId,
             deviceId,
             name,
             latname,
