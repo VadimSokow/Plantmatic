@@ -1,9 +1,9 @@
+import type { Device, DeviceWithPlants } from '@/types/device.ts'
+import type { Plant } from '@/types/plant.ts'
 import { useDeviceStore } from '@/stores/device.ts'
 import { usePlantStore } from '@/stores/plant.ts'
-import type { Plant } from '@/types/plant.ts'
-import type { Device, DeviceWithPlants } from '@/types/device.ts'
 
-export function useDeviceWithPlants(deviceId: string) {
+export function useDeviceWithPlants (deviceId: string) {
   const deviceStore = useDeviceStore()
   const plantStore = usePlantStore()
 
@@ -14,13 +14,15 @@ export function useDeviceWithPlants(deviceId: string) {
   const plants = computed(() => {
     const d = device.value as Device
     const plants: Plant[] = []
-    d.plantSlots.forEach(slot => {
-      if (!slot.plantId) return
+    for (const slot of d.plantSlots) {
+      if (!slot.plantId) {
+        continue
+      }
       const plant = plantStore.getPlantById(slot.plantId)
       if (plant) {
         plants.push(plant)
       }
-    })
+    }
     return plants
   })
 

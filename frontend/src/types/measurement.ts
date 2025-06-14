@@ -10,6 +10,7 @@ export interface MeasuredPlant {
   deviceId: string
   plantId: string
   fieldName: string
+  latest: MeasuredValue | undefined
   values: MeasuredValue[]
 }
 

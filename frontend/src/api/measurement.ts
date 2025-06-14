@@ -20,31 +20,12 @@ type MeasurementResult = {
   }
 }
 
-const timestep = 1000 * 60 * 5
-
-function generateDataSet (
-  plantId: string,
-  fieldName: string,
-  startTime: number,
-  endTime: number,
-  maxCount: number,
-  pageIndex: number,
-) {
-  const measurements: Measurement[] = []
-  let time = startTime
-  while (time < endTime) {
-    const measurement: Measurement = {
-      deviceId: '1',
-      plantId,
-      fieldName,
-      timestamp: new Date(time),
-      value: Math.random() * 30,
-    }
-    measurements.push(measurement)
-
-    time += timestep
-  }
-  return measurements
+type ServerMeasurement = {
+  deviceId: string
+  plantId: string
+  fieldName: string
+  timestamp: Date
+  value: number
 }
 
 export const fetchMeasurements = async (
@@ -54,6 +35,8 @@ export const fetchMeasurements = async (
   endTime: number,
   pageSize = 100,
 ): Promise<MeasuredPlant | null> => {
+  console.log(`Fetching measurements for plant ${plantId}`)
+
   if (startTime >= endTime) {
     return null
   }
@@ -62,6 +45,7 @@ export const fetchMeasurements = async (
     deviceId: 'unknown',
     plantId,
     fieldName,
+    latest: undefined,
     values: [],
   }
 
@@ -108,21 +92,35 @@ export const fetchMeasurements = async (
   return result
 }
 
-// export const fetchMeasurementsOld = async (
-//   plantId: string,
-//   fieldName: string,
-//   startTime: number,
-//   endTime: number,
-//   maxCount: number,
-//   pageIndex: number,
-// ): Promise<Measurement[] | null> => {
-//   // return generateDataSet(
-//   //   plantId,
-//   //   fieldName,
-//   //   startTime,
-//   //   endTime,
-//   //   maxCount,
-//   //   pageIndex,
-//   // )
-//   return null
-// }
+export const fetchNewestMeasurements = async (plantId: string, fieldNames: string[]): Promise<Record<string, Measurement | null> | null> => {
+  const response = await apiClient.get<Record<string, ServerMeasurement>>('/measurements/newest', {
+    params: {
+      plantId,
+      fieldNames,
+    },
+  })
+
+  const data = response.data
+  if (!data) {
+    return null
+  }
+
+  const measurements: Record<string, Measurement> = {}
+  for (const fieldName of fieldNames) {
+    const measurement = data[fieldName]
+    if (measurement) {
+      measurements[fieldName] = {
+        deviceId: measurement.deviceId,
+        plantId: measurement.plantId,
+        fieldName: measurement.fieldName,
+        timestamp: measurement.timestamp,
+        value: measurement.value,
+      }
+    }
+  }
+  if (Object.keys(measurements).length > 0) {
+    return measurements
+  }
+
+  return null
+}

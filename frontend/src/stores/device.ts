@@ -19,7 +19,7 @@ export const useDeviceStore = defineStore('devices', {
   },
 
   actions: {
-    async loadDevice(deviceId: string): Promise<Device | null> {
+    async loadDevice (deviceId: string): Promise<Device | null> {
       try {
         await this.fetchDevices()
         return this.devices[deviceId]
@@ -29,7 +29,7 @@ export const useDeviceStore = defineStore('devices', {
         return null
       }
     },
-    async loadDevices(forceRefresh = false): Promise<Device[] | null> {
+    async loadDevices (forceRefresh = false): Promise<Device[] | null> {
       try {
         await this.fetchDevices(forceRefresh)
         return Object.values(this.devices)
@@ -39,7 +39,7 @@ export const useDeviceStore = defineStore('devices', {
         return null
       }
     },
-    async fetchDevices(forceRefresh = false) {
+    async fetchDevices (forceRefresh = false) {
       const now = Date.now()
       // Wenn der Cache noch gültig ist und kein Neuladen erzwungen wird
       if (!forceRefresh && (now - this.lastFetchTimestamp < this.cacheDuration) && Object.values(this.devices).length > 0) {
@@ -51,13 +51,11 @@ export const useDeviceStore = defineStore('devices', {
       this.error = null
       try {
         const fetchedDevices = await fetchDevices()
-        console.log(fetchedDevices)
         this.devices = fetchedDevices.reduce((acc, device) => {
           acc[device.id] = device
           return acc
         }, {} as Record<string, Device>)
         this.lastFetchTimestamp = now
-        console.log('Devices fetched from API')
       } catch (error: any) {
         this.error = error.message || 'Failed to fetch devices'
         console.error(error)

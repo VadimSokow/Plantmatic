@@ -5,7 +5,6 @@ export function plantFieldWithDataToStrings (
   devicePlantSlot: number,
   data: Record<string, unknown> | undefined,
 ): string[] {
-  console.log('defs', defs)
   const lines: string[] = []
 
   for (const def of Object.values(defs)) {
@@ -18,19 +17,16 @@ export function plantFieldWithDataToStrings (
     }
 
     // Überspringen, wenn der Sensor für eine andere Pflanze konfiguriert ist
-    if (def.type === 'plant' && def.plantSlot !== devicePlantSlot) {
+    if (def.slot !== devicePlantSlot) {
       continue
     }
 
     const fieldValue = data[def.fieldName]
-
     // Prüfen, ob der Wert existiert und ein String ist
     if (typeof fieldValue === 'string') {
       line += fieldValue
       line += resolveUnitToString(def.unit)
     } else if (fieldValue === undefined || fieldValue === null) {
-      // Optional: Was tun, wenn der Wert nicht existiert oder null ist?
-      // Z.B. einen leeren String setzen oder gar nicht erst hinzufügen
       line += 'unknown'
     } else {
       line += String(fieldValue)
@@ -43,8 +39,8 @@ export function plantFieldWithDataToStrings (
   return lines
 }
 
-function resolveUnitToString (unit: string): string {
-  switch (unit) {
+export function resolveUnitToString (unit: string): string {
+  switch (unit.toLowerCase()) {
     case 'percent': {
       return '%'
     }
@@ -58,4 +54,13 @@ function resolveUnitToString (unit: string): string {
       return ''
     }
   }
+}
+
+export function sensorTypeToString (type: string): string {
+  // replace - to space and capitalize first letters after space
+  return type
+    .replace(/-/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }

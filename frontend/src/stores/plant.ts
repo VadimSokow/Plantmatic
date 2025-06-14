@@ -39,13 +39,11 @@ export const usePlantStore = defineStore('plants', {
       this.error = null
       try {
         const fetchedPlants = await fetchPlants()
-        console.log(fetchedPlants)
         this.plants = fetchedPlants.reduce((acc, plant) => {
-          acc[plant.id] = plant;
-          return acc;
-        }, {} as Record<string, Plant>);
+          acc[plant.id] = plant
+          return acc
+        }, {} as Record<string, Plant>)
         this.lastFetchTimestamp = now
-        console.log('Plants fetched from API')
       } catch (error: any) {
         this.error = error.message || 'Failed to fetch plants'
         console.error(error)

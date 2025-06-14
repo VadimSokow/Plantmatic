@@ -1,29 +1,30 @@
 import type { Device, DeviceModel } from '@/types/device.ts'
-import { apiClient } from '@/api/client.ts'
+import { getPaged } from '@/api/helper.ts'
 
-export const fetchDevices = async (): Promise<Device[]> => {
-  try {
-    const response = await apiClient.get('/devices')
-    const data = response.data
+type ResponseData = {
+  devices: Device[]
+  models: DeviceModel[]
+}
 
-    const models = data.models as DeviceModel[]
-    const getModelById = (id: string): DeviceModel | undefined => {
-      return models.find(device => device.id === id)
-    }
-
-    const devices: Array<Record<string, any>> = data['devices']
-    return devices.map(device => {
-      const model = getModelById(device.modelId)
-      if (!model) {
-        console.error(`Model ${device.id} not found for device ${device.id}`)
+export const fetchDevices = async (): Promise<Device[] | undefined> => {
+  return await getPaged<ResponseData, Device[]>('/devices', {},
+    (store, _, data) => {
+      const models = data.models as DeviceModel[]
+      const getModelById = (id: string): DeviceModel | undefined => {
+        return models.find(device => device.id === id)
       }
-      return {
-        ...device,
-        model,
-      } as Device
-    })
-  } catch (error: unknown) {
-    console.error('Fehler beim Laden der Geräte:', error)
-    throw error
-  }
+
+      const devices = (data['devices'] as Array<Record<string, any>>).map(device => {
+        const model = getModelById(device.modelId)
+        if (!model) {
+          console.error(`Model ${device.id} not found for device ${device.id}`)
+        }
+        return {
+          ...device,
+          model,
+        } as Device
+      })
+      return Array.of(...store, ...devices)
+    },
+    [])
 }

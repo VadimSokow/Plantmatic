@@ -10,8 +10,17 @@
           Pflanze löschen
         </v-btn>
       </v-col>
-      <v-col>
-        <PlantChartCard :field-name="'air_temp'" :plant="plant" :sensors="[]" />
+      <v-col
+        v-for="sensor in sensors"
+        :key="sensor.fieldName"
+        cols="12"
+        md="6"
+      >
+        <PlantChartCard
+          :field-name="sensor.fieldName"
+          :plant="plant"
+          :sensors="sensors"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -52,6 +61,13 @@
     loadAllData,
     clearError,
   } = useDeviceWithPlant(id.value)
+
+  const sensors = computed(() => {
+    if (!device.value || !device.value.model) {
+      return []
+    }
+    return Object.values(device.value.model.sensors).filter(s => s.slot === slotNumber.value)
+  })
 
   const deletePlantDialogRef = ref<InstanceType<typeof DeletePlantDialog> | null>(null)
 

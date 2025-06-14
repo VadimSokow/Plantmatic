@@ -11,11 +11,18 @@
       </div>
     </v-card-text>
   </v-card>
+
+  <LoadAndError
+    :error="error"
+    :is-loading="isLoading"
+    @error-cleared="clearError()"
+  />
 </template>
 
 <script setup lang="ts">
   import type { DeviceModelSensorConfig } from '@/types/device.ts'
   import type { Plant } from '@/types/plant.ts'
+  import { useLatestPlantMeasurement } from '@/composition/plantMeasurements.ts'
   import { plantFieldWithDataToStrings } from '@/helper/plant.ts'
 
   const props = defineProps<{
@@ -24,22 +31,35 @@
     sensors: Record<string, DeviceModelSensorConfig>
   }>()
 
-  const measuredValues = {
-    temp_air: '23',
-    hum_air: '43',
-    light: '100',
-    soil_hum: '60',
-  }
+  const {
+    latestMeasurements,
+    isLoading,
+    error,
+    loadLatestMeasurements,
+    clearError,
+  } = useLatestPlantMeasurement(props.plant.id, Object.values(props.sensors).map(s => s.fieldName))
 
   const fields = computed(() => {
     if (!props.slotNumber) {
-      console.warn('No slot number provided.')
       return []
+    }
+    const values: Record<string, string> = {}
+    for (const sensor of Object.values(props.sensors)) {
+      const latest = latestMeasurements.value[sensor.fieldName]
+      if (!latest) {
+        values[sensor.fieldName] = 'N/A'
+        continue
+      }
+      values[sensor.fieldName] = latest.value.toFixed(0)
     }
     return plantFieldWithDataToStrings(
       props.sensors,
       props.slotNumber,
-      measuredValues,
+      values,
     )
+  })
+
+  onMounted(() => {
+    loadLatestMeasurements()
   })
 </script>

@@ -18,30 +18,18 @@ export interface DeviceModel {
   name: string
   slotCount: number
   sensors: { [key: string]: DeviceModelSensorConfig }
-  actuators: DeviceModelActuatorConfig[]
 }
 
 export interface DeviceModelSensorConfig {
-  id: string
   name: string
-  type: 'device' | 'plant'
-  sensorDefinitionId: string
   fieldName: string
-  plantSlot?: number
+  description: string
+  slot: number
+  type: string
   unit: string
-}
-
-export interface DeviceModelActuatorConfig {
-  id: string
-  actuatorDefinitionId: string
-  purpose: string
-  fieldName: string
-  plantSlots: number[]
-}
-
-export interface DeviceWithPlant {
-  device: Device
-  plant: Plant
+  accuracy: number
+  min: number
+  max: number
 }
 
 export interface DeviceWithPlants {

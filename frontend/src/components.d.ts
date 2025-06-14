@@ -26,5 +26,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TemperatureChart: typeof import('./components/charts/TemperatureChart.vue')['default']
+    TimeRangeSelector: typeof import('./components/helper/TimeRangeSelector.vue')['default']
   }
 }

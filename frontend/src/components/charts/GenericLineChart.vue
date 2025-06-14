@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+  import type { DeviceModelSensorConfig } from '@/types/device.ts'
   import type { MeasuredPlant } from '@/types/measurement.ts'
   import {
     CategoryScale,
@@ -15,6 +16,7 @@
     Tooltip,
   } from 'chart.js'
   import { Line } from 'vue-chartjs'
+  import { resolveUnitToString, sensorTypeToString } from '@/helper/plant.ts'
   import 'chartjs-adapter-date-fns'
 
   ChartJS.register(
@@ -28,30 +30,24 @@
     CategoryScale,
   )
 
-  const props = defineProps<{ data: MeasuredPlant }>()
+  const props = defineProps<{
+    data: MeasuredPlant
+    sensor: DeviceModelSensorConfig
+  }>()
 
   const chartData = computed<ChartData<'line'>>(() => {
-    // let current = Date.now()
-    // const newTimeStamp = () => {
-    //   const randomOffset = Math.ceil(Math.random() * 4)
-    //   current += randomOffset * 1000
-    //   return new Date(current)
-    // }
-    // const values = [1, 3, 4, 5, 7, 3, 2, -1, -3, -4]
-    // const points = values.map(value => ({
-    //   x: newTimeStamp().getTime(),
-    //   y: value,
-    // }))
+    console.log('data:', props.data)
     const points = props.data.values.map(m => ({
-      x: new Date(m.timestamp).getTime(),
+      x: m.timestamp.getTime(),
       y: m.value,
     }))
+    console.log('Chart data points:', points)
 
     return {
       labels: points.map(p => p.x),
       datasets: [
         {
-          label: 'Temperatur (°C)',
+          label: `${props.sensor.name} (${resolveUnitToString(props.sensor.unit)})`,
           data: points.map(p => p.y),
           fill: false,
           borderColor: 'rgb(75, 192, 192)',
@@ -82,10 +78,17 @@
       x: {
         type: 'time',
         time: {
-          unit: 'second', // Skalierung für die Anzeige z.B. Sekunden
+          unit: 'minute',
+          minUnit: 'minute',
+          tooltipFormat: 'dd.MM.yyyy HH:mm:ss',
           displayFormats: {
-            second: 'mm:ss',
-            minute: 'hh:mm:ss',
+            minute: 'HH:mm',
+            hour: 'dd.MM HH:mm',
+            day: 'dd.MM',
+            week: 'dd.MM.yy',
+            month: 'MMM',
+            quarter: '[Q]Q',
+            year: 'yyyy',
           },
         },
         title: {
@@ -96,7 +99,7 @@
       y: {
         title: {
           display: true,
-          text: 'Temperatur (°C)',
+          text: `${sensorTypeToString(props.sensor.type)} (${resolveUnitToString(props.sensor.unit)})`,
         },
       },
     },
