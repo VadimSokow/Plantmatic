@@ -106,18 +106,19 @@ async function newestMeasurementsForPlant(request: HttpRequest, context: Invocat
     }
 }
 
+
 function parseQuery(request: HttpRequest): MeasurementsNewestQueryParameters {
     const errors: string[] = [];
 
     const plantId = request.query.get('plantId');
-    const fieldName = request.query.getAll('fieldName');
+    const fieldNames = request.query.getAll('fieldNames[]');
 
     if (typeof plantId !== 'string' || plantId.trim() === '') {
         errors.push("Query parameter 'plantId' is required and must be a non-empty string.");
     }
 
-    if (fieldName.length === 0) {
-        errors.push("Query parameter 'fieldName' is required and must contain at least one field.");
+    if (fieldNames.length === 0) {
+        errors.push("Query parameter 'fieldNames' is required and must contain at least one field.");
     }
 
     if (errors.length > 0) {
@@ -126,6 +127,6 @@ function parseQuery(request: HttpRequest): MeasurementsNewestQueryParameters {
 
     return {
         plantId,
-        fieldNames: fieldName,
+        fieldNames: fieldNames,
     };
 }
