@@ -9,7 +9,6 @@ interface PalntQueryParameters {
 }
 
 export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-
     let email = handleExtractUserEmail(request)
     if (typeof email !== 'string') {
         return email;
@@ -41,7 +40,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
         parameters: [
             {name: "@owner", value: email},
             {name: "@offset", value: offset},
-            {name: "@limt", value: queryParams.pageSize}
+            {name: "@limit", value: queryParams.pageSize}
         ]
     }
 
