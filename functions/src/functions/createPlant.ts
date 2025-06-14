@@ -1,25 +1,12 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
 import {CosmosClient} from "@azure/cosmos"
+import {handleExtractUserEmail} from "../helper/auth";
 
 const cosmosEndpoint = process.env.CosmosDBEndpoint;
 const cosmosKey = process.env.CosmosDBKey;
 
 
 export async function createPlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-
-
-    /*
-    const header = request.headers.get("authorization")
-    const email = getUser(header)
-    console.log("E-mail: ", email)
-
-    if (!email) {
-        return {
-            status: 401,
-        }
-    }
-
-     */
 
 
     try {
@@ -29,7 +16,6 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
         })
         const dbName = "Plantmatic"
         const plantConName = "plants"
-        const plantTypeConName = "plantType"
         const database = client.database(dbName)
         const plantContainer = database.container(plantConName)
 
@@ -37,26 +23,19 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
         const body: any = await request.json()
 
 
-        const deviceId = body.deviceId
         const name = body.name
-        const latname = body.latName
+        const latName = body.latName
 
-        /*
-        if (!userId || !deviceId || !name || !latname) {
-            return {
-                status: 400
-            }
-
+        let email = handleExtractUserEmail(request)
+        if (typeof email !== 'string') {
+            return email;
         }
 
-         */
-
+        const userId = email
         const newPlant = {
-            //userId,
-            deviceId,
+            userId,
             name,
-            latname,
-            currentSensorData: {} //"serversetig" setzen damit es auf jeden Fall da ist
+            latName,
         }
 
         const {resource} = await plantContainer.items.create(newPlant)

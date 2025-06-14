@@ -2,7 +2,6 @@ import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/func
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 import {InvalidQueryParameterError} from "../error/invalidQuery";
-import {validateDeviceQueryParameters} from "./devices";
 
 interface PalntQueryParameters {
     page: number
@@ -38,7 +37,7 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
     }
     const offset = queryParams.page * queryParams.pageSize;
     const plantQuery = {
-        query: "SELECT c.id, c.plantId, c.userId, c.deviceId, c.name, c.latName, c.currentSensorData FROM c where c.userId = @owner OFFSET @offset LIMIT @limit",
+        query: "SELECT c.id, c.userId, c.name, c.latName FROM c where c.userId = @owner OFFSET @offset LIMIT @limit",
         parameters: [
             {name: "@owner", value: email},
             {name: "@offset", value: offset},
