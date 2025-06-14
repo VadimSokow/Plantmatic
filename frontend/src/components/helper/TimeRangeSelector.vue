@@ -13,63 +13,63 @@
     <!--    </v-btn>-->
   </v-row>
 
-  <v-expand-transition>
-    <v-card v-if="showCustomDateRange" class="mt-4 pa-4">
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-menu
-            v-model="startDateMenu"
-            :close-on-content-click="false"
-            min-width="auto"
-            offset-y
-            transition="scale-transition"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="startDate"
-                label="Startdatum"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              />
-            </template>
-            <v-date-picker
-              v-model="startDate"
-              :max="endDate || new Date().toISOString().substr(0, 10)"
-              @input="startDateMenu = false"
-            />
-          </v-menu>
-        </v-col>
-        <v-col cols="12" sm="6">
-          <v-menu
-            v-model="endDateMenu"
-            :close-on-content-click="false"
-            min-width="auto"
-            offset-y
-            transition="scale-transition"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="endDate"
-                label="Enddatum"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              />
-            </template>
-            <v-date-picker
-              v-model="endDate"
-              :max="calculatedMaxEndDate"
-              :min="startDate"
-              @input="endDateMenu = false"
-            />
-          </v-menu>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-expand-transition>
+  <!--  <v-expand-transition>-->
+  <!--    <v-card v-if="showCustomDateRange" class="mt-4 pa-4">-->
+  <!--      <v-row>-->
+  <!--        <v-col cols="12" sm="6">-->
+  <!--          <v-menu-->
+  <!--            v-model="startDateMenu"-->
+  <!--            :close-on-content-click="false"-->
+  <!--            min-width="auto"-->
+  <!--            offset-y-->
+  <!--            transition="scale-transition"-->
+  <!--          >-->
+  <!--            <template #activator="{ on, attrs }">-->
+  <!--              <v-text-field-->
+  <!--                v-model="startDate"-->
+  <!--                label="Startdatum"-->
+  <!--                prepend-icon="mdi-calendar"-->
+  <!--                readonly-->
+  <!--                v-bind="attrs"-->
+  <!--                v-on="on"-->
+  <!--              />-->
+  <!--            </template>-->
+  <!--            <v-date-picker-->
+  <!--              v-model="startDate"-->
+  <!--              :max="endDate || new Date().toISOString().substr(0, 10)"-->
+  <!--              @input="startDateMenu = false"-->
+  <!--            />-->
+  <!--          </v-menu>-->
+  <!--        </v-col>-->
+  <!--        <v-col cols="12" sm="6">-->
+  <!--          <v-menu-->
+  <!--            v-model="endDateMenu"-->
+  <!--            :close-on-content-click="false"-->
+  <!--            min-width="auto"-->
+  <!--            offset-y-->
+  <!--            transition="scale-transition"-->
+  <!--          >-->
+  <!--            <template #activator="{ on, attrs }">-->
+  <!--              <v-text-field-->
+  <!--                v-model="endDate"-->
+  <!--                label="Enddatum"-->
+  <!--                prepend-icon="mdi-calendar"-->
+  <!--                readonly-->
+  <!--                v-bind="attrs"-->
+  <!--                v-on="on"-->
+  <!--              />-->
+  <!--            </template>-->
+  <!--            <v-date-picker-->
+  <!--              v-model="endDate"-->
+  <!--              :max="calculatedMaxEndDate"-->
+  <!--              :min="startDate"-->
+  <!--              @input="endDateMenu = false"-->
+  <!--            />-->
+  <!--          </v-menu>-->
+  <!--        </v-col>-->
+  <!--      </v-row>-->
+  <!--    </v-card>-->
+  <!--  </v-expand-transition>-->
 </template>
 
 <script setup lang="ts">
@@ -87,7 +87,7 @@
   }>()
 
   // Reaktive Daten mit Typen
-  const selectedPeriod = ref<'last24h' | 'today' | 'yesterday' | 'last7days' | 'custom'>('last24h')
+  const selectedPeriod = ref<'last24h' | 'today' | 'yesterday' | 'last7days' | 'custom' | 'test'>('last24h')
   const showCustomDateRange = ref<boolean>(false)
   const startDate = ref<string | null>(null)
   const endDate = ref<string | null>(null)

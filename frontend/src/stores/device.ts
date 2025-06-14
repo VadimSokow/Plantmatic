@@ -51,6 +51,11 @@ export const useDeviceStore = defineStore('devices', {
       this.error = null
       try {
         const fetchedDevices = await fetchDevices()
+        if (!fetchedDevices) {
+          this.loading = false
+          this.error = 'No devices found'
+          return
+        }
         this.devices = fetchedDevices.reduce((acc, device) => {
           acc[device.id] = device
           return acc

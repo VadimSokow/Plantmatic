@@ -39,6 +39,11 @@ export const usePlantStore = defineStore('plants', {
       this.error = null
       try {
         const fetchedPlants = await fetchPlants()
+        if (!fetchedPlants) {
+          this.loading = false
+          this.error = 'No plants found'
+          return
+        }
         this.plants = fetchedPlants.reduce((acc, plant) => {
           acc[plant.id] = plant
           return acc

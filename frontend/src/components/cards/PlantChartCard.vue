@@ -3,7 +3,7 @@
     <v-col>
       <TimeRangeSelector @update:time-range="handleTimeRangeUpdate" />
 
-      <GenericLineChart v-if="!isLoading && measurement && sensor" :data="measurementValue" :sensor="sensor" />
+      <GenericLineChart v-if="!isLoading && measurementValue && sensor" :data="measurementValue" :sensor="sensor" />
       <p v-else>measurement is undefined!</p>
     </v-col>
   </v-card>
