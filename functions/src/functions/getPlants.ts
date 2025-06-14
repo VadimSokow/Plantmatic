@@ -1,7 +1,13 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions"
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
+import {InvalidQueryParameterError} from "../error/invalidQuery";
+import {validateDeviceQueryParameters} from "./devices";
 
+interface PalntQueryParameters {
+    page: number
+    pageSize: number
+}
 
 export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
 
@@ -9,10 +15,34 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
     if (typeof email !== 'string') {
         return email;
     }
+
+    let queryParams: PalntQueryParameters
+
+    try {
+        queryParams = validatePlantQueryParameters(request)
+    } catch (error) {
+        if (error instanceof InvalidQueryParameterError) {
+            const body = {
+                error: error.name,
+                message: error.message
+            }
+            return {
+                status: 403,
+                body: JSON.stringify(body)
+            }
+        }
+        return {
+            status: 500,
+            body: "An internal server error occurred while processing parameters."
+        }
+    }
+    const offset = queryParams.page * queryParams.pageSize;
     const plantQuery = {
-        query: "SELECT c.id, c.plantId, c.userId, c.deviceId, c.name, c.latName, c.currentSensorData FROM c where c.userId = @owner",
+        query: "SELECT c.id, c.plantId, c.userId, c.deviceId, c.name, c.latName, c.currentSensorData FROM c where c.userId = @owner OFFSET @offset LIMIT @limit",
         parameters: [
-            {name: "@owner", value: email}
+            {name: "@owner", value: email},
+            {name: "@offset", value: offset},
+            {name: "@limt", value: queryParams.pageSize}
         ]
     }
 
@@ -22,7 +52,8 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             return {status: 500, body: "Database not available"}
         }
 
-        const {resources: plants} = await cosmos.query("plants", plantQuery).fetchAll()
+        const iterator = cosmos.query("plants", plantQuery)
+        const {resources: plants} = await iterator.fetchAll()
         if (!plants || plants.length === 0) {
             return {
                 status: 200,
@@ -31,12 +62,12 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             }
         }
 
-        // get all model ids
+        // get all plantType ids
         const typeIds = plants.map(plant => plant.latName);
         // remove duplicates
         const uniqueTypeIds = Array.from(new Set(typeIds));
 
-        // fetch models for unique model ids
+        // fetch models for unique type ids
         const plantTypes = [];
         for (let uniqueTypeId of uniqueTypeIds) {
             const typeQuery = {
@@ -57,6 +88,11 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             body: JSON.stringify({
                 plants: plants,
                 types: plantTypes,
+                pagination: {
+                    page: queryParams.page,
+                    pageSize: queryParams.pageSize,
+                    isEnd: plants.length < queryParams.pageSize
+                }
             })
         }
     } catch (error) {
@@ -65,6 +101,51 @@ export async function getPlants(request: HttpRequest, context: InvocationContext
             status: 500,
             body: `Error: ${error.message}`
         }
+    }
+
+}
+
+export function validatePlantQueryParameters(request: HttpRequest) {
+    const rawParams = request.query;
+    console.log("rawParams: ", rawParams);
+    const errors: string[] = [];
+
+    let page: number | undefined
+    let pageSize: number | undefined
+
+    const parseNumberParam = (paramName: string, value: string | undefined, required: boolean = true): number | undefined => {
+        if (value === undefined || value.trim() === '') {
+            if (required) {
+                errors.push(`Query parameter '${paramName}' is required.`);
+                return undefined;
+            }
+            return undefined;
+        }
+        const parsed = parseInt(value, 10);
+        if (isNaN(parsed)) {
+            errors.push(`Query parameter '${paramName}' must be a valid number.`);
+            return undefined;
+        }
+        return parsed;
+    };
+
+    page = parseNumberParam('page', rawParams.get('page'));
+    pageSize = parseNumberParam('pageSize', rawParams.get('pageSize'));
+
+    if (page !== undefined && page < 0) {
+        errors.push("'page' cannot be negative.");
+    }
+    if (pageSize !== undefined && pageSize <= 0) {
+        errors.push("'pageSize' must be a positive number.");
+    }
+
+    if (errors.length > 0) {
+        throw new InvalidQueryParameterError(errors.join(' '));
+    }
+
+    return {
+        page: page as number,
+        pageSize: pageSize as number
     }
 
 }
