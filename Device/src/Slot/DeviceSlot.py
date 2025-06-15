@@ -52,3 +52,7 @@ class DeviceSlot:
                 return slot
         return None
 
+    def cleanup(self):
+        if self.slots:
+            for slot in self.slots:
+                slot.cleanup()
