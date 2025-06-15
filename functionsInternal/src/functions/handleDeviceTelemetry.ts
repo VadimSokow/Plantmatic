@@ -16,8 +16,11 @@ export async function handleDeviceTelemetry(
     context: InvocationContext,
 ): Promise<void> {
     context.debug("Received telemetry event:", event);
+
+    const eventData: Record<string, any> = event.data;
+
     // Extract the telemetry data from the event
-    const telemetryData: Record<string, TelemetryMessage> = event.data;
+    const telemetryData: Record<string, TelemetryMessage> = eventData.telemetry;
     if (!telemetryData) {
         context.error("Invalid telemetry data received:", telemetryData);
         return;
@@ -38,7 +41,7 @@ export async function handleDeviceTelemetry(
     for (let entry of entries) {
         const plantId = entry[0];
         const sensorData = entry[1];
-        const data = sensorDataToObjects(plantId, sensorData)
+        const data = sensorDataToObjects(eventData.deviceId, plantId, sensorData)
         if (data.length === 0) {
             context.warn(`No valid sensor data found for plant ${plantId}.`);
             continue;
@@ -53,7 +56,7 @@ export async function handleDeviceTelemetry(
     }
 }
 
-function sensorDataToObjects(plantId: string, sensorData: TelemetryMessage): DBMeasurement[] {
+function sensorDataToObjects(deviceId: string, plantId: string, sensorData: TelemetryMessage): DBMeasurement[] {
     return Object.entries(sensorData).map(([key, value]) => {
         // convert the value to a number, else error
         if (typeof value !== 'number') {
@@ -61,6 +64,7 @@ function sensorDataToObjects(plantId: string, sensorData: TelemetryMessage): DBM
         }
         const valueNumber = Number(value)
         return {
+            deviceId: deviceId,
             plantId: plantId,
             fieldName: key,
             timestamp: Date.now(),
