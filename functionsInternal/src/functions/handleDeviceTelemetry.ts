@@ -15,7 +15,7 @@ export async function handleDeviceTelemetry(
     event: EventGridEvent,
     context: InvocationContext,
 ): Promise<void> {
-    context.debug("Received telemetry event:", event);
+    context.log("Received telemetry event:", event);
 
     const eventData: Record<string, any> = event.data;
 
