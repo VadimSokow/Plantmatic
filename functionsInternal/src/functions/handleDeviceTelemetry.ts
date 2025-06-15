@@ -17,8 +17,18 @@ export async function handleDeviceTelemetry(
 ): Promise<void> {
     context.log("Received telemetry event:", event);
 
-    const eventData: Record<string, any> = event.data;
-    const deviceId = eventData.systemProperties["iothub-connection-device-id"];
+    const eventData = event.data
+
+    const systemProperties: Record<string, any> | undefined = eventData['systemProperties'] || undefined;
+    if (!systemProperties) {
+        context.error("No system properties found in the event data.");
+        return;
+    }
+    const deviceId: string | undefined = systemProperties["iothub-connection-device-id"] || undefined;
+    if (!deviceId) {
+        context.error("No device ID found in the system properties.");
+        return;
+    }
 
     // extract eventData.body or decode if it is a base64 string
     let body: Record<string, any> | null = null
@@ -67,6 +77,7 @@ export async function handleDeviceTelemetry(
         try {
             const result = await cosmos.insert('measurements', data);
             context.log(`Inserted ${result.length} measurements for plant ${plantId}.`);
+            context.debug(result)
         } catch (error) {
             context.error(`Failed to insert measurements for plant ${plantId}:`, error);
         }

@@ -1,20 +1,21 @@
 import {
+    BulkOperationResponse,
     CosmosClient,
     Database,
     FeedOptions,
-    ItemResponse,
+    JSONObject, OperationInput,
     QueryIterator,
     RequestOptions,
     SqlQuerySpec
 } from "@azure/cosmos";
 
-export type InsertResponse<T> = Array<ItemResponse<Array<T>>>
+export type InsertResponse = Array<BulkOperationResponse>
 
 export interface CosmosBundle {
     client: CosmosClient
     db: Database
     query: (container: string, query: string | SqlQuerySpec, options?: FeedOptions) => QueryIterator<any>
-    insert: <T>(container: string, items: Array<T>, options?: RequestOptions) => Promise<InsertResponse<T>>
+    insert: <T>(container: string, items: Array<T>) => Promise<InsertResponse>
 }
 
 let cosmosInstance: CosmosBundle | null = null
@@ -34,7 +35,7 @@ function connectToCosmos(
         return db.container(container).items.query(query, options)
     }
 
-    const insert = async <T>(container: string, items: Array<T>, options?: RequestOptions): Promise<InsertResponse<T>>  => {
+    const insert = async <T>(container: string, items: Array<T>, options?: RequestOptions): Promise<InsertResponse> => {
         console.log('items to insert:', items)
         // split items into batches of 100
         const batchSize = 100;
@@ -44,10 +45,14 @@ function connectToCosmos(
         }
 
         // insert each batch
-        const responses: Array<ItemResponse<Array<T>>> = [];
+        const responses: Array<BulkOperationResponse> = [];
         for (const batch of batches) {
             console.log('batch to insert:', batch);
-            const response = await db.container(container).items.create(batch, options);
+            const operations: OperationInput[] = batch.map((doc) => ({
+                operationType: 'Create',
+                resourceBody: doc as JSONObject,
+            }))
+            const response = await db.container(container).items.bulk(operations);
             console.log('insert response:', response);
             responses.push(response);
         }
