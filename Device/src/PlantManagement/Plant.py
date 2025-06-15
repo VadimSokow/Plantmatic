@@ -162,26 +162,24 @@ class Plant:
         """
 
         # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}}
-        # measurement_data = get_measurement_test_data()
-        measurement_data = self.slot.get_all_sensor_values()
-
-        # save the last measured soil moisture
-        if measurement_data:
-            self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
-        else:
-            self.current_soil_moisture = None
-
-        data = {f"{self.name}": measurement_data}
-        data = json.dumps(data)
-        print(data)
         if self.slot is not None:
             logger.info(f"creating Message from Slot for {self.name}")
             measurement_data = self.slot.get_all_sensor_values()
+            # save the last measured soil moisture
+            if measurement_data:
+                self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
+            else:
+                self.current_soil_moisture = None
             data = {f"{self.name}": measurement_data}
             data = json.dumps(data)
         else:
             logger.info(f"Creating Message without Slot for {self.name}")
             measurement_data = get_measurement_test_data()
+            # save the last measured soil moisture
+            if measurement_data:
+                self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
+            else:
+                self.current_soil_moisture = None
             data = {f"{self.name}": measurement_data}
             data = json.dumps(data)
         logger.debug(f"Created Message : {data}")
