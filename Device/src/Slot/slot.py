@@ -1,4 +1,6 @@
 import json
+from typing import \
+    Optional
 
 from hardware.actuators.led_actuator import LedActuator
 from hardware.actuators.pump import Pump
@@ -24,10 +26,10 @@ class Slot:
         self.soil_sensor = soil_sensor
         self.dht11_sensor = dht11_sensor
 
-    def get_all_sensor_values(self) -> str | None:
+    def get_all_sensor_values(self) -> dict | None:
         """
-        Builds a String of all sensor values.
-        :return: A String with all Sensor values.
+        Builds a dict of all sensor values.
+        :return: A dict with all Sensor values.
         """
         humidity_percent = self.dht11_sensor.get_humidity_percent()
         temperature_c = self.dht11_sensor.get_temperature_celsius()
@@ -55,3 +57,8 @@ class Slot:
         :param color: to set the LED Actuator to. E.g., LedColor.RED
         """
         self.leds.set_status_color(color)
+
+    def water_now(self, duration: Optional[int] = None):
+        actual_duration = duration if duration is not None else 3
+        if self.pump:
+            self.pump.pump_for_duration(actual_duration)

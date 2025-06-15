@@ -53,6 +53,14 @@ class PlantManager(PlantManagerInterface):
                 # wenn, ja dann wird eine Messung ausgelöst
                 p.monitor(device_client, current_time)
 
+                # Autonomous watering of the plant
+                if p.current_soil_moisture is not None:
+                    # check if plant needs watering
+                    if p.is_watering_needed(p.current_soil_moisture, current_time):
+                        logger.info(f"MANAGER: Starte asynchrone Bewässerung für {p.name}")
+                        # start watering the plant (async)
+                        asyncio.create_task(p.water_until_target())
+
             # Prüft, ob sich an den Pflanzen etwas geändert hat
             if self.new_plants is not None:
                 logger.info("Plants will be updated to new Plants")
