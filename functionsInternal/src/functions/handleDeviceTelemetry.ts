@@ -18,9 +18,10 @@ export async function handleDeviceTelemetry(
     context.log("Received telemetry event:", event);
 
     const eventData: Record<string, any> = event.data;
+    const deviceId = eventData.systemProperties["iothub-connection-device-id"];
 
     // Extract the telemetry data from the event
-    const telemetryData: Record<string, TelemetryMessage> = eventData.telemetry;
+    const telemetryData: Record<string, TelemetryMessage> = eventData.body;
     if (!telemetryData) {
         context.error("Invalid telemetry data received:", telemetryData);
         return;
@@ -41,7 +42,7 @@ export async function handleDeviceTelemetry(
     for (let entry of entries) {
         const plantId = entry[0];
         const sensorData = entry[1];
-        const data = sensorDataToObjects(eventData.deviceId, plantId, sensorData)
+        const data = sensorDataToObjects(deviceId, plantId, sensorData)
         if (data.length === 0) {
             context.warn(`No valid sensor data found for plant ${plantId}.`);
             continue;
