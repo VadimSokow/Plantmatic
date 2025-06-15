@@ -35,13 +35,21 @@ class Slot:
         temperature_c = self.dht11_sensor.get_temperature_celsius()
         soil_moisture_percent = self.soil_sensor.get_moisture_percent()
         light_level_lux = self.light_sensor.get_light_level_lux()
+
         # Dict mit allen Sensorwerten bauen
-        sensor_values = {
-            self.dht11_sensor.humidity_value_name: humidity_percent,
-            self.dht11_sensor.temperature_value_name: temperature_c,
-            self.soil_sensor.value_name: soil_moisture_percent,
-            self.light_sensor.value_name: light_level_lux,
-        }
+        sensor_values = {}
+        if humidity_percent:
+            sensor_values[self.dht11_sensor.humidity_value_name] = humidity_percent
+
+        if temperature_c:
+            sensor_values[self.dht11_sensor.temperature_value_name] = temperature_c
+
+        if soil_moisture_percent:
+            sensor_values[self.soil_sensor.value_name] = soil_moisture_percent
+
+        if light_level_lux:
+            sensor_values[self.light_sensor.value_name] = light_level_lux
+
         return sensor_values
 
     def pump_for_duration(self, duration: int):

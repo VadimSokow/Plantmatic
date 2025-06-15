@@ -27,6 +27,7 @@ class PlantManager(PlantManagerInterface):
         self.plants: list[Plant] = []
         self.new_plants: list[Plant] = None
         self.deleted_plant_names: list[str] = []
+        self.error_plants: list[dict] = [] #TODO muss das? Was wenn interval, etc -1?
         self.plant_config_path: str = plant_config_path
         self.device_client = None
         self.device_slots = DeviceSlot()
@@ -71,11 +72,16 @@ class PlantManager(PlantManagerInterface):
                 for plant in self.plants:
                     plants_dict.update(plant.to_dict())
 
-                if self.deleted_plant_names is not None:
-                    print(self.deleted_plant_names)
+                if self.deleted_plant_names:
                     deleted_dict = {name: None for name in self.deleted_plant_names}
                     plants_dict.update(deleted_dict)
                     self.deleted_plant_names = []
+
+               # if self.error_plants: TODO muss das?
+                #    for ep in self.error_plants:
+                 #       error = {ep.get("Name"): ep.get("error")}
+                  #      plants_dict.update(error)
+                   #     self.error_plants = []
 
                 self.device_client.report_device_twin(plants_dict)
 
@@ -108,9 +114,11 @@ class PlantManager(PlantManagerInterface):
             p_slot = self.device_slots.get_slot(p_slot_num)
 
             plant_object = Plant(p_name, p_measuring_interval, p_min_humidity, p_max_humidity, p_slot_num, p_slot)
-            plant_object.to_string()
             plant_list.append(plant_object)
         return plant_list
+
+   # def check_if_plant_is_valid(self, name, measuring_interval, min_humidity, max_humidity) -> bool:
+     #   logger.info(f"Checking Plant {name}")
 
     def update_plant_toml(self, new_config):
         """
@@ -134,4 +142,4 @@ class PlantManager(PlantManagerInterface):
                         f"Plant: {name}, with key: {key}, and value: {value}")
                     okay = toml.update_section_file(self.plant_config_path, name, key, value)
                     if not okay:
-                        logger.error(f"An Error during updating toml occured with plant: {name}")
+                        logger.error(f"An Error during updating toml occurred with plant: {name}")
