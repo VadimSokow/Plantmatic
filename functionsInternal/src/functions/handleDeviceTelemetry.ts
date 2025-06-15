@@ -20,14 +20,30 @@ export async function handleDeviceTelemetry(
     const eventData: Record<string, any> = event.data;
     const deviceId = eventData.systemProperties["iothub-connection-device-id"];
 
-    // Extract the telemetry data from the event
-    const telemetryData: Record<string, TelemetryMessage> = eventData.body;
-    if (!telemetryData) {
-        context.error("Invalid telemetry data received:", telemetryData);
+    // extract eventData.body or decode if it is a base64 string
+    let body: Record<string, any> | null = null
+    if (typeof eventData.body === 'string') {
+        try {
+            body = JSON.parse(Buffer.from(eventData.body, 'base64').toString('utf-8'));
+        } catch (error) {
+            context.error("Failed to decode base64 body:", error);
+            return;
+        }
+    } else if (typeof eventData.body === 'object') {
+        body = eventData.body;
+    }
+    if (!body) {
+        context.error(`No body found in the event data. Type of eventData.body: ${typeof eventData.body} | Value: ${eventData.body}`);
         return;
     }
 
-    const entries = Object.entries(telemetryData);
+    // Extract the telemetry data from the event
+    if (!body) {
+        context.error("Invalid telemetry data received:", body);
+        return;
+    }
+
+    const entries = Object.entries(body);
     if (entries.length === 0) {
         context.warn("No telemetry data found in the event.");
         return;
