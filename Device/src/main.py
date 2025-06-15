@@ -23,7 +23,7 @@ def get_config_path() -> str:
     """
     main_path = os.path.abspath(__file__)
     main_path = os.path.dirname(main_path)
-    return os.path.join(os.path.dirname(main_path), "Config")
+    return os.path.join(os.path.dirname(main_path), "config")
 
 def signal_handler(sig, frame):
     """
@@ -66,4 +66,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        #TODO eigentlich sollte der eventloop das beenden + Device_Client verbindung trennen
+        print("\nProgramm durch KeyboardInterrupt (Ctrl+C) direkt beendet.")
+

@@ -22,6 +22,7 @@ class Plant:
         :param min_humidity: The min soil moisture. Below that, watering is required.
         :param max_humidity: The max soil moisture. Above that, watering must turn off.
         :param slot_num: The slot number of the Plant.
+        :param slot: The slot object corresponding to the slot_num
         """
         self.name = name
         self.measuring_interval = measuring_interval
@@ -40,6 +41,10 @@ class Plant:
         return f"Plant(Name: {self.name}, Measuring_interval: {self.measuring_interval}, Min_humidity: {self.min_humidity}, Max_humidity: {self.max_humidity})"
 
     def to_dict(self) -> dict:
+        """
+        Converts A this plant object into a dict.
+        :return: A dict that represents this plant
+        """
         logger.info(f"Make dict from plant{self.name}")
         data = {
             self.name: {
@@ -55,7 +60,7 @@ class Plant:
         """
         The monitor function. It will run until the coroutine is killed.
         :param device_client: The device client to push data into the cloud.
-        :param current_time: Hallo
+        :param current_time: The time at which this function is called.
         """
         # Prüfen, ob schon genug Zeit vergangen ist
         logger.info(f"Check interval of Plant: {self.name}")
@@ -71,29 +76,35 @@ class Plant:
     def create_message(self):
         """
         Creates a message to send to the cloud. It contains sensor values like temperature.
+        If the plant has a slot object this will send sensordata. If the plant has no slot object ths will send testdata.
         :return: The message for the Azure IoTHub.
         """
-        logger.info("creating message with dummy data")
+
         # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}}
-        # measurement_data = get_measurement_test_data()
-        measurement_data = self.slot.get_all_sensor_values()
-        data = {f"{self.name}": measurement_data}
-        data = json.dumps(data)
-        print(data)
+        if self.slot is not None:
+            logger.info(f"creating Message from Slot for {self.name}")
+            measurement_data = self.slot.get_all_sensor_values()
+            data = {f"{self.name}": measurement_data}
+            data = json.dumps(data)
+        else:
+            logger.info(f"Creating Message without Slot for {self.name}")
+            measurement_data = get_measurement_test_data()
+            data = {f"{self.name}": measurement_data}
+            data = json.dumps(data)
+        logger.debug(f"Created Message : {data}")
         return data
 
+   # def __eq__(self, other):
+  #      if not isinstance(other, Plant):
+ #           return False
+#        return (self.name == other.name
+                #and self.measuring_interval == other.measuring_interval
+              #  and self.min_humidity == other.min_humidity
+               # and self.max_humidity == other.max_humidity
+                #and self.slot_num == other.slot_num)
 
-    def __eq__(self, other):
-        if not isinstance(other, Plant):
-            return False
-        return (self.name == other.name
-                and self.measuring_interval == other.measuring_interval
-                and self.min_humidity == other.min_humidity
-                and self.max_humidity == other.max_humidity
-                and self.slot_num == other.slot_num)
-
-    def __hash__(self):
-        return hash(self.name)
+   # def __hash__(self):
+ #       return hash(self.name)
 
 
 def get_measurement_test_data():
@@ -101,13 +112,13 @@ def get_measurement_test_data():
     Generate some random values, which can be fed into the Azure IoTHub.
     :return: Random data.
     """
-    last_watered = time.time()
+    logger.info("creating message with dummy data")
     temperature_celsius = randint(0, 10)
     humidity_percent = randint(0, 10)
     soil_moisture_percent = randint(0, 10)
-    light_level_percent = randint(0, 10)
+    light_level_lux = randint(0, 10)
 
-    measurement_data = {"last_watered": last_watered, "temperature_celsius": temperature_celsius,
+    measurement_data = {"temperature_celsius": temperature_celsius,
                         "humidity_percent": humidity_percent,
-                        "soil_moisture_percent": soil_moisture_percent, "light_level_percent": light_level_percent}
+                        "soil_moisture_percent": soil_moisture_percent, "light_level_lux": light_level_lux}
     return measurement_data

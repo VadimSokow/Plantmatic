@@ -21,20 +21,20 @@ class DeviceClient:
         '''
         Returns device_client with config from config.toml (websockets, ConnectionString)
         '''
-        print("<get_device_Client>")
+        logger.info("Creating DeviceClient")
         connection_string = self.config["Connection"]["Connection_String"]
         websockets = self.config["Connection"]["Websockets"]
         device_client = IoTHubDeviceClient.create_from_connection_string(connection_string,
                                                                          websockets=websockets)  # erstellt device_client
 
         try:
-            print('Connecting')
+            logger.info("Connecting")
             device_client.connect()  # Baut verbindung zum Device im IoT hub auf
-            print('Connected')
+            logger.info("Connected")
             device_client.on_twin_desired_properties_patch_received = self.twin_patch_handler
             device_client.on_method_request_received = self.method_request_handler
+            logger.info("DeviceClient created successfully")
             return device_client
-            print("</get_device_Client>")
         except Exception as e:
             print("Fehler beim verbinden " + e)
             return None
@@ -110,7 +110,7 @@ class DeviceClient:
             self.device_client.send_message(message)
         except Exception as e:
             logger.error(f"Fehler beim senden der Message {e}")
-            # hier nochmal versuchen
+
 
 
     def disconnect_device_client(self):

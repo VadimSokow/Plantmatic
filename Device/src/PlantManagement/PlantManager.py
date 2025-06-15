@@ -32,12 +32,19 @@ class PlantManager(PlantManagerInterface):
         self.device_slots = DeviceSlot()
 
     async def start(self, device_client: DeviceClient, shutdown_event: Event) -> None:
+        """
+        A function that monitors all the plants in this plantManager once per second.
+        Checks after monitoring whether the new_plants is changed and updates the plants that will be monitored.
+        Sends updated plants with device_client to device_twin.
+        :param device_client the device_client object that will be used to send data to the IoT Hub.
+        :param shutdown_event when the shutdown event is set, this funktion will end. (Theoretisch!) TODO: fix shutdown_event
+        """
         logger.info("Starts a coroutine that monitors all plants")
         self.device_client = device_client
         self.plants = self.load_plants(self.plant_config_path)
         while not shutdown_event.is_set():
             await asyncio.sleep(1)
-            # in alle Pflanzen gucken, ob ihr intervall abgelaufen ist und sie geprüft werden müssen
+
             if shutdown_event.is_set():  # Nach dem Sleep nochmals prüfen
                 break
             current_time = time.time()  # Die aktuelle Zeit in Sekunden von 1970 als Float
@@ -47,18 +54,17 @@ class PlantManager(PlantManagerInterface):
                 p.monitor(device_client, current_time)
 
             # Prüft, ob sich an den Pflanzen etwas geändert hat
-            if self.new_plants:
+            if self.new_plants is not None:
                 logger.info("Plants will be updated to new Plants")
                 self.plants = self.new_plants
                 self.new_plants = None
-                # device twin aktualisieren, da jetzt die config des Raspi aktualisiert wurde
-                # was tun, wenn die Pflanze gelöscht ist?
 
                 plants_dict = {}
                 for plant in self.plants:
                     plants_dict.update(plant.to_dict())
 
                 if self.deleted_plant_names is not None:
+                    print(self.deleted_plant_names)
                     deleted_dict = {name: None for name in self.deleted_plant_names}
                     plants_dict.update(deleted_dict)
                     self.deleted_plant_names = []
@@ -66,11 +72,20 @@ class PlantManager(PlantManagerInterface):
                 self.device_client.report_device_twin(plants_dict)
 
     def push_new_plant_config(self, new_config):
+        """
+        Updates the plant config toml and new_plants list of the PlantManager Object.
+        :param new_config the updated plants that will be saved in the plant_config_config.
+        """
         logger.debug(f"push new config")
         self.update_plant_toml(new_config)
         self.new_plants = self.load_plants(self.plant_config_path)
 
     def load_plants(self, plant_config_path: str) -> list[Plant]:
+        """
+        Loads all plants from the plant_config_path and returns them as a List of plant objects.
+        :param plant_config_path the path of the config file that will be loaded
+        :return: List of plants
+        """
         logger.info(f"Loads plants to objects from: {plant_config_path}")
         plant_list = []
         plant_config = toml.load_file(plant_config_path)
@@ -87,13 +102,16 @@ class PlantManager(PlantManagerInterface):
             plant_object = Plant(p_name, p_measuring_interval, p_min_humidity, p_max_humidity, p_slot_num, p_slot)
             plant_object.to_string()
             plant_list.append(plant_object)
-
         return plant_list
 
-    def update_plant_toml(self, patch):
-        logger.info(f"Updating toml with: {patch}")
+    def update_plant_toml(self, new_config):
+        """
+        Updated the plant config file and adds names from deleted Plants to the deleted_plant_names List.
+        :param new_config The new data that will be safed in the plant_config_path from this PlantManager Object.
+        """
+        logger.info(f"Updating toml with: {new_config}")
 
-        for name, config in patch.items():
+        for name, config in new_config.items():
 
             if config is None:
                 logger.debug(f"Deleting section in toml: {name}")
