@@ -35,6 +35,7 @@ function connectToCosmos(
     }
 
     const insert = async <T>(container: string, items: Array<T>, options?: RequestOptions): Promise<InsertResponse<T>>  => {
+        console.log('items to insert:', items)
         // split items into batches of 100
         const batchSize = 100;
         const batches: Array<Array<T>> = [];
@@ -45,7 +46,9 @@ function connectToCosmos(
         // insert each batch
         const responses: Array<ItemResponse<Array<T>>> = [];
         for (const batch of batches) {
+            console.log('batch to insert:', batch);
             const response = await db.container(container).items.create(batch, options);
+            console.log('insert response:', response);
             responses.push(response);
         }
 
