@@ -26,8 +26,8 @@ class Slot:
 
     def get_all_sensor_values(self) -> str | None:
         """
-        Builds a JSON String of all sensor values.
-        :return: A JSON with all Sensor values.
+        Builds a String of all sensor values.
+        :return: A String with all Sensor values.
         """
         humidity_percent = self.dht11_sensor.get_humidity_percent()
         temperature_c = self.dht11_sensor.get_temperature_celsius()
