@@ -24,6 +24,8 @@ export const usePlantStore = defineStore('plants', {
         this.error = error.message || 'Failed to load plants'
         console.error(error)
         return null
+      } finally {
+        this.loading = false
       }
     },
 
@@ -60,16 +62,22 @@ export const usePlantStore = defineStore('plants', {
     async createPlant (deviceId: string, slot: number, latName: string, name: string): Promise<Plant | undefined> {
       this.loading = true
       this.error = null
-      const createResult: Plant | string = await createPlant(deviceId, slot, latName, name)
-      if (typeof createResult === 'string') {
-        // error
-        this.loading = false
-        this.error = createResult as string
-        return undefined
-      }
+      try {
+        const createResult: Plant | string = await createPlant(deviceId, slot, latName, name)
+        if (typeof createResult === 'string') {
+          // error
+          this.loading = false
+          this.error = createResult as string
+          return undefined
+        }
 
-      // add plant to plant store
-      this.plants[createResult.id] = createResult
+        // add plant to plant store
+        this.plants[createResult.id] = createResult
+      } catch (error: any) {
+        this.error = error.message || 'Failed to create plant'
+      } finally {
+        this.loading = false
+      }
     },
   },
 })

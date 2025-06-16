@@ -44,6 +44,8 @@ export const useDeviceStore = defineStore('devices', {
         this.error = error.message || 'Failed to load devices'
         console.error(error)
         return null
+      } finally {
+        this.loading = false
       }
     },
     async fetchDevices (forceRefresh = false) {

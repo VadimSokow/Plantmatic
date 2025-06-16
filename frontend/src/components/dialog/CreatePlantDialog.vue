@@ -124,29 +124,44 @@
 
     const allMockPlantTypes: PlantType[] = [
       {
-        latName: 'Solanum lycopersicum',
-        commonName: 'Tomate',
-        description: 'Leckere rote Frucht.',
+        latName: 'Monstera deliciosa',
+        commonName: 'Fensterblatt',
+        description: 'Eine beliebte Zimmerpflanze mit großen, gelappten Blättern, die Löcher entwickeln. Sie bevorzugt helles, indirektes Licht und mäßige Bewässerung.',
       },
       {
-        latName: 'Capsicum annuum',
-        commonName: 'Paprika',
-        description: 'Vielseitiges Gemüse.',
+        latName: 'Sansevieria trifasciata',
+        commonName: 'Bogenhanf',
+        description: 'Eine pflegeleichte Zimmerpflanze mit aufrechten, schwertförmigen Blättern. Sie ist sehr trockenheitstolerant und ideal für Anfänger.',
+      },
+      {
+        latName: 'Pothos epipremnum aureum',
+        commonName: 'Efeutute',
+        description: 'Eine robuste Rankpflanze mit herzförmigen Blättern. Sie ist sehr anpassungsfähig und verträgt verschiedene Lichtverhältnisse.',
+      },
+      {
+        latName: 'Spathiphyllum wallisii',
+        commonName: 'Friedenslilie',
+        description: 'Eine elegante Zimmerpflanze mit glänzenden Blättern und weißen Blüten. Sie ist bekannt für ihre luftreinigenden Eigenschaften.',
+      },
+      {
+        latName: 'Ficus lyrata',
+        commonName: 'Geigenfeige',
+        description: 'Eine auffällige Zimmerpflanze mit großen, geigenförmigen Blättern. Sie benötigt helles Licht und eine konstante Feuchtigkeit.',
+      },
+      {
+        latName: 'Aloe vera',
+        commonName: 'Echte Aloe',
+        description: 'Eine Sukkulente mit fleischigen Blättern, die für ihre medizinischen Eigenschaften bekannt ist. Sie bevorzugt viel Sonnenlicht und wenig Wasser.',
+      },
+      {
+        latName: 'Rosmarinus officinalis',
+        commonName: 'Rosmarin',
+        description: 'Ein aromatisches Kraut, das in der Küche und als Zierpflanze verwendet wird. Er benötigt viel Sonne und gut durchlässigen Boden.',
       },
       {
         latName: 'Mentha spicata',
-        commonName: 'Minze',
-        description: 'Frisches Kraut für Tee.',
-      },
-      {
-        latName: 'Fragaria x ananassa',
-        commonName: 'Erdbeere',
-        description: 'Beliebte Sommerfrucht.',
-      },
-      {
-        latName: 'Ocimum basilicum',
-        commonName: 'Basilikum',
-        description: 'Aromatische Kräuter.',
+        commonName: 'Grüne Minze',
+        description: 'Eine beliebte Minzart mit frischem, süßem Geschmack. Sie wächst schnell und benötigt feuchten Boden und etwas Sonne.',
       },
     ]
 
@@ -201,12 +216,17 @@
     }
     const selection = selectedPlantType.value as PlantType
 
+    if (!selectedPlantSlot.value) {
+      console.warn('Plant type is invalid.')
+    }
+    const slotNumber = selectedPlantSlot.value as number
+
     console.log('Neue Pflanze erstellen:', {
       latName: selection.latName,
       commonName: selection.commonName,
       plantName: plantName.value,
     })
-    createPlantInStore(1, selection.latName, plantName.value)
+    createPlantInStore(slotNumber, selection.latName, plantName.value)
     // Hier würde dein API-Aufruf zum Backend erfolgen, z.B.:
     // plantStore.createPlant(newPlantData)
     //   .then(() => {

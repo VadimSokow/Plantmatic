@@ -5,7 +5,7 @@
       {{ plant.name }}
     </v-card-title>
     <v-card-text>
-      <p>Art: {{ plant.type.commonName }}</p>
+      <p v-if="plant.type">Art: {{ plant.type.commonName }}</p>
       <div v-for="line in fields" :key="line">
         <p>{{ line }}</p>
       </div>

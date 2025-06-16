@@ -38,12 +38,12 @@ export const createPlant = async (
 ): Promise<Plant | string> => {
   const body = {
     deviceId,
-    slot: slotNumber,
+    slotNumber,
     latName: plantLatName,
     name: newPlantName,
   }
   const result = await apiClient.post('/plants', body)
-  if (result.status >= 200 && result.status < 300) {
+  if (result.status < 200 && result.status >= 300) {
     console.error(`Can not create Plant: ${result.status}`)
     return 'can not create Plant'
   }
