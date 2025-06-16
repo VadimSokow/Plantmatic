@@ -1,6 +1,6 @@
 import type { Plant } from '@/types/plant.ts'
 import { defineStore } from 'pinia'
-import { fetchPlants } from '@/api/plant.ts'
+import { createPlant, fetchPlants } from '@/api/plant.ts'
 
 export const usePlantStore = defineStore('plants', {
   state: () => ({
@@ -55,6 +55,21 @@ export const usePlantStore = defineStore('plants', {
       } finally {
         this.loading = false
       }
+    },
+
+    async createPlant (deviceId: string, slot: number, latName: string, name: string): Promise<Plant | undefined> {
+      this.loading = true
+      this.error = null
+      const createResult: Plant | string = await createPlant(deviceId, slot, latName, name)
+      if (typeof createResult === 'string') {
+        // error
+        this.loading = false
+        this.error = createResult as string
+        return undefined
+      }
+
+      // add plant to plant store
+      this.plants[createResult.id] = createResult
     },
   },
 })

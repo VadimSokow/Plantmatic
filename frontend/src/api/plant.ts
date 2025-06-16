@@ -1,4 +1,5 @@
 import type { Plant, PlantType } from '@/types/plant.ts'
+import { apiClient } from '@/api/client.ts'
 import { getPaged } from '@/api/helper.ts'
 
 type ResponseData = {
@@ -27,4 +28,27 @@ export const fetchPlants = async (): Promise<Plant[] | undefined> => {
       return Array.of(...store, ...plants)
     },
     [])
+}
+
+export const createPlant = async (
+  deviceId: string,
+  slotNumber: number,
+  plantLatName: string,
+  newPlantName: string,
+): Promise<Plant | string> => {
+  const body = {
+    deviceId,
+    slot: slotNumber,
+    latName: plantLatName,
+    name: newPlantName,
+  }
+  const result = await apiClient.post('/plants', body)
+  if (result.status >= 200 && result.status < 300) {
+    console.error(`Can not create Plant: ${result.status}`)
+    return 'can not create Plant'
+  }
+
+  // TODO: extract plant
+  const plant: Plant = result.data as Plant
+  return plant
 }

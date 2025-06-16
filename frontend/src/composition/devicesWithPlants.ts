@@ -1,8 +1,8 @@
+import type { DeviceWithPlants } from '@/types/device.ts'
 import { useDeviceStore } from '@/stores/device.ts'
 import { usePlantStore } from '@/stores/plant.ts'
-import type { Device, DeviceWithPlants } from '@/types/device.ts'
 
-export function useDevicesWithPlants() {
+export function useDevicesWithPlants () {
   const deviceStore = useDeviceStore()
   const plantStore = usePlantStore()
 
@@ -16,22 +16,26 @@ export function useDevicesWithPlants() {
     const devs = Object.values(devices.value)
     const plnts = Object.values(plants.value)
 
-    if (!devs.length || !plnts.length) {
+    if (devs.length === 0 || plnts.length === 0) {
       return []
     }
 
     const combined: DeviceWithPlants[] = []
     for (const value of devs) {
       const deviceWithPlants: DeviceWithPlants = { device: value, plants: [] }
-      if (!value.plantSlots) continue
-      value.plantSlots.forEach(slot => {
-        if (!slot.plantId) return
+      if (!value.plantSlots) {
+        continue
+      }
+      for (const slot of value.plantSlots) {
+        if (!slot.plantId) {
+          continue
+        }
 
         const plant = plants.value[slot.plantId]
         if (plant) {
           deviceWithPlants.plants.push(plant)
         }
-      })
+      }
       combined.push(deviceWithPlants)
     }
     return combined

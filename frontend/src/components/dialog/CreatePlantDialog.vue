@@ -13,6 +13,15 @@
           variant="outlined"
         />
 
+        <v-select
+          v-model="selectedPlantSlot"
+          density="compact"
+          :items="plantSlots"
+          label="Plant Slot"
+          no-data-text="Alle Slots bereits belegt."
+          variant="outlined"
+        />
+
         <v-autocomplete
           v-model="selectedPlantType"
           chips
@@ -56,19 +65,33 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <LoadAndError :error="error" :is-loading="isLoading" @error-cleared="clearError" />
 </template>
 
 <script lang="ts" setup>
   import { debounce } from 'lodash'
   import { computed, ref, watch } from 'vue'
+  import { useDeviceWithPlants } from '@/composition/deviceWithPlants.ts'
 
   export interface PlantType {
-    id?: string // PK in DB, könnte latName sein, hier generische ID
     latName: string
     commonName: string
     description: string
-  // configFields: PlantConfigField[]; // Für dieses Mockup nicht benötigt
   }
+
+  const props = defineProps<{
+    deviceId: string
+  }>()
+
+  const { device, createPlant: createPlantInStore, clearError, isLoading, error } = useDeviceWithPlants(props.deviceId)
+
+  const plantSlots = computed(() => {
+    if (!device.value) {
+      return []
+    }
+    return device.value.plantSlots.filter(slot => slot.plantId === null).map(slot => slot.slotNumber)
+  })
 
   // --- Props und Emits für die Dialog-Steuerung ---
   const dialog = ref(false) // Interner Zustand für die Sichtbarkeit des Dialogs
@@ -86,6 +109,7 @@
   // --- Formularfelder ---
   const plantName = ref('')
   const selectedPlantType = ref<PlantType | null>(null) // Speichert das ausgewählte PlantType-Objekt
+  const selectedPlantSlot = ref<null | number>(null)
 
   // --- Logik für die PlantType-Suche ---
   const plantTypeSuggestions = ref<PlantType[]>([]) // Die Liste der Vorschläge
@@ -100,31 +124,26 @@
 
     const allMockPlantTypes: PlantType[] = [
       {
-        id: '1',
         latName: 'Solanum lycopersicum',
         commonName: 'Tomate',
         description: 'Leckere rote Frucht.',
       },
       {
-        id: '2',
         latName: 'Capsicum annuum',
         commonName: 'Paprika',
         description: 'Vielseitiges Gemüse.',
       },
       {
-        id: '3',
         latName: 'Mentha spicata',
         commonName: 'Minze',
         description: 'Frisches Kraut für Tee.',
       },
       {
-        id: '4',
         latName: 'Fragaria x ananassa',
         commonName: 'Erdbeere',
         description: 'Beliebte Sommerfrucht.',
       },
       {
-        id: '5',
         latName: 'Ocimum basilicum',
         commonName: 'Basilikum',
         description: 'Aromatische Kräuter.',
@@ -177,16 +196,17 @@
       return
     }
 
-    const newPlantData = {
-      name: plantName.value,
-      plantTypeId:
-        selectedPlantType.value?.id || selectedPlantType.value?.latName, // Verwende ID oder latName als Referenz
-      plantTypeName: selectedPlantType.value?.commonName, // Optional: Speichere den commonName zur Anzeige
-    // Hier könnten weitere Felder hinzugefügt werden, wenn das Formular erweitert wird
+    if (!selectedPlantType.value) {
+      console.warn('Plant type is invalid.')
     }
+    const selection = selectedPlantType.value as PlantType
 
-    console.log('Neue Pflanze erstellen:', newPlantData)
-
+    console.log('Neue Pflanze erstellen:', {
+      latName: selection.latName,
+      commonName: selection.commonName,
+      plantName: plantName.value,
+    })
+    createPlantInStore(1, selection.latName, plantName.value)
     // Hier würde dein API-Aufruf zum Backend erfolgen, z.B.:
     // plantStore.createPlant(newPlantData)
     //   .then(() => {

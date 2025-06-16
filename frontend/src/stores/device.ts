@@ -1,7 +1,7 @@
 // stores/deviceStore.ts
 import type { Device } from '@/types/device'
 import { defineStore } from 'pinia'
-import { fetchDevices } from '@/api/device.ts'
+import { fetchDevice, fetchDevices } from '@/api/device.ts'
 
 export const useDeviceStore = defineStore('devices', {
   state: () => ({
@@ -20,13 +20,20 @@ export const useDeviceStore = defineStore('devices', {
 
   actions: {
     async loadDevice (deviceId: string): Promise<Device | null> {
+      this.loading = true
       try {
-        await this.fetchDevices()
-        return this.devices[deviceId]
+        const device = await fetchDevice(deviceId)
+        if (!device) {
+          return null
+        }
+        this.devices[deviceId] = device
+        return device
       } catch (error: any) {
         this.error = error.message || 'Failed to load device'
         console.error(error)
         return null
+      } finally {
+        this.loading = false
       }
     },
     async loadDevices (forceRefresh = false): Promise<Device[] | null> {

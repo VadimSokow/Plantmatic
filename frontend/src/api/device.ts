@@ -1,4 +1,5 @@
 import type { Device, DeviceModel } from '@/types/device.ts'
+import { apiClient } from '@/api/client.ts'
 import { getPaged } from '@/api/helper.ts'
 
 type ResponseData = {
@@ -27,4 +28,16 @@ export const fetchDevices = async (): Promise<Device[] | undefined> => {
       return Array.of(...store, ...devices)
     },
     [])
+}
+
+export const fetchDevice = async (deviceId: string): Promise<Device | null> => {
+  const result = await apiClient.get(`/devices/${deviceId}`)
+  if (!result) {
+    return null
+  }
+  const data = result.data as Record<string, any>
+  const device = data.device as Record<string, any>
+  device['modelId'] = undefined
+  device['model'] = data.model
+  return device as Device | null
 }

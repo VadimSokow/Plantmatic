@@ -11,29 +11,29 @@
       </v-btn>
     </v-col>
 
-    <CreatePlantDialog ref="createPlantDialogRef" />
+    <CreatePlantDialog ref="createPlantDialogRef" :device-id="device.id" />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import type { Device } from '@/types/device.ts'
-import CreatePlantDialog from '@/components/dialog/CreatePlantDialog.vue'
+  import type { Device } from '@/types/device.ts'
+  import CreatePlantDialog from '@/components/dialog/CreatePlantDialog.vue'
 
-defineProps<{
-  device: Device,
-  slots: {
-    total: number,
-    used: number,
-  } | null
-}>()
+  defineProps<{
+    device: Device
+    slots: {
+      total: number
+      used: number
+    } | null
+  }>()
 
-const createPlantDialogRef = ref<InstanceType<typeof CreatePlantDialog> | null>(null)
+  const createPlantDialogRef = ref<InstanceType<typeof CreatePlantDialog> | null>(null)
 
-const openCreatePlantDialog = () => {
-  if (createPlantDialogRef.value) {
-    createPlantDialogRef.value.openDialog()
+  const openCreatePlantDialog = () => {
+    if (createPlantDialogRef.value) {
+      createPlantDialogRef.value.openDialog()
+    }
   }
-}
 </script>
 
 <style scoped>
