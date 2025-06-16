@@ -37,7 +37,7 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
         const deviceId = body.deviceId
         const slotNumber = body.slotNumber
 
-        console.log("Für Geärt: ", deviceId, slotNumber)
+        console.log("Daten fuer Device: ", deviceId, slotNumber)
 
         if (!name || !latName || !deviceId || !slotNumber) {
             return {
