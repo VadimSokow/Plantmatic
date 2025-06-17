@@ -16,6 +16,8 @@ export function plantFieldWithDataToStrings (
       continue
     }
 
+    console.log(`${def.slot} !== ${devicePlantSlot}`)
+
     // Überspringen, wenn der Sensor für eine andere Pflanze konfiguriert ist
     if (def.slot !== devicePlantSlot) {
       continue

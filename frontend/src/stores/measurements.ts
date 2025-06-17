@@ -55,7 +55,6 @@ export const useMeasurementsStore = defineStore('measurements', {
       try {
         const result = await fetchNewestMeasurements(plantId, fieldNames)
         if (!result) {
-          this.error = 'No measurements found'
           this.loading = false
           return
         }

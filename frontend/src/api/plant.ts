@@ -38,7 +38,7 @@ export const createPlant = async (
 ): Promise<Plant | string> => {
   const body = {
     deviceId,
-    slot: slotNumber,
+    slotNumber,
     latName: plantLatName,
     name: newPlantName,
   }
