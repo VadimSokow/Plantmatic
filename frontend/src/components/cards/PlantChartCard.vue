@@ -7,11 +7,6 @@
       <p v-else>measurement is undefined!</p>
     </v-col>
   </v-card>
-  <LoadAndError
-    :error="error"
-    :is-loading="isLoading"
-    @error-cleared="clearError()"
-  />
 </template>
 
 <script setup lang="ts">
@@ -61,7 +56,7 @@
 
   const sensor = props.sensors.find(s => s.fieldName === props.fieldName)
 
-  const { measurement, isLoading, error, loadAllData, clearError }
+  const { measurement, isLoading, loadAllData }
     = usePlantMeasurement(props.plant.id, props.fieldName)
 
   onMounted(() => {

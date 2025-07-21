@@ -8,12 +8,6 @@
       </div>
     </v-col>
   </v-container>
-
-  <LoadAndError
-    :error="error"
-    :is-loading="isLoading"
-    @error-cleared="clearError()"
-  />
 </template>
 
 <script setup lang="ts">
@@ -30,10 +24,7 @@
 
   const {
     latestMeasurements,
-    isLoading,
-    error,
     loadLatestMeasurements,
-    clearError,
   } = useLatestPlantMeasurement(props.plant.id, Object.values(props.sensors).map(s => s.fieldName))
 
   const fields = computed(() => {

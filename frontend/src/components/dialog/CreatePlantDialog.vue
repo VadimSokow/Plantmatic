@@ -65,8 +65,6 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-  <LoadAndError :error="error" :is-loading="isLoading" @error-cleared="clearError" />
 </template>
 
 <script lang="ts" setup>
@@ -84,7 +82,7 @@
     deviceId: string
   }>()
 
-  const { device, createPlant: createPlantInStore, clearError, isLoading, error } = useDeviceWithPlants(props.deviceId)
+  const { device, createPlant: createPlantInStore } = useDeviceWithPlants(props.deviceId)
 
   const plantSlots = computed(() => {
     if (!device.value) {

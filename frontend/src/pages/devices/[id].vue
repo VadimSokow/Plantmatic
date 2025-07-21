@@ -24,11 +24,6 @@
       </v-row>
     </v-row>
   </v-container>
-  <LoadAndError
-    :error="error"
-    :is-loading="isLoading"
-    @error-cleared="clearError()"
-  />
 </template>
 
 <script setup lang="ts">
@@ -41,10 +36,7 @@
   const {
     device,
     plants,
-    isLoading,
-    error,
     loadAllData,
-    clearError,
   } = useDeviceWithPlants(id.value)
 
   const deviceSlots = computed(() => {

@@ -31,12 +31,6 @@
     @cancel="handleDeleteCanceled"
     @confirm="handlePlantDeleteConfirmed"
   />
-
-  <LoadAndError
-    :error="error"
-    :is-loading="isLoading"
-    @error-cleared="clearError()"
-  />
 </template>
 
 <script setup lang="ts">
@@ -57,9 +51,7 @@
     plant,
     slotNumber,
     isLoading,
-    error,
     loadAllData,
-    clearError,
   } = useDeviceWithPlant(id.value)
 
   const sensors = computed(() => {
