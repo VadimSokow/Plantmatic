@@ -1,4 +1,4 @@
-import type { Plant, PlantType } from '@/types/plant.ts'
+import type { Plant, PlantType, PlantTypeBase } from '@/types/plant.ts'
 import { apiClient } from '@/api/client.ts'
 import { getPaged } from '@/api/helper.ts'
 
@@ -27,6 +27,12 @@ export const fetchPlants = async (): Promise<Plant[] | undefined> => {
       })
       return Array.of(...store, ...plants)
     },
+    [])
+}
+
+export const fetchPlantTypeBases = async (): Promise<PlantTypeBase[] | undefined> => {
+  return await getPaged<PlantTypeBase[], PlantTypeBase[]>('/plantTypes/searchData', {},
+    (store, _, data) => Array.of(...store, ...data),
     [])
 }
 

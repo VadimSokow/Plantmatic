@@ -6,9 +6,12 @@ export interface Plant {
   name: string
 }
 
-export interface PlantType {
+export interface PlantTypeBase {
   latName: string
   commonName: string
+}
+
+export interface PlantType extends PlantTypeBase {
   description: string
   configFields: PlantConfigField[]
 }
