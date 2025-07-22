@@ -55,6 +55,13 @@ export const createPlant = async (
   }
 
   // TODO: extract plant
-  const plant: Plant = result.data as Plant
-  return plant
+  return result.data as Plant
+}
+
+export const deletePlant = async (plantId: string): Promise<number> => {
+  const result = await apiClient.delete(`/plant/${plantId}`)
+  if (result.status < 200 || result.status >= 300) {
+    console.error(`Can not delete Plant: ${result.status}`)
+  }
+  return result.status
 }

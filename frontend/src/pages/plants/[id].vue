@@ -36,6 +36,7 @@
 <script setup lang="ts">
   import DeletePlantDialog from '@/components/dialog/DeletePlantDialog.vue'
   import { useDeviceWithPlant } from '@/composition/deviceWithPlant.ts'
+  import router from '@/router'
 
   definePage({
     meta: {
@@ -51,6 +52,7 @@
     plant,
     slotNumber,
     isLoading,
+    deletePlant,
     loadAllData,
   } = useDeviceWithPlant(id.value)
 
@@ -69,27 +71,31 @@
     }
   }
 
-  // --- Handler für die Bestätigung des Löschens ---
-  const handlePlantDeleteConfirmed = async (plantId: string) => {
-    console.log(`Löschen der Pflanze mit ID: ${plantId} bestätigt.`)
-
-  // Hier würde der tatsächliche API-Aufruf zum Löschen stattfinden:
-  // try {
-  //   const plantStore = usePlantStore(); // Annahme: Du hast einen Plant Store
-  //   await plantStore.deletePlant(plantId); // Die Aktion in deinem Pinia Store
-  //   console.log(`Pflanze ${plantId} erfolgreich gelöscht!`);
-  //   // Optional: Benachrichtigung anzeigen (Snackbar)
-  //   // Optional: Zurück zur vorherigen Seite navigieren oder Liste aktualisieren
-  //   // router.back(); // Oder router.push('/plants');
-  // } catch (error) {
-  //   console.error(`Fehler beim Löschen der Pflanze ${plantId}:`, error);
-  //   // Fehlerbehandlung, z.B. Fehlermeldung im UI anzeigen
-  // }
+  const handlePlantDeleteConfirmed = async () => {
+    console.log(`delete plant with id`)
+    try {
+      await deletePlant()
+      console.log('plant has been deleted')
+    } catch (error) {
+      console.error('Error deleting plant:', error)
+    } finally {
+      if (deletePlantDialogRef.value) {
+        deletePlantDialogRef.value.closeDialog()
+      }
+      await loadAllData(true)
+      // navigate to the device page
+      const deviceId = device.value?.id
+      if (deviceId) {
+        // pop current route from history
+        await router.replace(`/devices/${deviceId}`)
+      } else {
+        console.error('Device ID is not available after deletion')
+      }
+    }
   }
 
-  // --- Handler, wenn das Löschen abgebrochen wird ---
   const handleDeleteCanceled = () => {
-    console.log('Löschen der Pflanze abgebrochen.')
+    console.log('delete canceled')
   }
 
   onMounted(() => {

@@ -19,6 +19,19 @@ export const useDeviceStore = defineStore('devices', {
   },
 
   actions: {
+    removePlantFromDevice (deviceId: string, plantId: string) {
+      const device = this.devices[deviceId]
+      if (!device) {
+        console.warn(`Device with ID ${deviceId} not found`)
+        return
+      }
+      const slotIndex = device.plantSlots.findIndex(slot => slot.plantId === plantId)
+      if (slotIndex === -1) {
+        console.warn(`Plant with ID ${plantId} not found in device ${deviceId}`)
+        return
+      }
+      device.plantSlots[slotIndex].plantId = null
+    },
     async loadDevice (deviceId: string): Promise<Device | null> {
       this.loading = true
       try {

@@ -1,13 +1,15 @@
 import { useDeviceStore } from '@/stores/device.ts'
 import { usePlantStore } from '@/stores/plant.ts'
 
-export function useDeviceWithPlant(plantId: string) {
+export function useDeviceWithPlant (plantId: string) {
   const deviceStore = useDeviceStore()
   const plantStore = usePlantStore()
 
   // lookup device id
-  const deviceId = deviceStore.getDeviceByPlantId(plantId)?.id ?? ""
-  if (deviceId === "") throw new Error('No device found for plant')
+  const deviceId = deviceStore.getDeviceByPlantId(plantId)?.id ?? ''
+  if (deviceId === '') {
+    throw new Error('No device found for plant')
+  }
 
   const isLoading = computed(() => deviceStore.loading || plantStore.loading)
   const error = computed(() => deviceStore.error || plantStore.error)
@@ -32,6 +34,18 @@ export function useDeviceWithPlant(plantId: string) {
     }
   }
 
+  const deletePlant = async () => {
+    if (!plant.value) {
+      throw new Error('Plant not found')
+    }
+    const result = await plantStore.deletePlant(plant.value.id)
+    if (result === undefined) {
+      throw new Error('Failed to delete plant')
+    }
+    // Optionally, you can also remove the plant from the device's slots
+    deviceStore.removePlantFromDevice(deviceId, plant.value.id)
+  }
+
   const clearError = () => {
     deviceStore.error = null
     plantStore.error = null
@@ -43,6 +57,7 @@ export function useDeviceWithPlant(plantId: string) {
     slotNumber,
     isLoading,
     error,
+    deletePlant,
     loadAllData,
     clearError,
   }

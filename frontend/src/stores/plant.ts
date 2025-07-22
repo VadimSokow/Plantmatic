@@ -1,6 +1,6 @@
 import type { Plant } from '@/types/plant.ts'
 import { defineStore } from 'pinia'
-import { createPlant, fetchPlants } from '@/api/plant.ts'
+import { createPlant, deletePlant, fetchPlants } from '@/api/plant.ts'
 
 export const usePlantStore = defineStore('plants', {
   state: () => ({
@@ -16,6 +16,26 @@ export const usePlantStore = defineStore('plants', {
   },
 
   actions: {
+    async deletePlant (plantId: string): Promise<number | undefined> {
+      this.loading = true
+      this.error = null
+      try {
+        const result = await deletePlant(plantId)
+        if (result < 200 || result >= 300) {
+          this.error = `Failed to delete plant with ID ${plantId} | Status: ${result} (${statusCodeToString(result)})`
+          return undefined
+        }
+        // remove plant from store
+        delete this.plants[plantId]
+        return result
+      } catch (error: any) {
+        this.error = error.message || 'Failed to delete plant'
+        console.error(error)
+        return undefined
+      } finally {
+        this.loading = false
+      }
+    },
     async loadPlants (forceRefresh = false): Promise<Plant[] | null> {
       try {
         await this.fetchPlants(forceRefresh)
@@ -81,3 +101,32 @@ export const usePlantStore = defineStore('plants', {
     },
   },
 })
+
+function statusCodeToString (status: number): string {
+  switch (status) {
+    case 200: {
+      return 'OK'
+    }
+    case 201: {
+      return 'Created'
+    }
+    case 400: {
+      return 'Bad Request'
+    }
+    case 401: {
+      return 'Unauthorized'
+    }
+    case 403: {
+      return 'Forbidden'
+    }
+    case 404: {
+      return 'Not Found'
+    }
+    case 500: {
+      return 'Internal Server Error'
+    }
+    default: {
+      return `Unknown Status: ${status}`
+    }
+  }
+}
