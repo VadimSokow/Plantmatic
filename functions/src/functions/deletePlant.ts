@@ -8,8 +8,7 @@ import {hasReadPermForPlant, PermissionState} from "../helper/permission";
  * The id is defined in the URL path as a parameter: '/plants/{id}'
  */
 export async function deletePlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    // let email = handleExtractUserEmail(request)
-    let email = "u38079@hs-harz.de"
+    let email = handleExtractUserEmail(request)
     if (typeof email !== 'string') {
         return email;
     }

@@ -22,8 +22,7 @@ interface MeasurementHistoryQueryParameters {
 
 async function measurements(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // resolve user
-    // let email = handleExtractUserEmail(request)
-    let email = "u38079@hs-harz.de"
+    let email = handleExtractUserEmail(request)
     if (typeof email !== 'string') {
         return email;
     }
