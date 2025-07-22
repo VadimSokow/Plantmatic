@@ -1,9 +1,18 @@
-import {CosmosClient, Database, FeedOptions, QueryIterator, SqlQuerySpec} from "@azure/cosmos";
+import {
+    CosmosClient,
+    Database,
+    FeedOptions,
+    ItemResponse,
+    PartitionKey,
+    QueryIterator,
+    SqlQuerySpec
+} from "@azure/cosmos";
 
 export interface CosmosBundle {
     client: CosmosClient
     db: Database
     query: (container: string, query: string | SqlQuerySpec, options?: FeedOptions) => QueryIterator<any>
+    remove: (container: string, id: string, partitionKey: PartitionKey) => Promise<ItemResponse<any>>
 }
 
 let cosmosInstance: CosmosBundle | null = null
@@ -23,10 +32,15 @@ function connectToCosmos(
         return db.container(container).items.query(query, options)
     }
 
+    const remove = (container: string, id: string, partitionKey: PartitionKey) => {
+        return db.container(container).item(id, partitionKey).delete();
+    }
+
     return {
         client,
         db,
         query,
+        remove
     } as CosmosBundle
 }
 

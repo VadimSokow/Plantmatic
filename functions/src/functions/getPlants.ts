@@ -9,7 +9,8 @@ interface PalntQueryParameters {
 }
 
 export async function getPlants(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    let email = handleExtractUserEmail(request)
+    // let email = handleExtractUserEmail(request)
+    let email = "u38079@hs-harz.de"
     if (typeof email !== 'string') {
         return email;
     }

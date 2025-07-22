@@ -2,7 +2,7 @@ import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/func
 import {handleExtractUserEmail} from "../helper/auth";
 import {InvalidQueryParameterError} from "../error/invalidQuery";
 import {getCosmosBundle} from "../helper/cosmos";
-import {hasReadPermForPlant} from "../helper/permission";
+import {hasReadPermForPlant, PermissionState} from "../helper/permission";
 
 app.http('measurementsNewestForPlant', {
     methods: ['GET'],
@@ -55,17 +55,27 @@ async function newestMeasurementsForPlant(request: HttpRequest, context: Invocat
         }
     }
 
-    if (!await hasReadPermForPlant(queryParams.plantId, userMail)) {
-        context.warn(`User ${userMail} does not have permission to access plant ${queryParams.plantId}`);
-        return {
-            status: 403,
-            body: JSON.stringify({
-                error: "Forbidden",
-                message: "You do not have permission to access this plant."
-            }),
-        };
-    } else {
-        context.log(`User ${userMail} has permission to access plant ${queryParams.plantId}`);
+    switch (await hasReadPermForPlant(queryParams.plantId, userMail)) {
+        case PermissionState.NotFound:
+            context.warn(`Plant ${queryParams.plantId} not found for user ${userMail}`);
+            return {
+                status: 404,
+                body: JSON.stringify({
+                    error: "Not Found",
+                    message: `Plant with ID ${queryParams.plantId} not found.`
+                }),
+            };
+        case PermissionState.NoPermission:
+            context.warn(`User ${userMail} does not have permission to access plant ${queryParams.plantId}`);
+            return {
+                status: 403,
+                body: JSON.stringify({
+                    error: "Forbidden",
+                    message: "You do not have permission to access this plant."
+                }),
+            };
+        default:
+            context.log(`User ${userMail} has permission to access plant ${queryParams.plantId}`);
     }
 
     const lastMeasurements: Record<string, Record<string, any>> = queryParams.fieldNames.reduce((acc, field) => {
