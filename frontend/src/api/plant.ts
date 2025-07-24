@@ -31,8 +31,8 @@ export const fetchPlants = async (): Promise<Plant[] | undefined> => {
 }
 
 export const fetchPlantTypeBases = async (): Promise<PlantTypeBase[] | undefined> => {
-  return await getPaged<PlantTypeBase[], PlantTypeBase[]>('/plantTypes/searchData', {},
-    (store, _, data) => Array.of(...store, ...data),
+  return await getPaged<{ plantTypes: PlantTypeBase[] }, PlantTypeBase[]>('/plantTypes/searchData', {},
+    (store, _, data) => Array.of(...store, ...(data.plantTypes || [])),
     [])
 }
 

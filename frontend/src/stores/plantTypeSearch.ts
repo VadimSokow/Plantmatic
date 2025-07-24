@@ -33,6 +33,7 @@ export const usePlantTypeSearchStore = defineStore('plant_type_search', {
       this.error = null
       try {
         const types = await fetchPlantTypeBases()
+        console.log(types)
         if (!types) {
           this.loading = false
           this.error = 'No plant types found'
