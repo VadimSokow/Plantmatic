@@ -70,3 +70,16 @@ class Slot:
         actual_duration = duration if duration is not None else 3
         if self.pump:
             self.pump.pump_for_duration(actual_duration)
+
+    def cleanup(self):
+        if self.pump:
+            self.pump.cleanup()
+        if self.leds:
+            self.leds.cleanup()
+        if self.light_sensor:
+            self.light_sensor.cleanup()
+        if self.soil_sensor:
+            self.soil_sensor.cleanup()
+        if self.dht11_sensor:
+            self.dht11_sensor.cleanup()
+

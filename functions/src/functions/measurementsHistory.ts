@@ -1,7 +1,7 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions";
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
-import {hasReadPermForPlant} from "../helper/permission";
+import {hasReadPermForPlant, PermissionState} from "../helper/permission";
 import {InvalidQueryParameterError} from "../error/invalidQuery";
 
 app.http('measurementsHistory', {
@@ -22,9 +22,9 @@ interface MeasurementHistoryQueryParameters {
 
 async function measurements(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // resolve user
-    let userMail = handleExtractUserEmail(request)
-    if (typeof userMail !== 'string') {
-        return userMail;
+    let email = handleExtractUserEmail(request)
+    if (typeof email !== 'string') {
+        return email;
     }
 
     // extract query parameters
@@ -62,17 +62,27 @@ async function measurements(request: HttpRequest, context: InvocationContext): P
     }
 
     // check if user is allowed to access the plant
-    if (!await hasReadPermForPlant(queryParams.plantId, userMail)) {
-        context.warn(`User ${userMail} does not have permission to access plant ${queryParams.plantId}`);
-        return {
-            status: 403,
-            body: JSON.stringify({
-                error: "Forbidden",
-                message: "You do not have permission to access this plant."
-            }),
-        };
-    } else {
-        context.log(`User ${userMail} has permission to access plant ${queryParams.plantId}`);
+    switch (await hasReadPermForPlant(queryParams.plantId, email)) {
+        case PermissionState.NotFound:
+            context.warn(`Plant ${queryParams.plantId} not found for user ${email}`);
+            return {
+                status: 404,
+                body: JSON.stringify({
+                    error: "Not Found",
+                    message: `Plant with ID ${queryParams.plantId} not found.`
+                }),
+            };
+        case PermissionState.NoPermission:
+            context.warn(`User ${email} does not have permission to access plant ${queryParams.plantId}`);
+            return {
+                status: 403,
+                body: JSON.stringify({
+                    error: "Forbidden",
+                    message: "You do not have permission to access this plant."
+                }),
+            };
+        default:
+            context.log(`User ${email} has permission to access plant ${queryParams.plantId}`);
     }
 
     const offset = queryParams.page * queryParams.pageSize;

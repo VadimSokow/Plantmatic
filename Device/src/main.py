@@ -16,6 +16,8 @@ config_connection_file = "connection_config.toml"
 # Globale Variable, um das Beenden des Programms zu signalisieren
 shutdown_event = asyncio.Event()
 
+plant_manager = None
+
 def get_config_path() -> str:
     """
     Returns the path to the config directory, which is one level above the current file's directory.
@@ -54,6 +56,8 @@ async def main():
 
     # Construct config file path and initialize PlantManager
     plant_manager = PlantManager(os.path.join(config_path, config_plant_file))
+    global plant_manager # to use the global plant_manager variable. Used to call cleanup() on the manager for keyboardinterupt
+    plant_manager = PlantManager(os.path.join(config_path, config_plant_file)) # Adresse von der PlantConfig wird gebaut
 
     connection_config = toml.load_file(os.path.join(config_path, config_connection_file))
     device_client = DeviceClient(connection_config, plant_manager)
@@ -71,5 +75,9 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
+
         print("\nProgram terminated by KeyboardInterrupt (Ctrl+C).")
+        if plant_manager:
+            plant_manager.cleanup()
+
 

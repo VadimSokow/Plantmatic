@@ -146,3 +146,7 @@ class PlantManager(PlantManagerInterface):
                     if not okay:
                         logger.error(f"An Error during updating toml occurred with plant: {name}")
                         #TODO: muss hier jetzt was passieren (testen)
+
+    def cleanup(self):
+        if self.device_slots:
+            self.device_slots.cleanup()

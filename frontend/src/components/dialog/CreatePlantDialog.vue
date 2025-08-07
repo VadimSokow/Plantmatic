@@ -13,6 +13,15 @@
           variant="outlined"
         />
 
+        <v-select
+          v-model="selectedPlantSlot"
+          density="compact"
+          :items="plantSlots"
+          label="Plant Slot"
+          no-data-text="Alle Slots bereits belegt."
+          variant="outlined"
+        />
+
         <v-autocomplete
           v-model="selectedPlantType"
           chips
@@ -59,16 +68,30 @@
 </template>
 
 <script lang="ts" setup>
+  import type { PlantTypeBase } from '@/types/plant.ts'
   import { debounce } from 'lodash'
   import { computed, ref, watch } from 'vue'
+  import { useDeviceWithPlants } from '@/composition/deviceWithPlants.ts'
+  import { usePlantTypeSearchStore } from '@/stores/plantTypeSearch.ts'
 
-  export interface PlantType {
-    id?: string // PK in DB, könnte latName sein, hier generische ID
-    latName: string
-    commonName: string
-    description: string
-  // configFields: PlantConfigField[]; // Für dieses Mockup nicht benötigt
-  }
+  const plantTypeSearchStore = usePlantTypeSearchStore()
+
+  onMounted(() => {
+    plantTypeSearchStore.fetchTypes()
+  })
+
+  const props = defineProps<{
+    deviceId: string
+  }>()
+
+  const { device, createPlant: createPlantInStore } = useDeviceWithPlants(props.deviceId)
+
+  const plantSlots = computed(() => {
+    if (!device.value) {
+      return []
+    }
+    return device.value.plantSlots.filter(slot => slot.plantId === null).map(slot => slot.slotNumber)
+  })
 
   // --- Props und Emits für die Dialog-Steuerung ---
   const dialog = ref(false) // Interner Zustand für die Sichtbarkeit des Dialogs
@@ -85,60 +108,13 @@
 
   // --- Formularfelder ---
   const plantName = ref('')
-  const selectedPlantType = ref<PlantType | null>(null) // Speichert das ausgewählte PlantType-Objekt
+  const selectedPlantType = ref<PlantTypeBase | null>(null)
+  const selectedPlantSlot = ref<null | number>(null)
 
   // --- Logik für die PlantType-Suche ---
-  const plantTypeSuggestions = ref<PlantType[]>([]) // Die Liste der Vorschläge
+  const plantTypeSuggestions = ref<PlantTypeBase[]>([])
   const isSearchingPlantTypes = ref(false)
-  const searchPlantTypeQuery = ref('') // Der aktuelle Suchbegriff im Autocomplete-Feld
-
-  // Simulierter API-Aufruf für PlantType-Suche
-  // Dies ersetzt deine Azure Function, die CosmosDB abfragt
-  const mockSearchPlantTypes = async (query: string): Promise<PlantType[]> => {
-    // Simuliere eine API-Verzögerung
-    await new Promise(resolve => setTimeout(resolve, 300))
-
-    const allMockPlantTypes: PlantType[] = [
-      {
-        id: '1',
-        latName: 'Solanum lycopersicum',
-        commonName: 'Tomate',
-        description: 'Leckere rote Frucht.',
-      },
-      {
-        id: '2',
-        latName: 'Capsicum annuum',
-        commonName: 'Paprika',
-        description: 'Vielseitiges Gemüse.',
-      },
-      {
-        id: '3',
-        latName: 'Mentha spicata',
-        commonName: 'Minze',
-        description: 'Frisches Kraut für Tee.',
-      },
-      {
-        id: '4',
-        latName: 'Fragaria x ananassa',
-        commonName: 'Erdbeere',
-        description: 'Beliebte Sommerfrucht.',
-      },
-      {
-        id: '5',
-        latName: 'Ocimum basilicum',
-        commonName: 'Basilikum',
-        description: 'Aromatische Kräuter.',
-      },
-    ]
-
-    // Filtere basierend auf der Abfrage (case-insensitive und startsWith/includes)
-    const lowerCaseQuery = query.toLowerCase()
-    return allMockPlantTypes.filter(
-      type =>
-        type.commonName.toLowerCase().includes(lowerCaseQuery)
-        || type.latName.toLowerCase().includes(lowerCaseQuery),
-    )
-  }
+  const searchPlantTypeQuery = ref('')
 
   // Debounced-Funktion für die Suche, um nicht zu viele Anfragen zu senden
   const debouncedSearch = debounce(async (query: string) => {
@@ -149,7 +125,7 @@
     }
     isSearchingPlantTypes.value = true
     try {
-      plantTypeSuggestions.value = await mockSearchPlantTypes(query)
+      plantTypeSuggestions.value = plantTypeSearchStore.searchByName(query)
     } catch (error) {
       console.error('Fehler bei der PlantType-Suche:', error)
       plantTypeSuggestions.value = []
@@ -166,50 +142,38 @@
 
   // --- Validierung für den Erstellen-Button ---
   const isFormValid = computed(() => {
-    // Pflanzenname muss nicht leer sein und ein PlantType muss ausgewählt sein
     return !!plantName.value && selectedPlantType.value !== null
   })
 
-  // --- Erstellen-Funktion ---
   const createPlant = () => {
     if (!isFormValid.value) {
       console.warn('Formular ist nicht gültig.')
       return
     }
 
-    const newPlantData = {
-      name: plantName.value,
-      plantTypeId:
-        selectedPlantType.value?.id || selectedPlantType.value?.latName, // Verwende ID oder latName als Referenz
-      plantTypeName: selectedPlantType.value?.commonName, // Optional: Speichere den commonName zur Anzeige
-    // Hier könnten weitere Felder hinzugefügt werden, wenn das Formular erweitert wird
+    if (!selectedPlantType.value) {
+      console.warn('Plant type is invalid.')
     }
+    const selection = selectedPlantType.value as PlantTypeBase
 
-    console.log('Neue Pflanze erstellen:', newPlantData)
+    if (!selectedPlantSlot.value) {
+      console.warn('Plant type is invalid.')
+    }
+    const slotNumber = selectedPlantSlot.value as number
 
-    // Hier würde dein API-Aufruf zum Backend erfolgen, z.B.:
-    // plantStore.createPlant(newPlantData)
-    //   .then(() => {
-    //     console.log('Pflanze erfolgreich erstellt!');
-    //     closeDialog();
-    //     // Optional: Event emit, um die übergeordnete Komponente zu informieren
-    //     // emit('plantCreated', newPlantData);
-    //   })
-    //   .catch(err => {
-    //     console.error('Fehler beim Erstellen der Pflanze:', err);
-    //     // Fehlerbehandlung, z.B. Snackbar anzeigen
-    //   });
+    console.log('Neue Pflanze erstellen:', {
+      latName: selection.latName,
+      commonName: selection.commonName,
+      plantName: plantName.value,
+    })
+    createPlantInStore(slotNumber, selection.latName, plantName.value)
 
-    // Nach dem Konsolen-Output den Dialog schließen und Felder zurücksetzen
     closeDialog()
     plantName.value = ''
     selectedPlantType.value = null
     plantTypeSuggestions.value = []
   }
 
-  // --- Watcher zum Zurücksetzen des Suchfeldes, wenn selectedPlantType gesetzt wird ---
-  // Dies verhindert, dass der Text im Autocomplete-Feld verschwindet, wenn ein Item ausgewählt wird.
-  // Vuetify 3 Autocomplete handhabt das oft automatisch, aber es schadet nicht, es zu haben.
   watch(selectedPlantType, newValue => {
     if (newValue && newValue.commonName !== searchPlantTypeQuery.value) {
       searchPlantTypeQuery.value = newValue.commonName

@@ -5,18 +5,12 @@
       {{ plant.name }}
     </v-card-title>
     <v-card-text>
-      <p>Art: {{ plant.type.commonName }}</p>
+      <p v-if="plant.type">Art: {{ plant.type.commonName }}</p>
       <div v-for="line in fields" :key="line">
         <p>{{ line }}</p>
       </div>
     </v-card-text>
   </v-card>
-
-  <LoadAndError
-    :error="error"
-    :is-loading="isLoading"
-    @error-cleared="clearError()"
-  />
 </template>
 
 <script setup lang="ts">
@@ -33,10 +27,7 @@
 
   const {
     latestMeasurements,
-    isLoading,
-    error,
     loadLatestMeasurements,
-    clearError,
   } = useLatestPlantMeasurement(props.plant.id, Object.values(props.sensors).map(s => s.fieldName))
 
   const fields = computed(() => {

@@ -5,7 +5,7 @@
       <v-btn value="today">Heute</v-btn>
       <v-btn value="yesterday">Gestern</v-btn>
       <v-btn value="last7days">Letzte 7 Tage</v-btn>
-      <v-btn value="test">Test</v-btn>
+      <!--      <v-btn value="test">Test</v-btn>-->
     </v-btn-toggle>
 
     <!--    <v-btn :color="selectedPeriod === 'custom' ? 'primary' : ''" @click="showCustomDateRange = !showCustomDateRange">-->

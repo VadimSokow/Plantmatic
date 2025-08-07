@@ -1,4 +1,5 @@
-import type { Plant, PlantType } from '@/types/plant.ts'
+import type { Plant, PlantType, PlantTypeBase } from '@/types/plant.ts'
+import { apiClient } from '@/api/client.ts'
 import { getPaged } from '@/api/helper.ts'
 
 type ResponseData = {
@@ -27,4 +28,40 @@ export const fetchPlants = async (): Promise<Plant[] | undefined> => {
       return Array.of(...store, ...plants)
     },
     [])
+}
+
+export const fetchPlantTypeBases = async (): Promise<PlantTypeBase[] | undefined> => {
+  return await getPaged<{ plantTypes: PlantTypeBase[] }, PlantTypeBase[]>('/plantTypes/searchData', {},
+    (store, _, data) => Array.of(...store, ...(data.plantTypes || [])),
+    [])
+}
+
+export const createPlant = async (
+  deviceId: string,
+  slotNumber: number,
+  plantLatName: string,
+  newPlantName: string,
+): Promise<Plant | string> => {
+  const body = {
+    deviceId,
+    slotNumber,
+    latName: plantLatName,
+    name: newPlantName,
+  }
+  const result = await apiClient.post('/plants', body)
+  if (result.status < 200 && result.status >= 300) {
+    console.error(`Can not create Plant: ${result.status}`)
+    return 'can not create Plant'
+  }
+
+  // TODO: extract plant
+  return result.data as Plant
+}
+
+export const deletePlant = async (plantId: string): Promise<number> => {
+  const result = await apiClient.delete(`/plant/${plantId}`)
+  if (result.status < 200 || result.status >= 300) {
+    console.error(`Can not delete Plant: ${result.status}`)
+  }
+  return result.status
 }

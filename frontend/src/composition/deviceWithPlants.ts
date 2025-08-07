@@ -42,6 +42,22 @@ export function useDeviceWithPlants (deviceId: string) {
     }
   }
 
+  const createPlant = async (slot: number, latName: string, name: string): Promise<Plant | undefined> => {
+    if (!device.value) {
+      return
+    }
+
+    const result = await plantStore.createPlant(device.value.id, slot, latName, name)
+    if (!result) {
+      return undefined
+    }
+
+    // load the updated device
+    await deviceStore.loadDevice(device.value.id)
+
+    return result
+  }
+
   const clearError = () => {
     deviceStore.error = null
     plantStore.error = null
@@ -54,6 +70,7 @@ export function useDeviceWithPlants (deviceId: string) {
     error,
     combined,
     loadAllData,
+    createPlant,
     clearError,
   }
 }

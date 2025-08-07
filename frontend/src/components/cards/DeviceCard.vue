@@ -22,11 +22,11 @@
 </template>
 
 <script setup lang="ts">
-import type { DeviceWithPlants } from '@/types/device.ts'
+  import type { DeviceWithPlants } from '@/types/device.ts'
 
-const props = defineProps<{ data: DeviceWithPlants }>()
+  const props = defineProps<{ data: DeviceWithPlants }>()
 
-const { device, plants } = props.data
+  const { device, plants } = props.data
 </script>
 
 <style scoped>

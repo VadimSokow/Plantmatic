@@ -1,6 +1,4 @@
-export interface Paging {
-    page: number;
-    pageSize: number;
-    totalElements: number;
-    totalPages: number;
+export interface PagingParameters {
+    page: number
+    pageSize: number
 }

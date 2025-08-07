@@ -46,4 +46,5 @@ class Pump(PumpActuatorInterface):
 
     def cleanup(self):
         """Cleanup. Turns off the Pump."""
+        print("Cleanup: Pumpe ausgeschaltet!")
         self.pump_off()
