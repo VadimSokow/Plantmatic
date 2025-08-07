@@ -55,7 +55,6 @@ async def main():
     logger.info(f"Config path: {config_path}")
 
     # Construct config file path and initialize PlantManager
-    plant_manager = PlantManager(os.path.join(config_path, config_plant_file))
     global plant_manager # to use the global plant_manager variable. Used to call cleanup() on the manager for keyboardinterupt
     plant_manager = PlantManager(os.path.join(config_path, config_plant_file)) # Adresse von der PlantConfig wird gebaut
 
@@ -75,9 +74,8 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-
-        print("\nProgram terminated by KeyboardInterrupt (Ctrl+C).")
         if plant_manager:
             plant_manager.cleanup()
+        logger.info("\nProgram terminated by KeyboardInterrupt (Ctrl+C).")
 
 
