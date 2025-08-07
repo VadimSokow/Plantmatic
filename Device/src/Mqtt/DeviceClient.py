@@ -35,61 +35,12 @@ class DeviceClient:
             logger.info("Connected")
             #add functions to handle requests on device_clients
             device_client.on_twin_desired_properties_patch_received = self.twin_patch_handler
-            device_client.on_method_request_received = self.method_request_handler
             logger.info("DeviceClient created successfully")
             return device_client
         except Exception as e:
             logger.error("Fehler beim verbinden " + e)
             return None
 
-    def method_request_handler(self, method_request: MethodRequestEvent):
-        """
-        The Function that is called when the IoT Hub sends a direct methode Request.
-        If the function given in the methode_request is watering_sec or watering_perc the functions with this names will be called with the payload of methode_request.
-        Sends Response to IoTHub before watering:
-            200 name and payload was okay
-            404 name of function was wrong
-            400 payload was not an int
-        """
-        print("<method_request_handler>")
-        print(f"Methodenaufruf empfangen: {method_request.name} payload: {method_request.payload}")
-        methode_is_ok = True
-        payload = {"result": True, "message": "Bewässerung gestartet."}
-        status = 200
-
-        if method_request.name != "watering_sec" and method_request.name != "watering_perc":
-            print(f"Methode not found {method_request.name}")
-            methode_is_ok = False
-            payload = {"result": False, "message": "Methode not found."}
-            status = 404
-
-        #Hier Pflanze aus Json nehmen und später an die entsprechende Bewässerungsmethode übergeben
-
-        if not isinstance(method_request.payload, int):
-            print(f"Payload not right {method_request.payload}")
-            methode_is_ok = False
-            payload = {"result": False, "message": "Payload is not valide."}
-            status = 400  # Bad Request
-
-        # Antwort an IoT Hub senden
-        method_response = MethodResponse.create_from_method_request(
-            method_request, status, payload
-        )
-
-        try:
-            self.device_client.send_method_response(method_response)
-            print("Senden erfolgreich")
-
-            # Start watering
-            if methode_is_ok:
-                if method_request.name == "watering_sec":
-                    self.watering_sec(method_request.payload)  # TODO ersetzen durch funktionen
-                if method_request.name == "watering_perc":
-                    self.watering_perc(method_request.payload)
-            print("</method_request_handler>")
-        except Exception as e:
-            print(f"Fehler beim antworten {e}")
-            print("</method_request_handler>")
 
 
     def twin_patch_handler(self, patch):
@@ -132,10 +83,4 @@ class DeviceClient:
 
 
 
-    def watering_sec(sec: int):
-        # TODO wie steuer ich die Pumpe?
-        print("Bewässerung läuft für Sekunden")
 
-    def watering_perc(perc: int):
-        # Bewässern bis Prozent Bodenfeuchte
-        print("Bewässerung läuft bis Bodenfeuchte")
