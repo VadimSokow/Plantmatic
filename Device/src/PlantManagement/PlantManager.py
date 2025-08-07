@@ -19,34 +19,36 @@ def print_plant_list(plants: list[Plant]):
 
 
 class PlantManager(PlantManagerInterface):
-    def __init__(self, plant_config_path: str):
+    def __init__(self, plant_config_path: str, plant_checkup_interval = 5):
         """
         Initializes the PlantManager with a path to the plant configuration file.
         """
         logger.info(f"Initializing PlantManager with config path: {plant_config_path}")
+        self.plant_checkup_interval = plant_checkup_interval
         self.plants: list[Plant] = []
         self.new_plants: list[Plant] = None
         self.deleted_plant_names: list[str] = []
-        self.error_plants: list[dict] = [] #TODO muss das? Was wenn interval, etc -1?
+        #self.error_plants: list[dict] = [] #TODO muss das? Was wenn interval, etc -1?
         self.plant_config_path: str = plant_config_path
         self.device_client = None
         self.device_slots = DeviceSlot()
 
     async def start(self, device_client: DeviceClient, shutdown_event: Event) -> None:
         """
-        A function that monitors all the plants in this plantManager once per second.
+        A function that monitors all the plants in this plantManager once per plant_checkup_interval.
         Checks after monitoring whether the new_plants is changed and updates the plants that will be monitored.
         Sends updated plants with device_client to device_twin.
-        :param device_client the device_client object that will be used to send data to the IoT Hub.
-        :param shutdown_event when the shutdown event is set, this funktion will end. (Theoretisch!) TODO: fix shutdown_event
+        :param device_client: The device_client object that will be used to send data to the IoT Hub.
+        :param shutdown_event: When the shutdown event is set, this funktion will end.
         """
         logger.info("Starts a coroutine that monitors all plants")
         self.device_client = device_client
         self.plants = self.load_plants(self.plant_config_path)
         while not shutdown_event.is_set():
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.plant_checkup_interval)
 
             if shutdown_event.is_set():  # Nach dem Sleep nochmals prüfen
+                logger.info("Plant Monitoring stoped")
                 break
             current_time = time.time()  # Die aktuelle Zeit in Sekunden von 1970 als Float
             for p in self.plants:
@@ -88,7 +90,7 @@ class PlantManager(PlantManagerInterface):
     def push_new_plant_config(self, new_config):
         """
         Updates the plant config toml and new_plants list of the PlantManager Object.
-        :param new_config the updated plants that will be saved in the plant_config_config.
+        :param new_config: The updated plants that will be saved in the plant_config_config.
         """
         logger.debug(f"push new config")
         self.update_plant_toml(new_config)
@@ -97,7 +99,7 @@ class PlantManager(PlantManagerInterface):
     def load_plants(self, plant_config_path: str) -> list[Plant]:
         """
         Loads all plants from the plant_config_path and returns them as a List of plant objects.
-        :param plant_config_path the path of the config file that will be loaded
+        :param plant_config_path: The path of the config file that will be loaded
         :return: List of plants
         """
         logger.info(f"Loads plants to objects from: {plant_config_path}")
@@ -143,3 +145,4 @@ class PlantManager(PlantManagerInterface):
                     okay = toml.update_section_file(self.plant_config_path, name, key, value)
                     if not okay:
                         logger.error(f"An Error during updating toml occurred with plant: {name}")
+                        #TODO: muss hier jetzt was passieren (testen)

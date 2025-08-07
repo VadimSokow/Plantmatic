@@ -18,7 +18,7 @@ class Plant:
         """
         Initialize a Plant with provided values.
         :param name: The name of the Plant.
-        :param measuring_interval: The measuring interval in seconds (also used for sleep in coroutine).
+        :param measuring_interval: The measuring interval in seconds.
         :param min_humidity: The min soil moisture. Below that, watering is required.
         :param max_humidity: The max soil moisture. Above that, watering must turn off.
         :param slot_num: The slot number of the Plant.
@@ -41,15 +41,15 @@ class Plant:
 
     def to_string(self) -> str:
         """
-        Converts a Plant into a string.
+        Converts a Plant with name, measuring interval, min and max humidity and slot number into a string.
         :return: A string that represents the Plant.
         """
         return f"Plant(Name: {self.name}, Measuring_interval: {self.measuring_interval}, Min_humidity: {self.min_humidity}, Max_humidity: {self.max_humidity})"
 
     def to_dict(self) -> dict:
         """
-        Converts A this plant object into a dict.
-        :return: A dict that represents this plant
+        Converts this plant with name, measuring interval, min and max humidity and slot number into a dictionary.
+        :return: A dict that represents this plant.
         """
         logger.info(f"Make dict from plant{self.name}")
         data = {
@@ -123,7 +123,7 @@ class Plant:
         Checks if the plant can be watered.
         :param soil_moisture: Target soil moisture in percent.
         :param current_time: Current time in seconds since epoch.
-        :return: true if the plant can be watered.
+        :return: True if the plant can be watered.
         """
         # soil moisture not low enough
         if soil_moisture >= self.min_humidity:
@@ -138,31 +138,33 @@ class Plant:
 
     def monitor(self, device_client: DeviceClient, current_time: float) -> None:
         """
-        The monitor function. It will run until the coroutine is killed.
+        This function checks if the difference between the current_time and the time this plant was measured is greater than the measuring_interval of this plant,
+        If so, the plant will be measured, and the telemetry is sent using the Device_Client.
         :param device_client: The device client to push data into the cloud.
         :param current_time: The time at which this function is called.
         """
-        # Prüfen, ob schon genug Zeit vergangen ist
+        # Checks if enough time has passed
         logger.info(f"Check interval of Plant: {self.name}")
         if current_time - self.last_monitored < self.measuring_interval:
             return
 
         logger.info(f"Starts monitoring for plant: {self.name}")
-        measure_data = self.create_message()
+        measure_data = self.measure_and_create_message()
 
         device_client.send_message(measure_data)
         self.last_monitored = current_time
         logger.info(f"End of monitoring for plant: {self.name}")
 
-    def create_message(self):
+    def measure_and_create_message(self):
         """
         Creates a message to send to the cloud. It contains sensor values like temperature.
-        If the plant has a slot object this will send sensordata. If the plant has no slot object ths will send testdata.
-        :return: The message for the Azure IoTHub.
+        If the plant has a slot object, this will send sensordata. If the plant has no slot object, this will send random "testdata".
+        :return: Measured data in JSON format
         """
 
-        # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}}
+        # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}} //TODO was hiermit?
         if self.slot is not None:
+            #When the plant has a slot object, a message will be built using the sensor data from the slot.
             logger.info(f"creating Message from Slot for {self.name}")
             measurement_data = self.slot.get_all_sensor_values()
             # save the last measured soil moisture
@@ -173,36 +175,27 @@ class Plant:
             data = {f"{self.name}": measurement_data}
             data = json.dumps(data)
         else:
+            # When the plant has no slot object, a message will be built using test data.
             logger.info(f"Creating Message without Slot for {self.name}")
             measurement_data = get_measurement_test_data()
             # save the last measured soil moisture
             if measurement_data:
                 self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
             else:
-                self.current_soil_moisture = None
+                self.current_soil_moisture = None #TODO was passiert wenn da None drin steht.
             data = {f"{self.name}": measurement_data}
             data = json.dumps(data)
         logger.debug(f"Created Message : {data}")
         return data
 
-   # def __eq__(self, other):
-  #      if not isinstance(other, Plant):
- #           return False
-#        return (self.name == other.name
-                #and self.measuring_interval == other.measuring_interval
-              #  and self.min_humidity == other.min_humidity
-               # and self.max_humidity == other.max_humidity
-                #and self.slot_num == other.slot_num)
-
-   # def __hash__(self):
- #       return hash(self.name)
-
 
 def get_measurement_test_data():
     """
-    Generate some random values, which can be fed into the Azure IoTHub.
-    :return: Random data.
+    Generates random test values for temperature, humidity, soil moisture, and light intensity.
+    The values are integers between 0 and 10 and are returned as a dictionary.
+    :return: A dictionary containing randomly generated measurement data.
     """
+
     logger.info("creating message with dummy data")
     temperature_celsius = randint(0, 10)
     humidity_percent = randint(0, 10)
