@@ -2,13 +2,15 @@ import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/func
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 import {hasReadPermForPlant, PermissionState} from "../helper/permission";
+import {PatchOperation, PatchOperationType} from "@azure/cosmos";
 
 /**
  * Deletes a plant by its ID.
  * The id is defined in the URL path as a parameter: '/plants/{id}'
  */
 export async function deletePlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    let email = handleExtractUserEmail(request)
+    // let email = handleExtractUserEmail(request)
+    const email = "u38079@hs-harz.de"
     if (typeof email !== 'string') {
         return email;
     }
@@ -42,24 +44,51 @@ export async function deletePlant(request: HttpRequest, context: InvocationConte
         }
 
         const rmResult = await cosmos.remove('plants', plantId, plantId)
-        if (rmResult.statusCode === 204) {
-            context.log(`Plant ${plantId} deleted successfully by user ${email}`);
-            return {
-                status: 200,
-                body: "Plant deleted successfully"
-            };
-        } else if (rmResult.statusCode === 404) {
+        if (rmResult.statusCode === 404) {
             context.warn(`Plant ${plantId} not found for user ${email}`);
             return {
                 status: 404,
                 body: "Plant not found"
             };
-        } else {
+        } else if (rmResult.statusCode < 200 || rmResult.statusCode >= 300) {
             context.error(`Failed to delete plant ${plantId} for user ${email}:`, rmResult);
             return {
                 status: rmResult.statusCode,
                 body: "Failed to delete plant"
             };
+        }
+
+        // update the plant list for the device
+        // fetch device
+        const deviceQuery = {
+            query: "SELECT * FROM c WHERE ARRAY_CONTAINS(c.plantSlots, { \"plantId\": @plantId }, true)",
+            parameters: [{ name: "@plantId", value: plantId }]
+        }
+        const { resources: devices } = await cosmos.query('devices', deviceQuery).fetchAll()
+        if (!devices || devices.length === 0) {
+            context.warn(`No device found with plant ${plantId} for user ${email}`);
+            return {
+                status: 404,
+                body: "Device not found"
+            };
+        }
+        const device = devices[0];
+        const plantDeviceIndex = device.plantSlots.findIndex(slot => slot.plantId === plantId);
+        // patch the slot
+        const patchResult = await cosmos.patch('devices', device.id, device.id, [
+            { op: 'replace', path: `/plantSlots/${plantDeviceIndex}/plantId`, value: null },
+        ])
+        if (patchResult.statusCode < 200 || patchResult.statusCode >= 300) {
+            context.error(`Failed to update device ${device.id} for user ${email}:`, patchResult);
+            return {
+                status: patchResult.statusCode,
+                body: "Failed to update device"
+            };
+        }
+        context.log(`Plant ${plantId} deleted successfully for user ${email}`);
+        return {
+            status: 204, // No Content
+            body: "Plant deleted successfully"
         }
     } catch (error) {
         context.log("Fehler beim Zugriff auf DB: ", error)

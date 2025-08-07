@@ -3,7 +3,7 @@ import {
     Database,
     FeedOptions,
     ItemResponse,
-    PartitionKey,
+    PartitionKey, PatchOperation,
     QueryIterator,
     SqlQuerySpec
 } from "@azure/cosmos";
@@ -13,6 +13,7 @@ export interface CosmosBundle {
     db: Database
     query: (container: string, query: string | SqlQuerySpec, options?: FeedOptions) => QueryIterator<any>
     remove: (container: string, id: string, partitionKey: PartitionKey) => Promise<ItemResponse<any>>
+    patch: (container: string, id: string, partitionKey: PartitionKey, operations: PatchOperation[]) => Promise<ItemResponse<any>>
 }
 
 let cosmosInstance: CosmosBundle | null = null
@@ -36,11 +37,16 @@ function connectToCosmos(
         return db.container(container).item(id, partitionKey).delete();
     }
 
+    const patch = (container: string, id: string, partitionKey: PartitionKey, operations: PatchOperation[]) => {
+        return db.container(container).item(id, partitionKey).patch({ operations });
+    }
+
     return {
         client,
         db,
         query,
-        remove
+        remove,
+        patch
     } as CosmosBundle
 }
 
