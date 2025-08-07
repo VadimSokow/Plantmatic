@@ -33,7 +33,7 @@ def signal_handler(sig, frame):
     Signal-Handler for SIGINT (Ctrl+C) and SIGTERM/SIGINT.
     Sets the global shutdown event to stop all coroutines.
     """
-    logger.info(f"\nSignal {sig} received. Shutting down programm...")
+    logger.info(f"Signal {sig} received. Shutting down programm...")
     shutdown_event.set()
 
 
@@ -54,8 +54,8 @@ async def main():
     config_path = get_config_path()
     logger.info(f"Config path: {config_path}")
 
-    # Construct config file path and initialize PlantManager
-    global plant_manager # to use the global plant_manager variable. Used to call cleanup() on the manager for keyboardinterupt
+    # Construct the config file path and initialize PlantManager
+    global plant_manager # to use the global plant_manager variable. Used to call cleanup() on the manager for KeyboardInterrupt
     plant_manager = PlantManager(os.path.join(config_path, config_plant_file)) # Adresse von der PlantConfig wird gebaut
 
     connection_config = toml.load_file(os.path.join(config_path, config_connection_file))
@@ -76,6 +76,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         if plant_manager:
             plant_manager.cleanup()
-        logger.info("\nProgram terminated by KeyboardInterrupt (Ctrl+C).")
+        logger.info("Program terminated by KeyboardInterrupt (Ctrl+C).")
 
 

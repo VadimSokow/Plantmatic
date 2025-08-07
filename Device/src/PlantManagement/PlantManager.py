@@ -28,7 +28,6 @@ class PlantManager(PlantManagerInterface):
         self.plants: list[Plant] = []
         self.new_plants: list[Plant] = None
         self.deleted_plant_names: list[str] = []
-        #self.error_plants: list[dict] = [] #TODO muss das? Was wenn interval, etc -1?
         self.plant_config_path: str = plant_config_path
         self.device_client = None
         self.device_slots = DeviceSlot()
@@ -47,13 +46,14 @@ class PlantManager(PlantManagerInterface):
         while not shutdown_event.is_set():
             await asyncio.sleep(self.plant_checkup_interval)
 
-            if shutdown_event.is_set():  # Nach dem Sleep nochmals prüfen
+            #Checks for shutdown event is set
+            if shutdown_event.is_set():
                 logger.info("Plant Monitoring stoped")
                 break
-            current_time = time.time()  # Die aktuelle Zeit in Sekunden von 1970 als Float
+            #Getting current time since 1970
+            current_time = time.time()
             for p in self.plants:
-                # für jede Pflanze in plants gucken, ob der unterschied zwischen der letzten Messung und der jetztigen Zeit größer ist, als der Intervall.
-                # wenn, ja dann wird eine Messung ausgelöst
+                #Checking all the plants of this manager
                 p.monitor(device_client, current_time)
 
                 # Autonomous watering of the plant
@@ -64,28 +64,36 @@ class PlantManager(PlantManagerInterface):
                         # start watering the plant (async)
                         asyncio.create_task(p.water_until_target())
 
-            # Prüft, ob sich an den Pflanzen etwas geändert hat
+            # Checks, if the plants changed
             if self.new_plants is not None:
                 logger.info("Plants will be updated to new Plants")
+                #set new plants as plants that will be monitored
                 self.plants = self.new_plants
                 self.new_plants = None
 
-                plants_dict = {}
-                for plant in self.plants:
-                    plants_dict.update(plant.to_dict())
+                self.report_updated_plants()
 
-                if self.deleted_plant_names:
-                    deleted_dict = {name: None for name in self.deleted_plant_names}
-                    plants_dict.update(deleted_dict)
-                    self.deleted_plant_names = []
 
-               # if self.error_plants: TODO muss das?
-                #    for ep in self.error_plants:
-                 #       error = {ep.get("Name"): ep.get("error")}
-                  #      plants_dict.update(error)
-                   #     self.error_plants = []
+    def report_updated_plants(self):
+        """
+        Builds a dictionary containing the current plants and the plants that have been deleted.
+        The current plants are added as dictionaries using their `to_dict()` method.
+        Deleted plants are represented by their names with `None` as values. After that, the list of deleted plant names is cleared.
+        The built dictionary will be reported through the device client.
+        """
+        #
+        plants_dict = {}
+        for plant in self.plants:
+            plants_dict.update(plant.to_dict())
 
-                self.device_client.report_device_twin(plants_dict)
+        if self.deleted_plant_names:
+            deleted_dict = {name: None for name in self.deleted_plant_names}
+            plants_dict.update(deleted_dict)
+            self.deleted_plant_names = []
+
+        self.device_client.report_device_twin(plants_dict)
+
+
 
     def push_new_plant_config(self, new_config):
         """
@@ -145,7 +153,7 @@ class PlantManager(PlantManagerInterface):
                     okay = toml.update_section_file(self.plant_config_path, name, key, value)
                     if not okay:
                         logger.error(f"An Error during updating toml occurred with plant: {name}")
-                        #TODO: muss hier jetzt was passieren (testen)
+
 
     def cleanup(self):
         if self.device_slots:
