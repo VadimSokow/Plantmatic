@@ -2,15 +2,13 @@ import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/func
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 import {hasReadPermForPlant, PermissionState} from "../helper/permission";
-import {PatchOperation, PatchOperationType} from "@azure/cosmos";
 
 /**
  * Deletes a plant by its ID.
  * The id is defined in the URL path as a parameter: '/plants/{id}'
  */
 export async function deletePlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    // let email = handleExtractUserEmail(request)
-    const email = "u38079@hs-harz.de"
+    let email = handleExtractUserEmail(request)
     if (typeof email !== 'string') {
         return email;
     }
