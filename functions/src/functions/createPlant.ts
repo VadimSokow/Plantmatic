@@ -138,7 +138,7 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
         console.log("Pflanzenart: ", plantType)
 
         // create plant entry for iot hub device twin
-        const plantConfig = { slot_num: slotNumber - 1 };
+        const plantConfig = { slot_num: slotNumber - 1, measuring_interval: device.config.measuringInterval };
         plantType.configFields.forEach((field) => {
             plantConfig[field.fieldName] = field.defaultValue;
         })
