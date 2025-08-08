@@ -13,7 +13,7 @@ logger = create_logger(__name__)
 
 
 class Plant:
-    def __init__(self, name: str, measuring_interval: int, min_humidity: int, max_humidity: int, slot_num: int,
+    def __init__(self, name: str, measuring_interval: int, min_soil_moisture: int, max_soil_moisture: int, slot_num: int,
                  slot: Slot):
         """
         Initialize a Plant with provided values.
@@ -26,12 +26,12 @@ class Plant:
         """
         self.name = name
         self.measuring_interval = measuring_interval
-        self.min_humidity = min_humidity
-        self.max_humidity = max_humidity
+        self.min_soil_moisture = min_soil_moisture
+        self.max_soil_moisture = max_soil_moisture
         self.slot_num = slot_num
         self.monitoring: Task | None = None
         self.last_monitored: float = 0  # In sekunden von 1970
-        self.slot: Slot = slot
+        self.slot: Slot = slot  # if slot_num has no slot in DeviceSlot than None
 
         # Variables for autonomous pump logic
         self.is_currently_watering: bool = False  # true when plant is currently watered
@@ -44,7 +44,7 @@ class Plant:
         Converts a Plant with name, measuring interval, min and max humidity and slot number into a string.
         :return: A string that represents the Plant.
         """
-        return f"Plant(Name: {self.name}, Measuring_interval: {self.measuring_interval}, Min_humidity: {self.min_humidity}, Max_humidity: {self.max_humidity})"
+        return f"Plant(Name: {self.name}, Measuring_interval: {self.measuring_interval}, Min_soil_moisture: {self.min_soil_moisture}, Max_soil_moisture: {self.max_soil_moisture})"
 
     def to_dict(self) -> dict:
         """
@@ -55,8 +55,8 @@ class Plant:
         data = {
             self.name: {
                 "measuring_interval": self.measuring_interval,
-                "min_humidity": self.min_humidity,
-                "max_humidity": self.max_humidity,
+                "minSoilMoisture": self.min_soil_moisture,
+                "maxSoilMoisture": self.max_soil_moisture,
                 "slot_num": self.slot_num
             }
         }
@@ -71,7 +71,7 @@ class Plant:
             logger.info(f"({self.name}) Bewässerung läuft bereits, überspringe neuen Start.")
             return
 
-        logger.info(f"AUTONOM ({self.name}): Starte Bewässerungszyklus (Ziel > {self.max_humidity}%).")
+        logger.info(f"AUTONOM ({self.name}): Starte Bewässerungszyklus (Ziel > {self.max_soil_moisture}%).")
         self.is_currently_watering = True
         self.last_pump_time = time.time() # set cooldown timer
 
@@ -110,8 +110,8 @@ class Plant:
                 break
 
             # check measured soil moisture
-            if current_moisture >= self.max_humidity:
-                logger.info(f"({self.name}) Ziel-Feuchtigkeit ({self.max_humidity}%) erreicht. Stoppe Bewässerung.")
+            if current_moisture >= self.max_soil_moisture:
+                logger.info(f"({self.name}) Ziel-Feuchtigkeit ({self.max_soil_moisture}%) erreicht. Stoppe Bewässerung.")
                 break
         else:
             logger.warning(f"({self.name}) Bewässerungszyklus nach {max_watering_cycles} Zyklen beendet. Ziel nicht erreicht. Mache eine längere Pause (Cooldown).")
@@ -125,8 +125,11 @@ class Plant:
         :param current_time: Current time in seconds since epoch.
         :return: True if the plant can be watered.
         """
+        #if sensor has an error
+        if soil_moisture < 0:
+            return False
         # soil moisture not low enough
-        if soil_moisture >= self.min_humidity:
+        if soil_moisture >= self.min_soil_moisture:
             return False
         # there is still a cooldown for watering
         if (current_time - self.last_pump_time) < self.cooldown_duration:
@@ -182,7 +185,7 @@ class Plant:
             if measurement_data:
                 self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
             else:
-                self.current_soil_moisture = None #TODO was passiert wenn da None drin steht.
+                self.current_soil_moisture = None
             data = {f"{self.name}": measurement_data}
             data = json.dumps(data)
         logger.debug(f"Created Message : {data}")

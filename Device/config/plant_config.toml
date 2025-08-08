@@ -1,6 +1,9 @@
-[Baum]
-max_humidity = 8
-measuring_interval = 10
-min_humidity = 40
+[5d72abe1-e1e9-4b63-a630-21860e7af5a0]
+maxSoilMoisture = 70
+maxTemperature = 28
+measuring_interval = 60
+minSoilMoisture = 40
+minTemperature = 18
 slot_num = 0
+
 

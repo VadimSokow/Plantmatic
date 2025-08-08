@@ -38,17 +38,10 @@ class Slot:
 
         # Dict mit allen Sensorwerten bauen
         sensor_values = {}
-        if humidity_percent:
-            sensor_values[self.dht11_sensor.humidity_value_name] = humidity_percent
-
-        if temperature_c:
-            sensor_values[self.dht11_sensor.temperature_value_name] = temperature_c
-
-        if soil_moisture_percent:
-            sensor_values[self.soil_sensor.value_name] = soil_moisture_percent
-
-        if light_level_lux:
-            sensor_values[self.light_sensor.value_name] = light_level_lux
+        sensor_values[self.dht11_sensor.humidity_value_name] = humidity_percent if humidity_percent else -999
+        sensor_values[self.dht11_sensor.temperature_value_name] = temperature_c if temperature_c else -999
+        sensor_values[self.soil_sensor.value_name] = soil_moisture_percent if soil_moisture_percent else -999
+        sensor_values[self.light_sensor.value_name] = light_level_lux if light_level_lux else -999
 
         return sensor_values
 

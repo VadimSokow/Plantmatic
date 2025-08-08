@@ -58,11 +58,13 @@ class PlantManager(PlantManagerInterface):
 
                 # Autonomous watering of the plant
                 if p.current_soil_moisture is not None:
-                    # check if plant needs watering
-                    if p.is_watering_needed(p.current_soil_moisture, current_time):
-                        logger.info(f"MANAGER: Starte asynchrone Bewässerung für {p.name}")
-                        # start watering the plant (async)
-                        asyncio.create_task(p.water_until_target())
+                    #if plant has no slot no real sensor data
+                    if p.slot:
+                        # check if plant needs watering
+                        if p.is_watering_needed(p.current_soil_moisture, current_time):
+                            logger.info(f"MANAGER: Starte asynchrone Bewässerung für {p.name}")
+                            # start watering the plant (async)
+                            asyncio.create_task(p.water_until_target())
 
             # Checks, if the plants changed
             if self.new_plants is not None:
@@ -118,12 +120,13 @@ class PlantManager(PlantManagerInterface):
         for name, config in plant_config.items():
             p_name = name
             p_measuring_interval = config.get("measuring_interval")
-            p_min_humidity = config.get("min_humidity")
-            p_max_humidity = config.get("max_humidity")
+            p_min_soil_moisture = config.get("minSoilMoisture")
+            p_max_soil_moisture = config.get("maxSoilMoisture")
             p_slot_num = config.get("slot_num")
             p_slot = self.device_slots.get_slot(p_slot_num)
 
-            plant_object = Plant(p_name, p_measuring_interval, p_min_humidity, p_max_humidity, p_slot_num, p_slot)
+            plant_object = Plant(p_name, p_measuring_interval, p_min_soil_moisture, p_max_soil_moisture, p_slot_num, p_slot)
+            plant_object.to_string()
             plant_list.append(plant_object)
         return plant_list
 
