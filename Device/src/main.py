@@ -13,7 +13,7 @@ logger = create_logger(__name__)
 config_plant_file = "plant_config.toml"
 config_connection_file = "connection_config.toml"
 
-# Globale Variable, um das Beenden des Programms zu signalisieren
+#Global variable to signal program exit
 shutdown_event = asyncio.Event()
 
 plant_manager = None

@@ -130,8 +130,7 @@ class PlantManager(PlantManagerInterface):
             plant_list.append(plant_object)
         return plant_list
 
-   # def check_if_plant_is_valid(self, name, measuring_interval, min_humidity, max_humidity) -> bool:
-     #   logger.info(f"Checking Plant {name}")
+
 
     def update_plant_toml(self, new_config):
         """
