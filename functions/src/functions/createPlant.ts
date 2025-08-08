@@ -1,6 +1,7 @@
 import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/functions";
 import {getCosmosBundle} from "../helper/cosmos";
 import {handleExtractUserEmail} from "../helper/auth";
+import {getIoTHubBundle} from "../helper/iothub";
 
 
 
@@ -15,6 +16,11 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
 
         if (!cosmos) {
             return {status: 500, body: "Database not available"}
+        }
+
+        const hub = getIoTHubBundle()
+        if (!hub) {
+            return {status: 500, body: "IoT Hub not available"}
         }
 
         // some cosmos prepare
@@ -116,12 +122,37 @@ export async function createPlant(request: HttpRequest, context: InvocationConte
         const {resource: updatedDevice} = await deviceContainer.item(device.id, device.id).replace(device)
         console.log("Device aktualisiert: ", updatedDevice)
 
+        // read the plant type by latName
+        const plantTypeQuery = {
+            query: "SELECT * FROM c WHERE c.latName = @latName",
+            parameters: [{name: '@latName', value: latName}]
+        }
+        const { resources: plantTypes } = await cosmos.query("plantType", plantTypeQuery).fetchAll()
+        if (!plantTypes || plantTypes.length === 0) {
+            return {
+                status: 404,
+                body: "Pflanzenart nicht gefunden"
+            }
+        }
+        const plantType = plantTypes[0]
+        console.log("Pflanzenart: ", plantType)
+
+        // create plant entry for iot hub device twin
+        const plantConfig = { slot_num: slotNumber - 1, measuring_interval: device.config.measuringInterval };
+        plantType.configFields.forEach((field) => {
+            plantConfig[field.fieldName] = field.defaultValue;
+        })
+        const twinEntry = {
+            [plantId]: plantConfig
+        }
+
+        // now update the device twin
+        await hub.updateDesired(deviceId, twinEntry)
+
         return {
             status: 201,
             body: JSON.stringify(resource)
         }
-
-
     } catch (error) {
         context.log("Fehler beim Zugriff auf DB: ", error)
         return {

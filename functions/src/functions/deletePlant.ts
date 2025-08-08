@@ -2,15 +2,14 @@ import {app, HttpRequest, HttpResponseInit, InvocationContext} from "@azure/func
 import {handleExtractUserEmail} from "../helper/auth";
 import {getCosmosBundle} from "../helper/cosmos";
 import {hasReadPermForPlant, PermissionState} from "../helper/permission";
-import {PatchOperation, PatchOperationType} from "@azure/cosmos";
+import {getIoTHubBundle} from "../helper/iothub";
 
 /**
  * Deletes a plant by its ID.
  * The id is defined in the URL path as a parameter: '/plants/{id}'
  */
 export async function deletePlant(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-    // let email = handleExtractUserEmail(request)
-    const email = "u38079@hs-harz.de"
+    let email = handleExtractUserEmail(request)
     if (typeof email !== 'string') {
         return email;
     }
@@ -27,6 +26,11 @@ export async function deletePlant(request: HttpRequest, context: InvocationConte
         const cosmos = getCosmosBundle()
         if (!cosmos) {
             return {status: 500, body: "Database not available"}
+        }
+
+        const hub = getIoTHubBundle()
+        if (!hub) {
+            return {status: 500, body: "IoT Hub not available"}
         }
 
         const hasPermission = await hasReadPermForPlant(plantId, email)
@@ -86,6 +90,12 @@ export async function deletePlant(request: HttpRequest, context: InvocationConte
             };
         }
         context.log(`Plant ${plantId} deleted successfully for user ${email}`);
+
+        // delete the plant from device twin
+        await hub.updateDesired(device.id, {
+            [plantId]: null
+        })
+
         return {
             status: 204, // No Content
             body: "Plant deleted successfully"
