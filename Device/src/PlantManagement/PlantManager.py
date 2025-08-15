@@ -32,7 +32,7 @@ class PlantManager(PlantManagerInterface):
         self.device_client = None
         self.device_slots = DeviceSlot()
 
-    async def start(self, device_client: DeviceClient, shutdown_event: Event) -> None:
+    async def run(self, device_client: DeviceClient, shutdown_event: Event) -> None:
         """
         A function that monitors all the plants in this plantManager once per plant_checkup_interval.
         Checks after monitoring whether the new_plants is changed and updates the plants that will be monitored.

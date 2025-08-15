@@ -182,7 +182,7 @@ class Plant:
             logger.info(f"Creating Message without Slot for {self.name}")
             measurement_data = get_measurement_test_data()
             # save the last measured soil moisture
-            if measurement_data:
+            if measurement_data:                #TODO bessern werden kann nur mit slot --> da kein slot ist braucht man auch kein current soil moisture speichern?
                 self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
             else:
                 self.current_soil_moisture = None
