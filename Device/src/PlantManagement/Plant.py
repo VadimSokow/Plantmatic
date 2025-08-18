@@ -19,8 +19,8 @@ class Plant:
         Initialize a Plant with provided values.
         :param name: The name of the Plant.
         :param measuring_interval: The measuring interval in seconds.
-        :param min_humidity: The min soil moisture. Below that, watering is required.
-        :param max_humidity: The max soil moisture. Above that, watering must turn off.
+        :param min_soil_moisture: The min soil moisture. Below that, watering is required.
+        :param max_soil_moisture: The max soil moisture. Above that, watering must turn off.
         :param slot_num: The slot number of the Plant.
         :param slot: The slot object corresponding to the slot_num
         """
@@ -29,7 +29,6 @@ class Plant:
         self.min_soil_moisture = min_soil_moisture
         self.max_soil_moisture = max_soil_moisture
         self.slot_num = slot_num
-        self.monitoring: Task | None = None
         self.last_monitored: float = 0  # In sekunden von 1970
         self.slot: Slot = slot  # if slot_num has no slot in DeviceSlot than None
 
@@ -165,7 +164,6 @@ class Plant:
         :return: Measured data in JSON format
         """
 
-        # {"PLANZEN_NAME" : {"last_watered": 1748859304.620811, "temperature_celsius": 6, "humidity_percent": 4, "soil_moisture_percent": 10, "light_level_percent": 10}} //TODO was hiermit?
         if self.slot is not None:
             #When the plant has a slot object, a message will be built using the sensor data from the slot.
             logger.info(f"creating Message from Slot for {self.name}")
@@ -181,11 +179,7 @@ class Plant:
             # When the plant has no slot object, a message will be built using test data.
             logger.info(f"Creating Message without Slot for {self.name}")
             measurement_data = get_measurement_test_data()
-            # save the last measured soil moisture
-            if measurement_data:                #TODO bessern werden kann nur mit slot --> da kein slot ist braucht man auch kein current soil moisture speichern?
-                self.current_soil_moisture = measurement_data.get("soil_moisture_percent")
-            else:
-                self.current_soil_moisture = None
+            self.current_soil_moisture = None
             data = {f"{self.name}": measurement_data}
             data = json.dumps(data)
         logger.debug(f"Created Message : {data}")

@@ -4,6 +4,5 @@ maxTemperature = 28
 measuring_interval = 60
 minSoilMoisture = 40
 minTemperature = 18
-slot_num = 0
-
+slot_num = 1
 

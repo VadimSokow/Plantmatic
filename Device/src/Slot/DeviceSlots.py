@@ -14,10 +14,10 @@ from hardware.sensors.dht11_sensor import DHT11Sensor
 from Slot.slot import Slot
 
 
-class DeviceSlot:
+class DeviceSlots: #TODO umbennen DeviceSlots
     def __init__(self):
         """
-        DeviceSlot holds all the supported slots of a device.
+        DeviceSlots holds all the supported slots of a device.
         Device version 1 only supports one plant slot.
         Add more slots in "configure()" method to support more plants.
         """

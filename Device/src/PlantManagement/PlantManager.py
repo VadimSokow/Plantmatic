@@ -8,7 +8,7 @@ from PlantManagement.Plant import Plant
 from PlantManagement.PlantManagerInterface import PlantManagerInterface
 from logger import create_logger
 
-from Slot.DeviceSlot import DeviceSlot
+from Slot.DeviceSlots import DeviceSlots
 
 logger = create_logger(__name__)
 
@@ -19,18 +19,18 @@ def print_plant_list(plants: list[Plant]):
 
 
 class PlantManager(PlantManagerInterface):
-    def __init__(self, plant_config_path: str, plant_checkup_interval = 5):
+    def __init__(self, plant_config_path: str, plant_checkup_interval = 300):
         """
         Initializes the PlantManager with a path to the plant configuration file.
         """
         logger.info(f"Initializing PlantManager with config path: {plant_config_path}")
-        self.plant_checkup_interval = plant_checkup_interval
+        self.plant_checkup_interval:float = plant_checkup_interval
         self.plants: list[Plant] = []
         self.new_plants: list[Plant] = None
         self.deleted_plant_names: list[str] = []
         self.plant_config_path: str = plant_config_path
         self.device_client = None
-        self.device_slots = DeviceSlot()
+        self.device_slots = DeviceSlots()
 
     async def run(self, device_client: DeviceClient, shutdown_event: Event) -> None:
         """
